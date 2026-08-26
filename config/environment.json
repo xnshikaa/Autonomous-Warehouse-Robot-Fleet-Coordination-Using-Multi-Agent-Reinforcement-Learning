@@ -13,6 +13,7 @@
     },
 
     "human_corridors": {
-        "enabled": true
+        "enabled": true,
+        "cells": []
     }
 }
