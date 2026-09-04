@@ -15,6 +15,8 @@ import {
   ControllerType
 } from '../types/warehouse';
 import { IObservationBuilder, DefaultObservationBuilder } from './ObservationBuilder';
+import { TaskQueue } from '../taskManagement/TaskQueue';
+import { RobotAssignment } from '../taskManagement/RobotAssignment';
 
 export class WarehouseEnvironment {
   public readonly action_space = {
@@ -32,6 +34,8 @@ export class WarehouseEnvironment {
   private state: WarehouseState;
   private observationBuilder: IObservationBuilder;
   private shelfMap: Set<string> = new Set();
+  private taskQueue: TaskQueue = new TaskQueue();
+  private robotAssignment: RobotAssignment = new RobotAssignment(this.taskQueue);
 
   constructor(
     config: WarehouseConfig = { gridWidth: 20, gridHeight: 20, cellSize: 2.0 },
@@ -377,13 +381,23 @@ export class WarehouseEnvironment {
           if (x === task.pickupPos[0] && y === task.pickupPos[1] && !hasCargo) {
             hasCargo = true;
             status = 'PICKUP';
-          } else if (x === task.deliveryPos[0] && y === task.deliveryPos[1] && hasCargo) {
-            hasCargo = false;
-            status = 'DELIVERING';
-            task.status = 'COMPLETED';
-            task.completedTimestep = this.state.timestep;
-            this.state.metrics.completedTasks++;
-          } else {
+            task.status = 'IN_PROGRESS';
+          }else if (
+           x === task.deliveryPos[0] &&
+           y === task.deliveryPos[1] &&
+           hasCargo
+          ) {
+            this.robotAssignment.completeTask(
+              r,
+              task,
+              this.state.timestep
+            );
+
+  hasCargo = false;
+  status = 'IDLE';
+
+  this.state.metrics.completedTasks++;
+} else {
             status = hasCargo ? 'DELIVERING' : 'MOVING';
           }
         }
@@ -467,10 +481,8 @@ export class WarehouseEnvironment {
       robots.push({
         id,
         position: [col, row],
-        targetPosition: [col, (row + 4) % (this.config.gridHeight - 1)],
         rotation: 0,
         status: 'IDLE',
-        taskId: `T${i < 10 ? '0' : ''}${i}`,
         hasCargo: false,
         battery: 85 + (i * 3) % 15,
         path: [],
@@ -485,28 +497,62 @@ export class WarehouseEnvironment {
   }
 
   private initTasks(): void {
-    const tasks: TaskState[] = [];
-    const taskCount = Math.max(4, Math.floor(this.state.robots.length * 0.7));
+  const tasks: TaskState[] = [];
 
-    for (let i = 1; i <= taskCount; i++) {
-      const id = `T${i < 10 ? '0' : ''}${i}`;
-      const pX = (i * 3 + 1) % (this.config.gridWidth - 2);
-      const pY = (i * 2 + 2) % (this.config.gridHeight - 4);
-      const dX = [0, 4, 9, 14][i % 4];
-      const dY = this.config.gridHeight - 1;
+  // Clear any tasks left in the queue from the previous episode
+  this.taskQueue.clearQueue();
 
-      tasks.push({
-        id,
-        pickupPos: [pX, pY],
-        pickupShelfId: `S${pX + 1}`,
-        deliveryPos: [dX, dY],
-        deliveryZoneId: `D0${(i % 4) + 1}`,
-        assignedRobotId: `R${i < 10 ? '0' : ''}${i}`,
-        status: 'IN_PROGRESS',
-        createdTimestep: 0
-      });
-    }
+  // Create tasks based on the current fleet size
+  const taskCount = Math.max(
+    4,
+    Math.floor(this.state.robots.length * 0.7)
+  );
 
-    this.state.tasks = tasks;
+  for (let i = 1; i <= taskCount; i++) {
+    const id = `T${i < 10 ? '0' : ''}${i}`;
+
+    const pX =
+      (i * 3 + 1) % (this.config.gridWidth - 2);
+
+    const pY =
+      (i * 2 + 2) % (this.config.gridHeight - 4);
+
+    const dX = [0, 4, 9, 14][i % 4];
+
+    const dY = this.config.gridHeight - 1;
+
+    // Create the task as UNASSIGNED
+    const task: TaskState = {
+      id,
+      pickupPos: [pX, pY],
+      pickupShelfId: `S${pX + 1}`,
+      deliveryPos: [dX, dY],
+      deliveryZoneId: `D0${(i % 4) + 1}`,
+      status: 'UNASSIGNED',
+      createdTimestep: 0
+    };
+
+    // Add task to the warehouse task list
+    tasks.push(task);
+
+    // Add the same task to the FIFO waiting queue
+    this.taskQueue.addTask(task);
   }
+
+  // Store all generated tasks in the warehouse state
+  this.state.tasks = tasks;
+
+  // Assign waiting tasks to available robots
+  while (this.taskQueue.hasWaitingTasks()) {
+    const result =
+      this.robotAssignment.assignNextTask(
+        this.state.robots
+      );
+
+    // Stop if there are no available robots
+    if (!result) {
+      break;
+    }
+  }
+}
 }
