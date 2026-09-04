@@ -1,5 +1,10 @@
+import { TaskQueue } from '../taskManagement/TaskQueue';
+import type { TaskState } from '../types/warehouse';
+import { RobotAssignment } from '../taskManagement/RobotAssignment';
+import type { RobotState } from '../types/warehouse';
 import { WarehouseEnvironment } from '../environment/WarehouseEnvironment';
 import { Action } from '../types/warehouse';
+
 
 export interface TestResult {
   id: number;
@@ -133,7 +138,138 @@ export function runAutomatedWarehouseTests(): TestResult[] {
   return results;
 }
 
+export function runTaskQueueTest(): void {
+  const queue = new TaskQueue();
+
+  const task1: TaskState = {
+    id: 'T01',
+    pickupPos: [1, 1],
+    deliveryPos: [5, 5],
+    status: 'UNASSIGNED'
+  };
+
+  const task2: TaskState = {
+    id: 'T02',
+    pickupPos: [2, 2],
+    deliveryPos: [6, 6],
+    status: 'UNASSIGNED'
+  };
+
+  const task3: TaskState = {
+    id: 'T03',
+    pickupPos: [3, 3],
+    deliveryPos: [7, 7],
+    status: 'UNASSIGNED'
+  };
+
+  queue.addTask(task1);
+  queue.addTask(task2);
+  queue.addTask(task3);
+
+  console.log('Queue length:', queue.getQueueLength());
+  console.log('Next task:', queue.getNextTask()?.id);
+
+  queue.removeTask('T01');
+
+  console.log('Queue length after removing T01:', queue.getQueueLength());
+  console.log('Next task after removing T01:', queue.getNextTask()?.id);
+}
+
+export function runRobotAssignmentTest(): void {
+  const queue = new TaskQueue();
+  const assignment = new RobotAssignment(queue);
+
+  const task: TaskState = {
+    id: 'T01',
+    pickupPos: [2, 3],
+    deliveryPos: [8, 8],
+    status: 'UNASSIGNED'
+  };
+
+  const robot: RobotState = {
+    id: 'R01',
+    position: [0, 0],
+    rotation: 0,
+    status: 'IDLE',
+    hasCargo: false,
+    battery: 100,
+    path: [],
+    safetyAlert: false
+  };
+
+  queue.addTask(task);
+
+  console.log('--- BEFORE ASSIGNMENT ---');
+  console.log('Queue length:', queue.getQueueLength());
+  console.log('Robot status:', robot.status);
+  console.log('Robot task:', robot.taskId);
+
+  const result = assignment.assignNextTask([robot]);
+
+  console.log('--- AFTER ASSIGNMENT ---');
+  console.log('Assigned robot:', result?.robot.id);
+  console.log('Assigned task:', result?.task.id);
+  console.log('Task status:', task.status);
+  console.log('Task assigned robot:', task.assignedRobotId);
+  console.log('Robot status:', robot.status);
+  console.log('Robot task:', robot.taskId);
+  console.log('Robot target:', robot.targetPosition);
+  console.log('Queue length:', queue.getQueueLength());
+
+  assignment.completeTask(robot, task, 100);
+
+  console.log('--- AFTER COMPLETION ---');
+  console.log('Task status:', task.status);
+  console.log('Robot status:', robot.status);
+  console.log('Robot task:', robot.taskId);
+}
+
+export function runTaskIntegrationTest(): void {
+  const env = new WarehouseEnvironment();
+
+  const state = env.getState();
+
+  console.log('--- TASK INTEGRATION TEST ---');
+
+  console.log('Total robots:', state.robots.length);
+  console.log('Total tasks:', state.tasks.length);
+
+  console.log(
+    'Assigned tasks:',
+    state.tasks.filter(task => task.status === 'ASSIGNED').length
+  );
+
+  console.log(
+    'Unassigned tasks:',
+    state.tasks.filter(task => task.status === 'UNASSIGNED').length
+  );
+
+  console.log('--- TASK DETAILS ---');
+
+  state.tasks.forEach(task => {
+    console.log(
+      task.id,
+      '| Status:', task.status,
+      '| Robot:', task.assignedRobotId
+    );
+  });
+
+  console.log('--- ROBOT DETAILS ---');
+
+  state.robots.forEach(robot => {
+    console.log(
+      robot.id,
+      '| Status:', robot.status,
+      '| Task:', robot.taskId,
+      '| Target:', robot.targetPosition
+    );
+  });
+}
+
 // Automatically expose on window for browser developer console execution
 if (typeof window !== 'undefined') {
   (window as any).runWarehouseTests = runAutomatedWarehouseTests;
+  (window as any).runTaskQueueTest = runTaskQueueTest;
+  (window as any).runRobotAssignmentTest = runRobotAssignmentTest;
+  (window as any).runTaskIntegrationTest = runTaskIntegrationTest;
 }
