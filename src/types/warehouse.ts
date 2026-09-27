@@ -11,7 +11,7 @@
  * NOT a 5th neural-network policy action.
  */
 
-export type AlgorithmType = 'QMIX' | 'IQL' | 'GREEDY_ASTAR';
+export type AlgorithmType = 'QMIX' | 'IQL' | 'GREEDY_ASTAR' | 'DEMO';
 
 export type ControllerType = 'TEST_CONTROLLER' | 'DEMO_CONTROLLER' | 'RL_BACKEND';
 
@@ -138,6 +138,13 @@ export interface WarehouseMetrics {
   fps: number;
 }
 
+export interface PolicyTelemetry {
+  source: 'QMIX' | 'DEMO';
+  checkpointLoaded: boolean;
+  trained: boolean;
+  checkpointPath?: string | null;
+}
+
 export interface ShelfState {
   id: string;
   gridPos: [number, number];
@@ -158,6 +165,7 @@ export interface WarehouseState {
   recentCollisions: ConflictEvent[];
   lastActionTraces?: ActionEventTrace[];
   metrics: WarehouseMetrics;
+  policy?: PolicyTelemetry;
   isDemoMode: boolean;
   safetyOverrideActive: boolean;
   isConnectedToBackend: boolean;

@@ -4,10 +4,13 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 from collections import deque
 from typing import Any
 
 from src.ai.environment import WarehouseEnvironment
+from src.marl.environment_adapter import MARLEnvironmentAdapter
+from src.marl.qmix_controller import QMIXController
 
 try:
     from fastapi import WebSocket, WebSocketDisconnect
@@ -19,10 +22,10 @@ except ImportError:  # pragma: no cover - optional backend dependency
 
 
 def _next_policy_actions(environment: WarehouseEnvironment) -> dict[int, int]:
-    """Choose one action per robot for the live bridge.
+    """Choose deterministic demo actions for the optional visual fallback.
 
-    This is only a small deterministic controller for the visualizer. Movement
-    itself remains exclusively in ``WarehouseEnvironment.step``.
+    The default live bridge uses ``QMIXController`` instead. Movement itself
+    remains exclusively in ``WarehouseEnvironment.step`` in both modes.
     """
     actions: dict[int, int] = {}
     static_blocked = set(environment.get_active_layout().obstacles) | set(environment.get_active_layout().human_corridors)
@@ -80,8 +83,18 @@ def _planned_path(environment: WarehouseEnvironment, robot, extra_blocked=()) ->
     return path
 
 
-def build_state_payload(environment: WarehouseEnvironment) -> dict[str, Any]:
+def build_state_payload(
+    environment: WarehouseEnvironment,
+    policy_telemetry: dict[str, object] | None = None,
+) -> dict[str, Any]:
     """Build a JSON snapshot matching the existing React state contract."""
+    policy = policy_telemetry or {
+        "source": "QMIX",
+        "checkpointLoaded": False,
+        "trained": False,
+        "checkpointPath": None,
+    }
+    is_qmix = policy.get("source") == "QMIX"
     layout = environment.get_active_layout()
     tasks = [{
         "id": f"T{task.task_id:02d}", "pickupPos": list(task.pickup_position),
@@ -116,7 +129,9 @@ def build_state_payload(environment: WarehouseEnvironment) -> dict[str, Any]:
     step = environment.episode_manager.current_step
     return {
         "type": "state_update", "timestep": step, "episode": environment.episode,
-        "algorithm": "QMIX", "controllerType": "RL_BACKEND",
+        "algorithm": "QMIX" if is_qmix else "DEMO",
+        "controllerType": "RL_BACKEND" if is_qmix else "DEMO_CONTROLLER",
+        "policy": policy,
         "config": {"gridWidth": layout.width, "gridHeight": layout.height, "cellSize": 1, "layoutId": layout.layout_id},
         "layout": layout.to_dict(), "robots": robots,
         "shelves": [{"id": f"S{i:02d}", "gridPos": list(c), "levels": 1, "aisleId": "LAYOUT"}
@@ -134,19 +149,55 @@ def build_state_payload(environment: WarehouseEnvironment) -> dict[str, Any]:
                      "movementSteps": sum(r.last_executed_action is not None for r in environment.robots),
                      "idleRobotSteps": sum(r.last_executed_action is None for r in environment.robots),
                      "timestep": step, "episode": environment.episode, "reward": 0, "fps": 0},
-        "safetyOverrideActive": bool(events), "isDemoMode": False, "isConnectedToBackend": True,
+        "safetyOverrideActive": bool(events), "isDemoMode": not is_qmix,
+        "isConnectedToBackend": True,
     }
 
 
-def create_app(environment: WarehouseEnvironment | None = None, interval_seconds: float = 0.1):
-    """Create the optional FastAPI app expected by ``PythonWebSocketProvider``."""
+def create_app(
+    environment: WarehouseEnvironment | None = None,
+    interval_seconds: float = 0.1,
+    policy_source: str = "qmix",
+    checkpoint_path: str | None = None,
+):
+    """Create the FastAPI app used by the visualizer.
+
+    ``policy_source="qmix"`` is the default and routes live actions through
+    ``MARLEnvironmentAdapter`` and ``QMIXController``. Use
+    ``policy_source="demo"`` only for a deterministic visual fallback.
+    """
     try:
         from fastapi import FastAPI
     except ImportError as error:  # pragma: no cover
         raise RuntimeError("FastAPI is required for the WebSocket bridge; install requirements.txt.") from error
+    policy_source = policy_source.lower().strip()
+    if policy_source not in {"qmix", "demo"}:
+        raise ValueError("policy_source must be 'qmix' or 'demo'")
+
     env = environment or WarehouseEnvironment(load_layout_tasks=True)
     env.reset()
+    adapter = MARLEnvironmentAdapter(environment=env)
+    checkpoint_path = checkpoint_path or os.environ.get("QMIX_CHECKPOINT")
+    qmix_controller = (
+        QMIXController(
+            adapter,
+            checkpoint_path=checkpoint_path,
+            epsilon=float(os.environ.get("QMIX_EPSILON", "0")),
+        )
+        if policy_source == "qmix"
+        else None
+    )
     app = FastAPI(title="Warehouse Environment Backend")
+
+    def current_policy() -> dict[str, object]:
+        if qmix_controller is not None:
+            return qmix_controller.telemetry
+        return {
+            "source": "DEMO",
+            "checkpointLoaded": False,
+            "trained": False,
+            "checkpointPath": None,
+        }
 
     @app.get("/health")
     async def health():
@@ -154,7 +205,7 @@ def create_app(environment: WarehouseEnvironment | None = None, interval_seconds
 
     @app.get("/state")
     async def state():
-        return build_state_payload(env)
+        return build_state_payload(env, current_policy())
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
@@ -168,6 +219,8 @@ def create_app(environment: WarehouseEnvironment | None = None, interval_seconds
                         env.reset()
                     elif command.get("type") == "set_fleet_size":
                         env.set_num_robots(int(command["size"]))
+                        if qmix_controller is not None:
+                            qmix_controller.reset_for_fleet()
                     elif command.get("type") == "pause":
                         paused = True
                     elif command.get("type") == "resume":
@@ -176,10 +229,17 @@ def create_app(environment: WarehouseEnvironment | None = None, interval_seconds
                         delay = max(0.01, float(interval_seconds) / max(0.1, float(command.get("speed", 1))))
                 except asyncio.TimeoutError:
                     if not paused:
-                        _, _, terminated, _ = env.step(_next_policy_actions(env))
+                        actions = (
+                            qmix_controller.select_actions()
+                            if qmix_controller is not None
+                            else _next_policy_actions(env)
+                        )
+                        _, _, terminated, _ = adapter.step(actions)
                         if terminated:
                             env.reset()
-                        await websocket.send_json(build_state_payload(env))
+                        await websocket.send_json(
+                            build_state_payload(env, current_policy())
+                        )
         except WebSocketDisconnect:
             return
 

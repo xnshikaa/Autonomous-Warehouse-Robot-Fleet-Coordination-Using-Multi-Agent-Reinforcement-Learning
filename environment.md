@@ -49,8 +49,20 @@ telemetry. Layout switching is followed by `reset()`.
 ## JavaScript/Python connection
 
 `src/api/warehouse_backend.py` serializes the environment into the existing
-React `WarehouseState` shape and provides an optional FastAPI WebSocket at
+React `WarehouseState` shape and provides a FastAPI WebSocket at
 `ws://127.0.0.1:8000/ws`, which matches `src/api/PythonWebSocketProvider.ts`.
+The live action path now uses the same environment instance as the telemetry:
+
+```text
+QMIXController -> MARLEnvironmentAdapter -> WarehouseEnvironment.step()
+```
+
+This means QMIX actions enter the real pre-movement safety hook, and the
+resulting robot positions, rewards, overrides, and events are sent to the UI.
+The adapter is the interface between the warehouse environment and QMIX or an
+external EPyMARL loop. It exposes per-agent observations, action dictionaries,
+rewards, termination, and centralized global state.
+
 Run it after installing dependencies with:
 
 ```text
@@ -58,8 +70,24 @@ python -m src.api.warehouse_backend
 ```
 
 The bridge also supports the provider's `reset`, `pause`, `resume`, and
-`set_speed` messages. It is telemetry/control glue only; QMIX action selection
-and training remain in the existing MARL layer.
+`set_speed` messages. Fleet-size changes rebuild the QMIX network dimensions.
+Use `policy_source="demo"` only when a deterministic visual fallback is
+needed. The default is `policy_source="qmix"`.
+
+The default QMIX controller has no trained checkpoint in this repository. It
+therefore proves the end-to-end policy-to-simulator connection using the
+learner's initial weights, but it is not expected to show learned task
+completion. Set `QMIX_CHECKPOINT` to a compatible PyTorch checkpoint to run a
+trained policy:
+
+```powershell
+$env:QMIX_CHECKPOINT = "C:\path\to\qmix_checkpoint.pt"
+python -m src.api.warehouse_backend
+```
+
+The checkpoint must contain an `agent_network` state dictionary and may contain
+a `mixer` state dictionary. `QMIXTrainer` is the in-repository training example;
+EPyMARL itself is not vendored.
 
 ## Tests
 
@@ -74,6 +102,11 @@ corridors, dimensions/bounds, active-layout and robot-state access, target
 cells, blocked movement, pre-movement safety, telemetry, layout switching,
 reset isolation, and JSON frontend payloads.
 
-The WebSocket bridge requires the optional `fastapi` and `uvicorn` dependencies
-listed in `requirements.txt`. EPyMARL itself is not vendored in this repository;
-the existing QMIX-ready adapter remains the supported training integration.
+`tests/test_qmix_controller.py` covers live QMIX action selection through the
+shared adapter and environment. `tests/test_environment_adapter.py` also
+covers wrapping an existing live environment and fleet resizing.
+
+The WebSocket bridge requires the `fastapi` and `uvicorn` dependencies listed
+in `requirements.txt`. PyTorch is required by the QMIX learner. EPyMARL itself
+is not vendored; the adapter is the supported integration boundary for an
+external EPyMARL training loop.

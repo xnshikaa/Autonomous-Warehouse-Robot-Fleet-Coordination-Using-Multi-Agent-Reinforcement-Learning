@@ -6,14 +6,32 @@ class MARLEnvironmentAdapter:
     Adapter between the existing warehouse environment and
     a multi-agent RL training interface.
 
-    This keeps the Week 3 WarehouseEnvironment unchanged while
-    exposing observations, actions, rewards, and global state
-    in a structure suitable for later QMIX/EPyMARL integration.
+    This keeps the warehouse environment as the source of truth for movement
+    and safety while exposing the multi-agent interface consumed by QMIX and
+    compatible external training loops.
     """
 
-    def __init__(self, num_agents=5, max_steps=100, layout_id=None):
-        self.num_agents = num_agents
+    def __init__(
+        self,
+        num_agents=5,
+        max_steps=100,
+        layout_id=None,
+        environment=None,
+    ):
+        """Create an adapter around a new or existing warehouse environment.
 
+        Passing an existing environment is important for the live backend:
+        the UI and the QMIX policy then operate on exactly the same episode
+        state instead of maintaining two simulations.
+        """
+        if environment is not None:
+            if not isinstance(environment, WarehouseEnvironment):
+                raise TypeError("environment must be a WarehouseEnvironment")
+            self.environment = environment
+            self.num_agents = environment.num_robots
+            return
+
+        self.num_agents = num_agents
         self.environment = WarehouseEnvironment(
             num_robots=num_agents,
             max_steps=max_steps,
@@ -77,7 +95,13 @@ class MARLEnvironmentAdapter:
     def get_num_agents(self):
         """Return the number of cooperative agents."""
 
-        return self.num_agents
+        return self.environment.num_robots
+
+    def set_num_agents(self, num_agents):
+        """Resize the shared environment and keep the adapter in sync."""
+
+        self.environment.set_num_robots(num_agents)
+        self.num_agents = self.environment.num_robots
 
     def get_active_layout(self):
         return self.environment.get_active_layout()
