@@ -11,12 +11,13 @@ class MARLEnvironmentAdapter:
     in a structure suitable for later QMIX/EPyMARL integration.
     """
 
-    def __init__(self, num_agents=5, max_steps=100):
+    def __init__(self, num_agents=5, max_steps=100, layout_id=None):
         self.num_agents = num_agents
 
         self.environment = WarehouseEnvironment(
             num_robots=num_agents,
-            max_steps=max_steps
+            max_steps=max_steps,
+            layout_id=layout_id,
         )
 
     def reset(self):
@@ -77,3 +78,9 @@ class MARLEnvironmentAdapter:
         """Return the number of cooperative agents."""
 
         return self.num_agents
+
+    def get_active_layout(self):
+        return self.environment.get_active_layout()
+
+    def set_layout(self, layout_id):
+        self.environment.set_layout(layout_id)
