@@ -71,13 +71,30 @@ QMIX policy -> proposed action -> SafetyLayer -> movement API
 An override can be passed to the existing project logger through the optional
 `logger` argument; the core logic remains independently testable.
 
-## Current dependencies and limitations
+## Week 4 environment integration
 
-The repository still lacks the completed warehouse/grid layout,
-production robot movement API, and final coordinate/orientation semantics.
-It also has no final corridor cell annotations. Supplying those external
-inputs should replace the configuration data and test adapter, not require a
-rewrite of the Corridor Module or Safety Layer.
+The Week 4 environment now supplies the production integration boundary:
+
+- `src/warehouse/layouts.py` owns validated layout data, dimensions, obstacles,
+  robot starts, tasks, and human-corridor annotations.
+- `WarehouseEnvironment` rebuilds the `CorridorModule` whenever the active
+  layout changes and supplies its real `get_target_cell` movement API to the
+  `SafetyLayer`.
+- `WarehouseEnvironment.step()` checks every proposed action before changing
+  any robot position, then records the final safety event and exposes it to
+  the live backend telemetry.
+- The existing logger in `src/infrastructure/logger.py` now receives every
+  final override with robot ID, current cell, proposed action, target cell,
+  final action, reason, episode, and timestep.
+
+The test-only movement adapter remains in `tests/test_safety_layer.py` for
+isolated unit coverage. The live integration tests use the real Week 4 layout
+library and movement provider instead of invented corridor coordinates.
+
+The remaining project limitation is that the layouts are simulation data, not
+physical sensor input. A future runtime layout provider can be passed through
+the existing `LayoutLibrary`/`WarehouseEnvironment` boundary without changing
+the Corridor Module or Safety Layer.
 
 This simulation safety gate is not ISO certification and does not replace
 hardware emergency stops, sensors, or other required personnel-protection

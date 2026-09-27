@@ -1,22 +1,35 @@
-# Python virtual environment
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+lerna-debug.log*
+
+node_modules
+dist
+dist-ssr
+*.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+.idea
+.DS_Store
+*.suo
+*.ntvsca
+*.njsproj
+*.sln
+*.sw?
+
+# Python & MLflow
 .venv/
 venv/
 env/
-
-# Python cache files
+mlruns/
+mlflow.db*
 __pycache__/
-*.py[cod]
-
-# Pytest cache
+*.pyc
 .pytest_cache/
-
-# Generated log files
-logs/*.log
-
-# IDE files
-.vscode/
-.idea/
-
-# OS files
-.DS_Store
-Thumbs.db
+artifacts/checkpoints/

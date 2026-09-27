@@ -104,10 +104,30 @@ def log_collision(logger, robot_id):
     )
 
 
-def log_safety_override(logger, robot_id, reason):
-    """Log when the safety layer overrides a robot action."""
+def log_safety_override(
+    logger,
+    robot_id,
+    reason,
+    *,
+    current_cell=None,
+    proposed_action=None,
+    target_cell=None,
+    final_action=None,
+    episode=None,
+    timestep=None,
+):
+    """Log a complete safety override event.
+
+    The optional event fields preserve compatibility with existing callers
+    while allowing the live environment to log enough context for audit and
+    replay.
+    """
     logger.warning(
-        f"Safety override | robot_id={robot_id} | reason={reason}"
+        "Safety override | "
+        f"robot_id={robot_id} | reason={reason} | "
+        f"current_cell={current_cell} | proposed_action={proposed_action} | "
+        f"target_cell={target_cell} | final_action={final_action} | "
+        f"episode={episode} | timestep={timestep}"
     )
 
 
