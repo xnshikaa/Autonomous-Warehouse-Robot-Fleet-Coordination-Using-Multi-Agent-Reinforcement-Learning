@@ -141,28 +141,43 @@ The visualizer connects to `ws://localhost:8000/ws` and expects JSON payloads co
 
 ---
 
-## 🔗 Connecting to Python RL (QMIX) Backend Later
+## 🔗 Python RL (QMIX) Connection
 
-When ready to connect your Python Gym/PyMARL QMIX environment:
+The Week 4 Python backend is now connected to the simulator. Its live action
+path is:
 
-1. Create a simple FastAPI WebSocket endpoint in Python:
-   ```python
-   from fastapi import FastAPI, WebSocket
-   import asyncio
+```text
+QMIXController -> MARLEnvironmentAdapter -> WarehouseEnvironment.step()
+                                                    |
+                                      movement + safety + rewards
+```
 
-   app = FastAPI()
+The adapter is the small integration boundary that translates the warehouse
+environment into the multi-agent interface expected by QMIX or an external
+EPyMARL training loop. It keeps the frontend, policy, and environment on the
+same episode state. The backend uses the QMIX learner for action selection by
+default; `policy_source="demo"` remains available as a deterministic fallback.
 
-   @app.websocket("/ws")
-   async def websocket_endpoint(websocket: WebSocket):
-       await websocket.accept()
-       while True:
-           # Get current state snapshot from Python QMIX environment
-           state = env.get_warehouse_state()
-           await websocket.send_json(state)
-           await asyncio.sleep(0.1) # 10 Hz telemetry sync
-   ```
-2. Start the Python server on port 8000: `uvicorn main:app --port 8000`.
-3. The Three.js frontend will automatically connect to `ws://localhost:8000/ws` and transition from `DEMO MODE` to `LIVE BACKEND`.
+Start the backend with:
+
+```powershell
+python -m src.api.warehouse_backend
+```
+
+The UI connects to `ws://localhost:8000/ws`. The `/state` response includes
+`policy.source`, `policy.checkpointLoaded`, and `policy.trained`. The repository
+does not currently contain a trained QMIX checkpoint, so the default live
+connection is a real QMIX inference path with initial (untrained) weights. A
+trained checkpoint can be supplied with:
+
+```powershell
+$env:QMIX_CHECKPOINT = "C:\path\to\qmix_checkpoint.pt"
+python -m src.api.warehouse_backend
+```
+
+The checkpoint format is a PyTorch dictionary containing `agent_network` and,
+optionally, `mixer` state dictionaries. `QMIXTrainer` remains the in-repo
+training example; EPyMARL is not vendored here.
 
 ---
 
@@ -174,7 +189,11 @@ When ready to connect your Python Gym/PyMARL QMIX environment:
 
 ---
 
-## 🎯 Recommended Next Step
+## 🎯 Current Status
 
-Build the Python Gym / PyMARL environment backend with QMIX action selection and broadcast telemetry snapshots over `ws://localhost:8000/ws` to visualize live RL training/evaluation runs!
+The simulator, Python environment, QMIX inference bridge, safety checks, and
+WebSocket telemetry are implemented. The remaining model-dependent step is to
+train a policy or connect an externally trained EPyMARL checkpoint; until then
+the UI correctly reports `QMIX: UNTRAINED` when the default controller is used.
+
 

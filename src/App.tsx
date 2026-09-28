@@ -44,8 +44,7 @@ export default function App() {
   };
 
   const handleFleetSizeChange = (size: number) => {
-    const fp = getFallbackProvider();
-    if (fp) fp.setFleetSize(size);
+    providerRef.current?.setFleetSize(size);
   };
 
   const handlePauseToggle = () => {

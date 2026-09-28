@@ -25,6 +25,8 @@ dist-ssr
 
 # Python & MLflow
 .venv/
+venv/
+env/
 mlruns/
 mlflow.db*
 __pycache__/

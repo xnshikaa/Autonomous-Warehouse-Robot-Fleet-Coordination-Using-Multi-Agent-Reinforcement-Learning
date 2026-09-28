@@ -40,6 +40,9 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
   isPresentationMode
 }) => {
   const { metrics, isConnectedToBackend, safetyOverrideActive } = state;
+  const policyLabel = state.policy?.source === 'QMIX'
+    ? (state.policy.trained ? 'QMIX: CHECKPOINT' : 'QMIX: UNTRAINED')
+    : 'DEMO CONTROLLER';
 
   return (
     <div className="absolute inset-0 pointer-events-none z-30 flex flex-col justify-between p-4 font-mono text-xs">
@@ -71,11 +74,11 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
             </span>
 
             <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700/80 text-slate-300">
-              POLICY: SIMULATION CONTROLLER
+              POLICY: {policyLabel}
             </span>
 
             <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-bold">
-              TARGET: QMIX READY
+              TARGET: QMIX CONNECTED
             </span>
           </div>
 
@@ -134,7 +137,7 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
         <div className="w-full max-w-xl mx-auto pointer-events-auto glass-panel border border-amber-500/50 rounded-xl p-2.5 bg-amber-500/10 flex items-center justify-between text-amber-400 text-xs shadow-2xl animate-pulse">
           <div className="flex items-center space-x-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span className="font-bold">SAFETY OVERRIDE TRIGGERED $\rightarrow$ WAIT</span>
+            <span className="font-bold">SAFETY OVERRIDE TRIGGERED → WAIT</span>
           </div>
           <span className="text-[10px] text-amber-300">DETERMINISTIC CONFLICT RESOLUTION</span>
         </div>
