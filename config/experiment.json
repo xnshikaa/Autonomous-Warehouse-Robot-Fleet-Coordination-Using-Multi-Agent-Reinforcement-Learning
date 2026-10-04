@@ -1,0 +1,7 @@
+{
+    "experiment_name": "qmix_baseline",
+    "algorithm": "QMIX",
+    "num_robots": 5,
+    "random_seed": 42,
+    "episodes": 1000
+}
