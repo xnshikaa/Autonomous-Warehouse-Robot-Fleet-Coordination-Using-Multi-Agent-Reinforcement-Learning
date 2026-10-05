@@ -38,6 +38,7 @@ export class DemoController implements IController {
       }
 
       const path = this.findBFSPath([x, y], [targetX, targetY], gridWidth, gridHeight, shelfSet);
+      robot.path = path ?? [];
 
       if (path && path.length > 1) {
         const nextCell = path[1];
