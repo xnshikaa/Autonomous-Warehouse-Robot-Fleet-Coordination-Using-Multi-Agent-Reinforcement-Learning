@@ -4,6 +4,8 @@ This document summarizes the Week 5 Member 3 evaluation work prepared in the
 isolated `week5-work` folder. It is intended as a handoff document for the
 next team member and for integration into the overall project.
 
+Note: Real time testing/episode based tracing will be performed after week6 merge and evaluation needs to be redone then. 
+
 ## Scope
 
 The Week 5 evaluation implementation covers:
