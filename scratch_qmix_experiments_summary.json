@@ -1,0 +1,114 @@
+[
+  {
+    "name": "Run A (Baseline)",
+    "run_name": "qmix_run_A_baseline",
+    "run_id": "2395b1fc83394d198ea37e8327edc5bd",
+    "params": {
+      "lr": 0.001,
+      "batch_size": 32,
+      "epsilon_end": 0.05,
+      "target_update_interval": 10
+    },
+    "metrics": {
+      "mean_reward": -644.6686666666666,
+      "best_reward": -270.56,
+      "early_mean_reward": -475.21400000000006,
+      "late_mean_reward": -880.1499999999999,
+      "reward_improvement": -404.9359999999998,
+      "mean_completion": 0.0,
+      "late_mean_completion": 0.0,
+      "mean_conflicts": 132.3,
+      "early_mean_conflicts": 100.1,
+      "late_mean_conflicts": 178.7,
+      "conflict_reduction": -78.6,
+      "mean_loss": 2590774.9883186505,
+      "initial_loss": 348.45077175564234,
+      "final_loss": 4656093.0125
+    },
+    "latest_checkpoint": "artifacts/checkpoints\\qmix\\2395b1fc83394d198ea37e8327edc5bd\\latest"
+  },
+  {
+    "name": "Run B (Lower Learning Rate 3e-4)",
+    "run_name": "qmix_run_B_lr3e4",
+    "run_id": "cd89dc76619e4b60af8da1b5c1ade6ca",
+    "params": {
+      "lr": 0.0003,
+      "batch_size": 32,
+      "epsilon_end": 0.05,
+      "target_update_interval": 10
+    },
+    "metrics": {
+      "mean_reward": -399.7129999999999,
+      "best_reward": -144.09999999999997,
+      "early_mean_reward": -489.64000000000004,
+      "late_mean_reward": -304.97399999999993,
+      "reward_improvement": 184.6660000000001,
+      "mean_completion": 0.0,
+      "late_mean_completion": 0.0,
+      "mean_conflicts": 83.48333333333333,
+      "early_mean_conflicts": 103.2,
+      "late_mean_conflicts": 59.5,
+      "conflict_reduction": 43.7,
+      "mean_loss": 733.1729417267551,
+      "initial_loss": 360.9556240505642,
+      "final_loss": 189.43334045410157
+    },
+    "latest_checkpoint": "artifacts/checkpoints\\qmix\\cd89dc76619e4b60af8da1b5c1ade6ca\\latest"
+  },
+  {
+    "name": "Run C (Faster Exploration & Target Sync 5)",
+    "run_name": "qmix_run_C_fast_sync",
+    "run_id": "6ca54518b614411ebef03112cdf561ad",
+    "params": {
+      "lr": 0.0005,
+      "batch_size": 32,
+      "epsilon_end": 0.01,
+      "target_update_interval": 5
+    },
+    "metrics": {
+      "mean_reward": -736.973,
+      "best_reward": -270.42000000000013,
+      "early_mean_reward": -483.6240000000001,
+      "late_mean_reward": -925.5759999999998,
+      "reward_improvement": -441.9519999999997,
+      "mean_completion": 0.0,
+      "late_mean_completion": 0.0,
+      "mean_conflicts": 149.31666666666666,
+      "early_mean_conflicts": 101.4,
+      "late_mean_conflicts": 191.2,
+      "conflict_reduction": -89.79999999999998,
+      "mean_loss": 10167622.786612628,
+      "initial_loss": 364.32850138346356,
+      "final_loss": 6768464.1171875
+    },
+    "latest_checkpoint": "artifacts/checkpoints\\qmix\\6ca54518b614411ebef03112cdf561ad\\latest"
+  },
+  {
+    "name": "Run D (Refined Combination: lr 8e-4, batch 64, sync 5)",
+    "run_name": "qmix_run_D_refined_best",
+    "run_id": "3f1553055ba04a13bf297b2d3b97e746",
+    "params": {
+      "lr": 0.0008,
+      "batch_size": 64,
+      "epsilon_end": 0.02,
+      "target_update_interval": 5
+    },
+    "metrics": {
+      "mean_reward": -406.74966666666666,
+      "best_reward": -34.74,
+      "early_mean_reward": -488.64400000000006,
+      "late_mean_reward": -182.96999999999997,
+      "reward_improvement": 305.6740000000001,
+      "mean_completion": 0.0,
+      "late_mean_completion": 0.0,
+      "mean_conflicts": 85.68333333333334,
+      "early_mean_conflicts": 103.0,
+      "late_mean_conflicts": 36.5,
+      "conflict_reduction": 66.5,
+      "mean_loss": 1032.4803378281067,
+      "initial_loss": 310.751028621898,
+      "final_loss": 194.76631717681886
+    },
+    "latest_checkpoint": "artifacts/checkpoints\\qmix\\3f1553055ba04a13bf297b2d3b97e746\\latest"
+  }
+]

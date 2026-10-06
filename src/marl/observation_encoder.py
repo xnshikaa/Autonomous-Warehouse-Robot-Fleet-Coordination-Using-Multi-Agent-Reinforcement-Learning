@@ -107,10 +107,7 @@ class ObservationEncoder:
 
         if assigned_task is not None:
 
-            # The current Python RobotState does not yet contain
-            # a carrying_item field, so use False until that state
-            # is added by the movement/task integration.
-            carrying_item = False
+            carrying_item = getattr(robot, "carrying_item", False) or (robot.position == assigned_task.pickup_position)
 
             if carrying_item:
                 target_x, target_y = assigned_task.delivery_position
@@ -138,11 +135,11 @@ class ObservationEncoder:
 
         # 3. Task status flags = 2 values
         has_task = 1.0 if assigned_task is not None else 0.0
-        carrying_item = 0.0
+        carrying_item_val = 1.0 if (assigned_task is not None and carrying_item) else 0.0
 
         vector.extend([
             has_task,
-            carrying_item
+            carrying_item_val
         ])
 
         if len(vector) != 50:

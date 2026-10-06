@@ -1,0 +1,23 @@
+{
+  "step": 60,
+  "algorithm": "QMIX",
+  "run_id": "3f1553055ba04a13bf297b2d3b97e746",
+  "timestamp": "2026-10-05T06:00:19Z",
+  "observation_vector": "50-D",
+  "action_space": "Discrete(4)",
+  "is_best": false,
+  "best_metric_val": -128.38,
+  "keys": [
+    "agent_network",
+    "mixer",
+    "target_agent_network",
+    "target_mixer",
+    "optimizer",
+    "update_count",
+    "episode",
+    "epsilon",
+    "seed",
+    "config",
+    "replay_buffer"
+  ]
+}

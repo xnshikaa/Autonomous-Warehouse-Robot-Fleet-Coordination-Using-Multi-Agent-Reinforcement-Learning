@@ -109,6 +109,8 @@ class WarehouseEnvironment:
     def reset(self):
         self._active_layout.validate(required_robots=self.num_robots)
         self.robots = [RobotState(i, self._active_layout.robot_starts[i]) for i in range(self.num_robots)]
+        for robot in self.robots:
+            robot.carrying_item = False
         self.tasks = []
         if self.load_layout_tasks:
             for task in self._active_layout.task_locations:
@@ -299,10 +301,18 @@ class WarehouseEnvironment:
             robot.blocked_reason = event.reason if blocked else None
 
         delivered = set()
+        for robot in self.robots:
+            task = self._get_robot_task(robot.robot_id)
+            if task and not task.completed and robot.position == task.pickup_position:
+                robot.carrying_item = True
+
         for task in self.tasks:
-            if not task.completed and task.assigned_robot is not None and self.robots[task.assigned_robot].position == task.delivery_position:
-                task.completed = True
-                delivered.add(task.assigned_robot)
+            if not task.completed and task.assigned_robot is not None:
+                robot = self.robots[task.assigned_robot]
+                if getattr(robot, "carrying_item", False) and robot.position == task.delivery_position:
+                    task.completed = True
+                    delivered.add(task.assigned_robot)
+                    robot.carrying_item = False
         self.episode_manager.step()
         rewards = {}
         for robot in self.robots:
