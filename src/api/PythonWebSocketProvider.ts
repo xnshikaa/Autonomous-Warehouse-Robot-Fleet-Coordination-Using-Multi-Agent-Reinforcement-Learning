@@ -75,7 +75,6 @@ export class PythonWebSocketProvider implements StateProvider {
       this.fallbackProvider.setFleetSize(size);
     }
   }
-
   public selectRobot(robotId: string | null): void {
     this.fallbackProvider.selectRobot(robotId);
   }

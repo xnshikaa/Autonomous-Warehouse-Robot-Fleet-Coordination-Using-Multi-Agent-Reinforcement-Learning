@@ -1,0 +1,38 @@
+{
+  "run_id": "44fb3ff6cf7a4eb0965b0b92bb6dbd67",
+  "run_name": "qmix_final_best_model",
+  "total_episodes": 150,
+  "hyperparameters": {
+    "lr": 0.0008,
+    "batch_size": 64,
+    "epsilon_start": 1.0,
+    "epsilon_end": 0.02,
+    "gamma": 0.99,
+    "target_update_interval": 5,
+    "max_steps_per_episode": 200,
+    "replay_buffer_capacity": 10000,
+    "replay_warmup_size": 64,
+    "grad_clip_norm": 10.0
+  },
+  "metrics": {
+    "mean_reward": -3470.6585333333396,
+    "std_reward": 944.0086807004792,
+    "best_reward": -1456.5799999999992,
+    "worst_reward": -5515.840000000024,
+    "early_mean_reward": -2254.021621621622,
+    "late_mean_reward": -4535.200000000014,
+    "reward_improvement": -2281.178378378392,
+    "mean_loss": 9303684795306064.0,
+    "final_loss": 406691151.865,
+    "initial_loss": 224.6025620063726,
+    "mean_conflicts": 695.3666666666667,
+    "early_mean_conflicts": 478.5945945945946,
+    "late_mean_conflicts": 872.0,
+    "conflict_reduction": -393.4054054054054,
+    "total_optimizer_updates": 29937,
+    "final_epsilon": 0.020000000000000018,
+    "mean_completions_per_episode": 0.0,
+    "best_completions_per_episode": 0.0
+  },
+  "checkpoint_path": "artifacts/checkpoints\\qmix\\44fb3ff6cf7a4eb0965b0b92bb6dbd67\\latest"
+}

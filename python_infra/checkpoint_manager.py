@@ -184,6 +184,17 @@ class CheckpointManager:
             target_dir = os.path.join(self.run_dir, f"checkpoint_{checkpoint_target}")
         elif checkpoint_target in ("latest", "best"):
             target_dir = os.path.join(self.run_dir, checkpoint_target)
+            if not os.path.exists(target_dir):
+                algo_dir = os.path.join(self.base_dir, self.algorithm.lower())
+                if os.path.exists(algo_dir):
+                    candidates = [
+                        os.path.join(algo_dir, r, checkpoint_target)
+                        for r in os.listdir(algo_dir)
+                        if os.path.exists(os.path.join(algo_dir, r, checkpoint_target))
+                    ]
+                    if candidates:
+                        candidates.sort(key=os.path.getmtime, reverse=True)
+                        target_dir = candidates[0]
         else:
             target_dir = checkpoint_target
 

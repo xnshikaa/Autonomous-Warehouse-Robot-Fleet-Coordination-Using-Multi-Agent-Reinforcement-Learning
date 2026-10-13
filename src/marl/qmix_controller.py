@@ -69,7 +69,7 @@ class QMIXController:
         if not path.is_file():
             raise FileNotFoundError(f"QMIX checkpoint not found: {path}")
 
-        payload: Any = torch.load(path, map_location="cpu")
+        payload: Any = torch.load(path, map_location="cpu", weights_only=False)
         if not isinstance(payload, dict):
             raise ValueError("QMIX checkpoint must contain a state dictionary payload")
 

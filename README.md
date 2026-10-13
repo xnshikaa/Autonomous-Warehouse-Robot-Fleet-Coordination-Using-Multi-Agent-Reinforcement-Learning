@@ -196,3 +196,4 @@ WebSocket telemetry are implemented. The remaining model-dependent step is to
 train a policy or connect an externally trained EPyMARL checkpoint; until then
 the UI correctly reports `QMIX: UNTRAINED` when the default controller is used.
 
+
