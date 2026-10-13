@@ -1,0 +1,20 @@
+{
+    "warehouse": {
+        "width": 20,
+        "height": 20,
+        "active_layout": "standard"
+    },
+
+    "shelves": {
+        "count": 10
+    },
+
+    "dispatch": {
+        "count": 1
+    },
+
+    "human_corridors": {
+        "enabled": true,
+        "cells": []
+    }
+}

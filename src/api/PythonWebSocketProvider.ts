@@ -8,7 +8,7 @@ export class PythonWebSocketProvider implements StateProvider {
   private activeState: WarehouseState;
   private url: string;
 
-  constructor(url: string = 'ws://localhost:8000/ws') {
+  constructor(url: string = 'ws://127.0.0.1:8000/ws') {
     this.url = url;
     this.fallbackProvider = new DemoStateProvider();
     this.activeState = this.fallbackProvider.getState();
@@ -65,6 +65,14 @@ export class PythonWebSocketProvider implements StateProvider {
       this.ws.send(JSON.stringify({ type: 'reset' }));
     } else {
       this.fallbackProvider.reset();
+    }
+  }
+
+  public setFleetSize(size: number): void {
+    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+      this.ws.send(JSON.stringify({ type: 'set_fleet_size', size }));
+    } else {
+      this.fallbackProvider.setFleetSize(size);
     }
   }
 

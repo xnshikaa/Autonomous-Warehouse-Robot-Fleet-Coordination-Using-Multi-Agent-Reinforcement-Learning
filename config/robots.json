@@ -1,0 +1,16 @@
+{
+    "num_robots": 5,
+
+    "fleet_sizes": [
+        5,
+        10,
+        20
+    ],
+
+    "actions": {
+        "forward": 0,
+        "backward": 1,
+        "left": 2,
+        "right": 3
+    }
+}

@@ -87,7 +87,7 @@ export const WarehouseCanvas: React.FC<WarehouseCanvasProps> = ({
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
       {/* Floating Toolbar */}
-      <div className="absolute top-4 right-4 z-20 flex items-center space-x-2 pointer-events-auto">
+      <div className="absolute top-44 right-4 z-40 flex items-center space-x-2 pointer-events-auto">
         <button
           onClick={handlePathModeToggle}
           className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-mono transition-all glass-panel border border-slate-700/60 shadow-xl ${

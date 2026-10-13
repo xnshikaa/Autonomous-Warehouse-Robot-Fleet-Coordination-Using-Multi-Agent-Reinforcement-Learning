@@ -115,6 +115,7 @@ export class WarehouseSceneController {
       }
       if (current && current.name.startsWith('AMR_')) {
         const robotId = current.name.replace('AMR_', '');
+        this.pathSystem.setSelectedRobot(robotId);
         if (this.onRobotSelected) {
           this.onRobotSelected(robotId);
         }
@@ -123,6 +124,7 @@ export class WarehouseSceneController {
     }
 
     if (this.onRobotSelected) this.onRobotSelected(null);
+    this.pathSystem.setSelectedRobot(null);
   };
 
   public onResize = (): void => {
