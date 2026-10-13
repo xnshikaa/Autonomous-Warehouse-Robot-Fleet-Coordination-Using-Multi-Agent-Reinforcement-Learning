@@ -185,24 +185,24 @@ class WarehouseEnvironment:
 
         observations = []
 
+        active_tasks = {}
+
+        for task in self.tasks:
+            if (
+                task.assigned_robot is not None
+                and not task.completed
+                and task.assigned_robot not in active_tasks
+            ):
+                active_tasks[task.assigned_robot] = task
+
         for robot in self.robots:
 
             current_task_id = None
             nearest_task_bearing = (0, 0)
 
-            assigned_tasks = [
-                task
-                for task in self.tasks
-                if (
-                    task.assigned_robot
-                    == robot.robot_id
-                    and not task.completed
-                )
-            ]
+            task = active_tasks.get(robot.robot_id)
 
-            if assigned_tasks:
-
-                task = assigned_tasks[0]
+            if task is not None:
 
                 current_task_id = task.task_id
 
@@ -378,13 +378,15 @@ class WarehouseEnvironment:
             for robot in self.robots
         }
 
+        active_tasks = {
+            robot.robot_id: self._get_robot_task(robot.robot_id)
+            for robot in self.robots
+        }
+
         previous_distances = {}
 
         for robot in self.robots:
-
-            task = self._get_robot_task(
-                robot.robot_id
-            )
+            task = active_tasks[robot.robot_id]
 
             if task is None:
 
@@ -607,10 +609,7 @@ class WarehouseEnvironment:
 
         for robot in self.robots:
 
-            task = self._get_robot_task(
-                robot.robot_id
-            )
-
+            task = active_tasks[robot.robot_id]
             if task is None:
 
                 current_distance = 0
