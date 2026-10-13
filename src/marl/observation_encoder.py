@@ -23,7 +23,7 @@ class ObservationEncoder:
         self.grid_width = grid_width
         self.grid_height = grid_height
 
-    def encode(self, robot, robots, tasks, shelves=None, layout=None):
+    def encode(self, robot, robots, tasks, shelves=None):
         """
         Encode one robot's observation.
 
@@ -37,14 +37,7 @@ class ObservationEncoder:
             List containing exactly 50 float values.
         """
 
-        if layout is not None:
-            grid_width, grid_height = layout.dimensions
-            shelves = set(layout.obstacles)
-            corridor_cells = set(layout.human_corridors)
-        else:
-            grid_width, grid_height = self.grid_width, self.grid_height
-            shelves = set(shelves or [])
-            corridor_cells = {(x, y) for x in range(8, 11) for y in range(8, 11)}
+        shelves = set(shelves or [])
 
         robot_positions = {
             other_robot.position
@@ -70,9 +63,9 @@ class ObservationEncoder:
 
                 elif (
                     cx < 0
-                    or cx >= grid_width
+                    or cx >= self.grid_width
                     or cy < 0
-                    or cy >= grid_height
+                    or cy >= self.grid_height
                 ):
                     category = self.WALL_OR_BOUNDARY
 
@@ -82,7 +75,7 @@ class ObservationEncoder:
                 elif (cx, cy) in robot_positions:
                     category = self.ROBOT
 
-                elif (cx, cy) in corridor_cells:
+                elif 8 <= cx <= 10 and 8 <= cy <= 10:
                     category = self.HUMAN_CORRIDOR
 
                 one_hot = [0.0] * 5
@@ -119,11 +112,11 @@ class ObservationEncoder:
 
             norm_delta_row = (
                 target_y - ry
-            ) / max(1, grid_height - 1)
+            ) / max(1, self.grid_height - 1)
 
             norm_delta_col = (
                 target_x - rx
-            ) / max(1, grid_width - 1)
+            ) / max(1, self.grid_width - 1)
 
             norm_distance = math.sqrt(
                 norm_delta_row ** 2 +

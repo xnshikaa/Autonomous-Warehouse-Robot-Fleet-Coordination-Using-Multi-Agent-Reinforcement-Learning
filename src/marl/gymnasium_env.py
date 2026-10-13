@@ -23,7 +23,6 @@ class WarehouseGymEnv(gym.Env):
         self,
         num_agents: int = 5,
         max_steps: int = 100,
-        layout_id: str | None = None,
     ):
         super().__init__()
 
@@ -35,7 +34,6 @@ class WarehouseGymEnv(gym.Env):
         self.adapter = MARLEnvironmentAdapter(
             num_agents=num_agents,
             max_steps=max_steps,
-            layout_id=layout_id,
         )
 
         self.encoder = ObservationEncoder()
@@ -149,7 +147,6 @@ class WarehouseGymEnv(gym.Env):
                 robot,
                 robots,
                 tasks,
-                layout=environment.get_active_layout(),
             )
 
             vector = np.asarray(

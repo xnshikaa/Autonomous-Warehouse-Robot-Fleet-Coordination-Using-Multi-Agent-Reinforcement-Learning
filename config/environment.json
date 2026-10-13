@@ -1,8 +1,7 @@
 {
     "warehouse": {
         "width": 20,
-        "height": 20,
-        "active_layout": "standard"
+        "height": 20
     },
 
     "shelves": {
