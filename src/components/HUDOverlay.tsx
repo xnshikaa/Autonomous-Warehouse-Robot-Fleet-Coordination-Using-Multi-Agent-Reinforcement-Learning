@@ -134,7 +134,7 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
         <div className="w-full max-w-xl mx-auto pointer-events-auto glass-panel border border-amber-500/50 rounded-xl p-2.5 bg-amber-500/10 flex items-center justify-between text-amber-400 text-xs shadow-2xl animate-pulse">
           <div className="flex items-center space-x-2.5">
             <AlertTriangle className="w-4 h-4 text-amber-400" />
-            <span className="font-bold">SAFETY OVERRIDE TRIGGERED $\rightarrow$ WAIT</span>
+            <span className="font-bold">SAFETY OVERRIDE TRIGGERED → WAIT</span>
           </div>
           <span className="text-[10px] text-amber-300">DETERMINISTIC CONFLICT RESOLUTION</span>
         </div>
