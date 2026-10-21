@@ -100,9 +100,14 @@ def _record_episode(
         "steps": steps,
     }
 
-
 def _rule_based_provider(environment: WarehouseEnvironment) -> dict[int, int]:
-    return RuleBasedController(environment).get_actions()
+    controller = getattr(environment, "_rule_based_controller", None)
+
+    if controller is None:
+        controller = RuleBasedController(environment)
+        environment._rule_based_controller = controller
+
+    return controller.get_actions()
 
 
 def generate_rule_based(

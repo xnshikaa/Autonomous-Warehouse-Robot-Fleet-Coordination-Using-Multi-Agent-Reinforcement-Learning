@@ -7,7 +7,6 @@ from .metrics import (
     TaskTiming,
     evaluate_episodes,
 )
-from .trace_generator import generate_traces, write_traces
 
 __all__ = [
     "CollisionMetrics",
@@ -15,6 +14,4 @@ __all__ = [
     "EpisodeRecord",
     "TaskTiming",
     "evaluate_episodes",
-    "generate_traces",
-    "write_traces",
 ]
