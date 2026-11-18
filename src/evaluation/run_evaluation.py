@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import argparse
 import json
+from dataclasses import fields
 from pathlib import Path
 
 from src.evaluation.metrics import EpisodeRecord, evaluate_episodes
@@ -12,10 +13,16 @@ from src.evaluation.plots import plot_completion_time, write_results_csv
 
 def load_episode_records(paths: list[Path]) -> list[EpisodeRecord]:
     records: list[EpisodeRecord] = []
+    record_fields = {field.name for field in fields(EpisodeRecord)}
     for path in paths:
         document = json.loads(path.read_text(encoding="utf-8"))
         for episode in document.get("episodes", []):
-            records.append(EpisodeRecord(**episode))
+            records.append(
+                EpisodeRecord(**{
+                    key: value for key, value in episode.items()
+                    if key in record_fields
+                })
+            )
     return records
 
 

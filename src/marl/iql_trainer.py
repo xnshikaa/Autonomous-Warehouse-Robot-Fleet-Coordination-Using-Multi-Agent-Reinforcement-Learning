@@ -82,6 +82,7 @@ class IQLTrainer:
         self.num_robots = num_robots
         self.observation_dim = observation_dim
         self.action_dim = action_dim
+        self.seed = 42 if seed is None else seed
         self.episodes = episodes
         self.max_steps = max_steps
 
@@ -97,7 +98,10 @@ class IQLTrainer:
             torch.manual_seed(seed)
 
         # Use the existing Week 4 environment exactly as it is.
-        self.env = WarehouseGymEnv()
+        self.env = WarehouseGymEnv(
+            num_agents=num_robots,
+            max_steps=max_steps,
+        )
 
         # One independent learner per robot.
         self.learners = [
@@ -111,6 +115,25 @@ class IQLTrainer:
         ]
 
         self.epsilon = epsilon_start
+
+    def _initialize_episode(self, episode_seed: int):
+        """Reset the warehouse and add a reproducible set of safe tasks."""
+        observations, _ = self.env.reset()
+        environment = self.env.adapter.environment
+        if not environment.tasks:
+            from src.warehouse.task_generation import generate_task_assignments
+
+            for task in generate_task_assignments(
+                environment, random.Random(episode_seed)
+            ):
+                environment.add_task(
+                    task.task_id,
+                    task.pickup_position,
+                    task.delivery_position,
+                    task.assigned_robot,
+                )
+            observations = self.env._encode_observations()
+        return observations
 
     def _select_actions(
         self,
@@ -165,7 +188,7 @@ class IQLTrainer:
 
         for episode in range(1, self.episodes + 1):
 
-            observations, _ = self.env.reset()
+            observations = self._initialize_episode(self.seed + episode)
 
             episode_reward = 0.0
             episode_losses = []
@@ -275,9 +298,11 @@ class IQLTrainer:
         rewards = []
 
         try:
-            for _ in range(episodes):
+            for episode in range(episodes):
 
-                observations, _ = self.env.reset()
+                observations = self._initialize_episode(
+                    self.seed + 1_000_000 + episode
+                )
 
                 episode_reward = 0.0
 

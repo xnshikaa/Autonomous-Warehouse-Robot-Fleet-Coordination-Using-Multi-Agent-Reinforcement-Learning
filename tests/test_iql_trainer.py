@@ -17,6 +17,31 @@ def test_iql_trainer_initialization():
     assert trainer.epsilon == 1.0
 
 
+def test_iql_trainer_configures_requested_fleet_and_horizon():
+    trainer = IQLTrainer(num_robots=10, episodes=1, max_steps=3, seed=42)
+
+    assert trainer.env.num_agents == 10
+    assert trainer.env.adapter.environment.max_steps == 3
+    assert len(trainer.learners) == 10
+
+
+def test_iql_training_starts_with_seeded_task_observations():
+    trainer = IQLTrainer(episodes=1, max_steps=1, seed=42)
+    captured = []
+    select_actions = trainer._select_actions
+
+    def capture(observations):
+        captured.append(observations.copy())
+        return select_actions(observations)
+
+    trainer._select_actions = capture
+    trainer.train()
+
+    assert captured[0].shape == (5, 50)
+    assert (captured[0][:, 48] == 1.0).all()
+    assert len(trainer.env.adapter.environment.tasks) == 5
+
+
 def test_iql_training():
     trainer = IQLTrainer(
         episodes=2,

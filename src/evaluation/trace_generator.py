@@ -9,15 +9,19 @@ from __future__ import annotations
 import argparse
 import json
 import random
-from dataclasses import asdict
 from pathlib import Path
 from typing import Any, Callable
 
 import numpy as np
+import torch
 
 from src.ai.environment import WarehouseEnvironment
 from src.ai.baselines.rule_based import RuleBasedController
-from src.evaluation.metrics import infer_robot_robot_collisions
+from src.marl.environment_adapter import MARLEnvironmentAdapter
+from src.marl.iql_learner import IQLLearner
+from src.marl.observation_encoder import ObservationEncoder
+from src.marl.qmix_controller import QMIXController
+from src.warehouse.task_generation import generate_task_assignments
 
 
 def _task_snapshot(environment: WarehouseEnvironment) -> list[dict[str, Any]]:
@@ -31,17 +35,25 @@ def _task_snapshot(environment: WarehouseEnvironment) -> list[dict[str, Any]]:
     ]
 
 
-def _add_default_tasks(environment: WarehouseEnvironment) -> None:
-    """Create the deterministic task layout used by the existing baseline."""
-
-    for robot in environment.robots:
-        row = robot.robot_id % environment.warehouse_height
+def _add_seeded_tasks(environment: WarehouseEnvironment, seed: int) -> list[dict[str, Any]]:
+    """Create safe tasks reproducibly so policies can share episode inputs."""
+    tasks = generate_task_assignments(environment, random.Random(seed))
+    for task in tasks:
         environment.add_task(
-            task_id=robot.robot_id,
-            pickup_position=(5, row),
-            delivery_position=(10, row),
-            assigned_robot=robot.robot_id,
+            task.task_id,
+            task.pickup_position,
+            task.delivery_position,
+            task.assigned_robot,
         )
+    return [
+        {
+            "task_id": task.task_id,
+            "assigned_robot": task.assigned_robot,
+            "pickup_position": list(task.pickup_position),
+            "delivery_position": list(task.delivery_position),
+        }
+        for task in tasks
+    ]
 
 
 def _record_episode(
@@ -49,6 +61,7 @@ def _record_episode(
     fleet_size: int,
     episode_number: int,
     max_steps: int,
+    task_seed: int,
     action_provider: Callable[[WarehouseEnvironment], dict[int, int]],
 ) -> dict[str, Any]:
     environment = WarehouseEnvironment(
@@ -56,46 +69,56 @@ def _record_episode(
         max_steps=max_steps,
     )
     environment.reset()
-    _add_default_tasks(environment)
+    initial_tasks = _add_seeded_tasks(environment, task_seed)
 
     task_snapshots: list[list[dict[str, Any]]] = [_task_snapshot(environment)]
     collision_events: list[dict[str, Any]] = []
-    previous_positions = {
-        robot.robot_id: robot.position for robot in environment.robots
-    }
+    safety_conflict_events: list[dict[str, Any]] = []
+    action_trace: list[dict[str, Any]] = []
     steps = 0
     terminated = False
 
     while not terminated and steps < max_steps:
         actions = action_provider(environment)
-        proposed_positions = {
-            robot.robot_id: environment._get_next_position(
-                robot, actions[robot.robot_id]
-            )
-            for robot in environment.robots
-        }
-        collision_events.extend(
-            {
-                "step": steps + 1,
-                **event,
-            }
-            for event in infer_robot_robot_collisions(
-                previous_positions, proposed_positions
-            )
-        )
-        _, _, terminated, _ = environment.step(actions)
+        _, rewards, terminated, _ = environment.step(actions)
         steps += 1
+        action_trace.append({
+            "step": steps,
+            "requested_actions": actions,
+            "executed_actions": {
+                robot.robot_id: robot.last_executed_action
+                for robot in environment.robots
+            },
+            "positions": {
+                robot.robot_id: list(robot.position)
+                for robot in environment.robots
+            },
+            "agent_rewards": rewards,
+        })
+        safety_conflict_events.extend(
+            {
+                "type": "robot_robot_conflict",
+                "status": "prevented_by_safety",
+                "robot_id": event.robot_id,
+                "step": steps,
+                "current_cell": list(event.current_cell),
+                "target_cell": None if event.target_cell is None else list(event.target_cell),
+            }
+            for event in environment.get_safety_events()
+            if event.reason == "robot_collision"
+        )
         task_snapshots.append(_task_snapshot(environment))
-        previous_positions = {
-            robot.robot_id: robot.position for robot in environment.robots
-        }
 
     return {
         "algorithm": algorithm,
         "fleet_size": fleet_size,
         "episode": episode_number,
+        "task_seed": task_seed,
+        "initial_tasks": initial_tasks,
+        "action_trace": action_trace,
         "task_snapshots": task_snapshots,
         "collision_events": collision_events,
+        "safety_conflict_events": safety_conflict_events,
         "safety_overrides": environment.safety_overrides,
         "steps": steps,
     }
@@ -103,6 +126,55 @@ def _record_episode(
 
 def _rule_based_provider(environment: WarehouseEnvironment) -> dict[int, int]:
     return RuleBasedController(environment).get_actions()
+
+
+def _qmix_provider(checkpoint: str | Path, fleet_size: int):
+    path = Path(checkpoint)
+    if path.is_dir():
+        candidates = [path / "checkpoint_state.pt", path / "checkpoint_state.pkl"]
+        path = next((candidate for candidate in candidates if candidate.is_file()), path)
+    if not path.is_file():
+        raise FileNotFoundError(f"QMIX checkpoint file not found: {path}")
+    holder: dict[str, QMIXController] = {}
+
+    def provide(environment: WarehouseEnvironment) -> dict[int, int]:
+        if "controller" not in holder:
+            adapter = MARLEnvironmentAdapter(
+                num_agents=fleet_size,
+                max_steps=environment.max_steps,
+                environment=environment,
+            )
+            holder["controller"] = QMIXController(adapter, checkpoint_path=path)
+        else:
+            holder["controller"].adapter.environment = environment
+        return holder["controller"].select_actions()
+
+    return provide
+
+
+def _iql_provider(checkpoint: str | Path, fleet_size: int):
+    directory = Path(checkpoint)
+    if not directory.is_dir():
+        raise FileNotFoundError(f"IQL checkpoint directory not found: {directory}")
+    learners = [IQLLearner(observation_dim=50, action_dim=4) for _ in range(fleet_size)]
+    for robot_id, learner in enumerate(learners):
+        learner.load(str(directory / f"iql_robot_{robot_id}.pt"))
+
+    def provide(environment: WarehouseEnvironment) -> dict[int, int]:
+        layout = environment.get_active_layout()
+        encoder = ObservationEncoder(layout.width, layout.height)
+        actions = {}
+        for robot in environment.robots:
+            observation = torch.as_tensor(
+                encoder.encode(robot, environment.robots, environment.tasks, layout=layout),
+                dtype=torch.float32,
+            )
+            actions[robot.robot_id] = learners[robot.robot_id].select_action(
+                observation, epsilon=0.0
+            )
+        return actions
+
+    return provide
 
 
 def generate_rule_based(
@@ -119,6 +191,7 @@ def generate_rule_based(
             fleet_size,
             episode,
             max_steps,
+            seed + episode - 1,
             _rule_based_provider,
         )
         for episode in range(1, episodes + 1)
@@ -131,22 +204,34 @@ def generate_traces(
     episodes: int,
     max_steps: int,
     seed: int,
+    checkpoint: str | Path | None = None,
 ) -> list[dict[str, Any]]:
-    """Generate traces using a merged algorithm implementation.
-
-    QMIX and IQL integrations are intentionally lazy imports. This keeps the
-    Week 5 branch runnable with the existing baseline and allows the same
-    command to work after the team merges the MARL branches.
-    """
-
-    if algorithm.lower() in {"rule-based", "rule_based", "rule"}:
+    """Generate seeded traces by running the requested policy checkpoint."""
+    normalized = algorithm.lower().replace("_", "-")
+    if normalized in {"rule-based", "rule"}:
         return generate_rule_based(fleet_size, episodes, max_steps, seed)
+    if checkpoint is None:
+        raise ValueError(f"A trained {algorithm} checkpoint is required for evaluation.")
+    if normalized == "qmix":
+        provider = _qmix_provider(checkpoint, fleet_size)
+        canonical = "QMIX"
+    elif normalized == "iql":
+        provider = _iql_provider(checkpoint, fleet_size)
+        canonical = "IQL"
+    else:
+        raise ValueError(f"Unsupported evaluation algorithm: {algorithm}")
 
-    raise RuntimeError(
-        f"{algorithm} trace generation requires the merged MARL policy adapter. "
-        "Run the Rule-Based generator now, or add the merged QMIX/IQL "
-        "action provider in this module after integration."
-    )
+    return [
+        _record_episode(
+            canonical,
+            fleet_size,
+            episode,
+            max_steps,
+            seed + episode - 1,
+            provider,
+        )
+        for episode in range(1, episodes + 1)
+    ]
 
 
 def write_traces(
@@ -169,6 +254,7 @@ def main() -> None:
     parser.add_argument("--episodes", type=int, default=10)
     parser.add_argument("--max-steps", type=int, default=200)
     parser.add_argument("--seed", type=int, default=42)
+    parser.add_argument("--checkpoint", type=Path)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
 
@@ -181,6 +267,7 @@ def main() -> None:
         args.episodes,
         args.max_steps,
         args.seed,
+        args.checkpoint,
     )
     write_traces(traces, args.output)
     print(f"Wrote {len(traces)} episode traces to {args.output}")
