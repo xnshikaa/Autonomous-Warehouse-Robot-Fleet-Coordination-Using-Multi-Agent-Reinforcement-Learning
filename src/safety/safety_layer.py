@@ -47,6 +47,50 @@ class SafetyDecision:
         yield self.was_overridden
 
 
+@dataclass(frozen=True)
+class SafetyOverrideEvent:
+    """Serializable safety result recorded by the environment."""
+
+    robot_id: Any
+    current_cell: Cell
+    proposed_action: int
+    target_cell: Cell | None
+    final_action: int | None
+    overridden: bool
+    reason: str | None
+    episode: int
+    timestep: int
+
+    @classmethod
+    def from_decision(
+        cls, decision: SafetyDecision, *, episode: int, timestep: int
+    ) -> "SafetyOverrideEvent":
+        return cls(
+            robot_id=decision.robot_id,
+            current_cell=decision.current_cell,
+            proposed_action=decision.proposed_action,
+            target_cell=decision.target_cell,
+            final_action=decision.final_action,
+            overridden=decision.was_overridden,
+            reason=decision.override_reason,
+            episode=episode,
+            timestep=timestep,
+        )
+
+    def to_dict(self) -> dict[str, Any]:
+        return {
+            "robot_id": self.robot_id,
+            "current_cell": list(self.current_cell),
+            "proposed_action": self.proposed_action,
+            "target_cell": None if self.target_cell is None else list(self.target_cell),
+            "final_action": self.final_action,
+            "overridden": self.overridden,
+            "reason": self.reason,
+            "episode": self.episode,
+            "timestep": self.timestep,
+        }
+
+
 def _normalise_current_cell(position: Sequence[int]) -> Cell:
     if isinstance(position, (str, bytes)) or not isinstance(position, Sequence):
         raise ValueError("robot_state.position must be a two-item coordinate.")

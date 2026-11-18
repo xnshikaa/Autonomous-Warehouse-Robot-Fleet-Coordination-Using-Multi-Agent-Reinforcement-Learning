@@ -23,7 +23,7 @@ class ObservationEncoder:
         self.grid_width = grid_width
         self.grid_height = grid_height
 
-    def encode(self, robot, robots, tasks, shelves=None):
+    def encode(self, robot, robots, tasks, shelves=None, layout=None):
         """
         Encode one robot's observation.
 
@@ -37,6 +37,8 @@ class ObservationEncoder:
             List containing exactly 50 float values.
         """
 
+        if layout is not None:
+            shelves = getattr(layout, "obstacles", ())
         shelves = set(shelves or [])
 
         robot_positions = {

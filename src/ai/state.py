@@ -8,6 +8,11 @@ class RobotState:
 
     robot_id: int
     position: Tuple[int, int]
+    carrying_item: bool = False
+    last_requested_action: int | None = None
+    last_executed_action: int | None = None
+    action_overridden: bool = False
+    blocked_reason: str | None = None
 
 
 @dataclass
