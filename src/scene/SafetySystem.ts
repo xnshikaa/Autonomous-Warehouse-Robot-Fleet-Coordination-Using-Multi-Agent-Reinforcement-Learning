@@ -5,6 +5,7 @@ import { gridToWorld } from './gridConfig';
 export class SafetySystem {
   public group: THREE.Group;
   private collisionRingMap: Map<string, THREE.Mesh> = new Map();
+  private collisionLabelMap: Map<string, THREE.Sprite> = new Map();
   private overrideWarningMesh!: THREE.Mesh;
   private overrideMat!: THREE.MeshBasicMaterial;
   private pulseTime: number = 0;
@@ -71,6 +72,11 @@ export class SafetySystem {
 
         this.collisionRingMap.set(c.id, ring);
         this.group.add(ring);
+
+        const label = this.createConflictLabel(c.robots);
+        label.position.set(wPos.x, 0.55, wPos.z);
+        this.collisionLabelMap.set(c.id, label);
+        this.group.add(label);
       }
     });
 
@@ -81,6 +87,14 @@ export class SafetySystem {
         (ring.material as THREE.Material).dispose();
         this.group.remove(ring);
         this.collisionRingMap.delete(id);
+
+        const label = this.collisionLabelMap.get(id);
+        if (label) {
+          (label.material as THREE.SpriteMaterial).map?.dispose();
+          (label.material as THREE.Material).dispose();
+          this.group.remove(label);
+          this.collisionLabelMap.delete(id);
+        }
       }
     });
   }
@@ -91,6 +105,8 @@ export class SafetySystem {
     // Pulse safety override boundary if active
     if (safetyOverrideActive) {
       this.overrideMat.opacity = 0.4 + Math.sin(this.pulseTime) * 0.25;
+    } else {
+      this.overrideMat.opacity = 0.0;
     }
 
     // Pulse collision rings
@@ -98,5 +114,39 @@ export class SafetySystem {
     this.collisionRingMap.forEach(ring => {
       ring.scale.set(scale, scale, 1);
     });
+    this.collisionLabelMap.forEach(label => {
+      label.material.opacity = 0.72 + Math.sin(this.pulseTime) * 0.2;
+    });
+  }
+
+  private createConflictLabel(robotIds: string[]): THREE.Sprite {
+    const canvas = document.createElement('canvas');
+    canvas.width = 256;
+    canvas.height = 64;
+    const context = canvas.getContext('2d')!;
+    context.fillStyle = '#7F1D1D';
+    context.fillRect(0, 0, canvas.width, canvas.height);
+    context.strokeStyle = '#FCA5A5';
+    context.lineWidth = 4;
+    context.strokeRect(2, 2, canvas.width - 4, canvas.height - 4);
+    context.fillStyle = '#FFFFFF';
+    context.font = 'bold 27px "JetBrains Mono", monospace';
+    context.textAlign = 'center';
+    context.textBaseline = 'middle';
+    const participants = robotIds
+      .map(id => String(Number(id.match(/\d+/)?.[0] ?? id)))
+      .join('/');
+    context.fillText(`! ${participants || 'CONFLICT'}`, canvas.width / 2, canvas.height / 2);
+
+    const texture = new THREE.CanvasTexture(canvas);
+    const material = new THREE.SpriteMaterial({
+      map: texture,
+      transparent: true,
+      depthWrite: false,
+      opacity: 0.9
+    });
+    const sprite = new THREE.Sprite(material);
+    sprite.scale.set(2.8, 0.7, 1);
+    return sprite;
   }
 }

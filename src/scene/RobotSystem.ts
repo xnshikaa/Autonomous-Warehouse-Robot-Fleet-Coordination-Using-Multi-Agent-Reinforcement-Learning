@@ -103,6 +103,7 @@ export class RobotSystem {
 
       amr.setStatus(state.status);
       amr.setHasCargo(state.hasCargo);
+      amr.setSafetyState(Boolean(state.safetyAlert), Boolean(state.actionOverridden));
     });
 
     // Clean up decommissioned robots

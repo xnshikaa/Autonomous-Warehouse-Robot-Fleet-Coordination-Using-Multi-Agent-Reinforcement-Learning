@@ -104,10 +104,13 @@ def log_collision(logger, robot_id):
     )
 
 
-def log_safety_override(logger, robot_id, reason):
+def log_safety_override(logger, robot_id, reason, **details):
     """Log when the safety layer overrides a robot action."""
+    suffix = " | " + " | ".join(
+        f"{key}={value}" for key, value in details.items()
+    )
     logger.warning(
-        f"Safety override | robot_id={robot_id} | reason={reason}"
+        f"Safety override | robot_id={robot_id} | reason={reason}{suffix}"
     )
 
 

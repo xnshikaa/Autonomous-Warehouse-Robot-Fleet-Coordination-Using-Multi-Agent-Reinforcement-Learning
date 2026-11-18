@@ -12,6 +12,8 @@ export class AMRModel {
   private lidarTowerMesh!: THREE.Mesh;
   private cargoPackageMesh!: THREE.Group;
   private idBadgeMesh!: THREE.Mesh;
+  private safetyIndicatorMesh!: THREE.Mesh;
+  private readonly labelColor = '#0F172A';
 
   // Status color mappings
   private readonly statusColors: Record<RobotStatus, number> = {
@@ -214,6 +216,13 @@ export class AMRModel {
     this.statusBandMesh = new THREE.Mesh(bandGeo, this.statusBandMaterial);
     this.statusBandMesh.position.set(0, 0.36, 0);
     this.mesh.add(this.statusBandMesh);
+
+    const safetyGeo = new THREE.ConeGeometry(0.13, 0.18, 6);
+    const safetyMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
+    this.safetyIndicatorMesh = new THREE.Mesh(safetyGeo, safetyMat);
+    this.safetyIndicatorMesh.position.set(0, 0.86, 0.38);
+    this.safetyIndicatorMesh.visible = false;
+    this.mesh.add(this.safetyIndicatorMesh);
   }
 
   /**
@@ -257,7 +266,7 @@ export class AMRModel {
   }
 
   /**
-   * Crisp ID Badge Tag (e.g. "R01")
+   * Crisp ID Badge Tag (e.g. "#1 R01")
    */
   private buildIdBadge(): void {
     const canvas = document.createElement('canvas');
@@ -265,29 +274,31 @@ export class AMRModel {
     canvas.height = 64;
     const ctx = canvas.getContext('2d')!;
 
-    ctx.fillStyle = '#0F172A';
+    ctx.fillStyle = this.labelColor;
     ctx.fillRect(0, 0, 128, 64);
-    ctx.strokeStyle = '#38BDF8';
+    ctx.strokeStyle = '#F8FAFC';
     ctx.lineWidth = 4;
     ctx.strokeRect(2, 2, 124, 60);
 
-    ctx.font = 'bold 32px "JetBrains Mono", monospace';
+    ctx.font = 'bold 22px "JetBrains Mono", monospace';
     ctx.fillStyle = '#FFFFFF';
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
-    ctx.fillText(this.robotId, 64, 32);
+    const numericLabel = this.robotId.match(/\d+/)?.[0] ?? this.robotId;
+    const numberLabel = /^\d+$/.test(numericLabel) ? String(Number(numericLabel)) : numericLabel;
+    ctx.fillText(`#${numberLabel} ${this.robotId}`, 64, 32);
 
     const texture = new THREE.CanvasTexture(canvas);
     const badgeMat = new THREE.MeshStandardMaterial({
       map: texture,
-      emissive: 0x38bdf8,
-      emissiveIntensity: 0.4,
+      emissive: 0x0f172a,
+      emissiveIntensity: 0.25,
       side: THREE.DoubleSide
     });
 
     this.idBadgeMesh = new THREE.Mesh(new THREE.PlaneGeometry(0.6, 0.3), badgeMat);
-    this.idBadgeMesh.position.set(0, 0.72, 0); // Hovering cleanly above top LiDAR sensor
-    this.idBadgeMesh.rotation.y = 0; // Facing front/top view
+    this.idBadgeMesh.position.set(0, 0.72, 0); // Hovering above the chassis
+    this.idBadgeMesh.rotation.x = -Math.PI / 2; // Readable in the fixed top-down shot
     this.mesh.add(this.idBadgeMesh);
   }
 
@@ -300,6 +311,13 @@ export class AMRModel {
 
   public setHasCargo(hasCargo: boolean): void {
     this.cargoPackageMesh.visible = hasCargo;
+  }
+
+  public setSafetyState(safetyAlert: boolean, actionOverridden: boolean = false): void {
+    this.safetyIndicatorMesh.visible = safetyAlert || actionOverridden;
+    (this.safetyIndicatorMesh.material as THREE.MeshBasicMaterial).color.setHex(
+      safetyAlert ? 0xef4444 : 0xf59e0b
+    );
   }
 
   public update(deltaTimeSec: number): void {

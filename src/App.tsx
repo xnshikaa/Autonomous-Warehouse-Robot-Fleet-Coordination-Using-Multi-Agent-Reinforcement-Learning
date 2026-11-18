@@ -8,6 +8,7 @@ import { CinematicIntro } from './components/CinematicIntro';
 import { PythonWebSocketProvider } from './api/PythonWebSocketProvider';
 import { WarehouseSceneController } from './scene/WarehouseSceneController';
 import { WarehouseState } from './types/warehouse';
+import { PathVisibilityMode } from './scene/PathSystem';
 
 export default function App() {
   const providerRef = useRef<PythonWebSocketProvider | null>(null);
@@ -20,7 +21,10 @@ export default function App() {
   const [isPaused, setIsPaused] = useState<boolean>(false);
   const [speedMultiplier, setSpeedMultiplier] = useState<number>(1.0);
   const [isPresentationMode, setIsPresentationMode] = useState<boolean>(false);
+  const [isWarehouseFullscreen, setIsWarehouseFullscreen] = useState<boolean>(false);
+  const [pathMode, setPathMode] = useState<PathVisibilityMode>('ALL');
   const [showIntro, setShowIntro] = useState<boolean>(true);
+  const warehouseRootRef = useRef<HTMLDivElement>(null);
 
   // Developer validation flag via ?dev=true URL parameter
   const isDevMode = new URLSearchParams(window.location.search).get('dev') === 'true';
@@ -37,6 +41,15 @@ export default function App() {
     return () => {
       unsubscribe();
     };
+  }, []);
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsWarehouseFullscreen(document.fullscreenElement === warehouseRootRef.current);
+    };
+
+    document.addEventListener('fullscreenchange', handleFullscreenChange);
+    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
   }, []);
 
   const getFallbackProvider = () => {
@@ -78,6 +91,17 @@ export default function App() {
     }
   };
 
+  const handleWarehouseFullscreenToggle = () => {
+    if (document.fullscreenElement === warehouseRootRef.current) {
+      void document.exitFullscreen();
+      return;
+    }
+
+    if (warehouseRootRef.current?.requestFullscreen) {
+      void warehouseRootRef.current.requestFullscreen();
+    }
+  };
+
   if (!state) {
     return (
       <div className="w-screen h-screen bg-industrial-900 flex items-center justify-center font-mono text-slate-300 text-xs">
@@ -91,7 +115,7 @@ export default function App() {
   const fallbackProvider = getFallbackProvider();
 
   return (
-    <div className="w-screen h-screen relative bg-industrial-900 text-slate-100 overflow-hidden select-none">
+    <div ref={warehouseRootRef} className="w-screen h-screen relative bg-industrial-900 text-slate-100 overflow-hidden select-none">
       {/* Cinematic Intro Overlay */}
       {showIntro && (
         <CinematicIntro onComplete={() => setShowIntro(false)} />
@@ -100,7 +124,10 @@ export default function App() {
       {/* 3D WebGL Canvas Layer */}
       <WarehouseCanvas
         state={state}
+        pathMode={pathMode}
+        isWarehouseFullscreen={isWarehouseFullscreen}
         onRobotSelect={setSelectedRobotId}
+        onPathModeChange={setPathMode}
         onControllerReady={ctrl => {
           controllerRef.current = ctrl;
         }}
@@ -114,9 +141,20 @@ export default function App() {
         onReset={handleReset}
         onSpeedChange={handleSpeedChange}
         onPresentationModeToggle={() => setIsPresentationMode(!isPresentationMode)}
+        onWarehouseFullscreenToggle={handleWarehouseFullscreenToggle}
         isPaused={isPaused}
         currentSpeed={speedMultiplier}
         isPresentationMode={isPresentationMode}
+        isWarehouseFullscreen={isWarehouseFullscreen}
+        pathMode={pathMode}
+        onPathModeToggle={() => {
+          const nextMode: Record<PathVisibilityMode, PathVisibilityMode> = {
+            ALL: 'SELECTED_ONLY',
+            SELECTED_ONLY: 'OFF',
+            OFF: 'ALL'
+          };
+          setPathMode(nextMode[pathMode]);
+        }}
       />
 
       {/* Developer-Only Validation Panel (accessible via ?dev=true) */}

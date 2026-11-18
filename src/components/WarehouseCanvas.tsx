@@ -1,26 +1,29 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { WarehouseSceneController } from '../scene/WarehouseSceneController';
-import { CameraMode, WarehouseState } from '../types/warehouse';
+import { WarehouseState } from '../types/warehouse';
 import { PathVisibilityMode } from '../scene/PathSystem';
-import { Camera, Eye, Orbit, Route } from 'lucide-react';
 
 interface WarehouseCanvasProps {
   state: WarehouseState;
+  pathMode: PathVisibilityMode;
+  isWarehouseFullscreen: boolean;
   onRobotSelect: (robotId: string | null) => void;
   onControllerReady?: (controller: WarehouseSceneController) => void;
   onFpsUpdate?: (fps: number) => void;
+  onPathModeChange?: (mode: PathVisibilityMode) => void;
 }
 
 export const WarehouseCanvas: React.FC<WarehouseCanvasProps> = ({ 
   state, 
+  pathMode,
+  isWarehouseFullscreen,
   onRobotSelect, 
   onControllerReady, 
-  onFpsUpdate 
+  onFpsUpdate,
+  onPathModeChange
 }) => {
   const containerRef = useRef<HTMLDivElement>(null);
   const controllerRef = useRef<WarehouseSceneController | null>(null);
-  const [currentCameraMode, setCurrentCameraMode] = useState<CameraMode>('OVERVIEW');
-  const [pathMode, setPathMode] = useState<PathVisibilityMode>('ALL');
   const [fps, setFps] = useState<number>(60);
 
   useEffect(() => {
@@ -61,87 +64,24 @@ export const WarehouseCanvas: React.FC<WarehouseCanvasProps> = ({
     }
   }, [state]);
 
-  const handleCameraChange = (mode: CameraMode) => {
-    if (controllerRef.current) {
-      controllerRef.current.cameraManager.setCameraMode(mode);
-      setCurrentCameraMode(mode);
-    }
-  };
-
-  const handlePathModeToggle = () => {
-    const nextMode: Record<PathVisibilityMode, PathVisibilityMode> = {
-      ALL: 'SELECTED_ONLY',
-      SELECTED_ONLY: 'OFF',
-      OFF: 'ALL'
-    };
-    const newMode = nextMode[pathMode];
-    setPathMode(newMode);
-    if (controllerRef.current) {
-      controllerRef.current.setPathVisibilityMode(newMode);
-    }
-  };
+  useEffect(() => {
+    controllerRef.current?.setPathVisibilityMode(pathMode);
+    onPathModeChange?.(pathMode);
+  }, [pathMode, onPathModeChange]);
 
   return (
-    <div className="w-full h-full relative overflow-hidden bg-industrial-900 select-none">
+    <div className={`absolute inset-x-0 overflow-hidden bg-industrial-900 select-none ${
+      isWarehouseFullscreen
+        ? 'inset-y-0'
+        : 'top-[18rem] bottom-[18rem] sm:top-[14rem] sm:bottom-[14rem] lg:top-[10rem] lg:bottom-[9rem]'
+    }`}>
       {/* 3D Canvas Mount Point */}
       <div ref={containerRef} className="w-full h-full cursor-grab active:cursor-grabbing" />
 
-      {/* Floating Toolbar */}
-      <div className="absolute top-44 right-4 z-40 flex items-center space-x-2 pointer-events-auto">
-        <button
-          onClick={handlePathModeToggle}
-          className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-xl text-xs font-mono transition-all glass-panel border border-slate-700/60 shadow-xl ${
-            pathMode !== 'OFF'
-              ? 'text-emerald-400 border-emerald-500/40 bg-emerald-500/10 font-bold'
-              : 'text-slate-400 hover:text-white'
-          }`}
-          title="Toggle 3D Robot Route Paths (ALL / SELECTED / OFF)"
-        >
-          <Route className="w-3.5 h-3.5" />
-          <span>PATHS: {pathMode}</span>
-        </button>
-
-        <div className="flex items-center space-x-1.5 glass-panel p-1.5 rounded-xl border border-slate-700/60 shadow-xl">
-          <button
-            onClick={() => handleCameraChange('OVERVIEW')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
-              currentCameraMode === 'OVERVIEW'
-                ? 'bg-industrial-accent text-slate-950 font-bold shadow-lg shadow-industrial-accent/20'
-                : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
-            }`}
-          >
-            <Camera className="w-3.5 h-3.5" />
-            <span>OVERVIEW</span>
-          </button>
-
-          <button
-            onClick={() => handleCameraChange('TOP_DOWN')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
-              currentCameraMode === 'TOP_DOWN'
-                ? 'bg-industrial-accent text-slate-950 font-bold shadow-lg shadow-industrial-accent/20'
-                : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
-            }`}
-          >
-            <Eye className="w-3.5 h-3.5" />
-            <span>TOP-DOWN</span>
-          </button>
-
-          <button
-            onClick={() => handleCameraChange('FREE_ORBIT')}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-mono transition-all ${
-              currentCameraMode === 'FREE_ORBIT'
-                ? 'bg-industrial-accent text-slate-950 font-bold shadow-lg shadow-industrial-accent/20'
-                : 'text-slate-300 hover:bg-slate-800/80 hover:text-white'
-            }`}
-          >
-            <Orbit className="w-3.5 h-3.5" />
-            <span>FREE ORBIT</span>
-          </button>
-        </div>
-      </div>
-
       {/* Real-time FPS Telemetry Widget */}
-      <div className="absolute bottom-4 right-4 z-20 glass-panel px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] font-mono flex items-center space-x-2 text-slate-400">
+      <div className={`absolute right-4 z-20 glass-panel px-3 py-1.5 rounded-lg border border-slate-800 text-[11px] font-mono flex items-center space-x-2 text-slate-400 ${
+        isWarehouseFullscreen ? 'bottom-4' : 'top-2'
+      }`}>
         <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
         <span>RENDER ENGINE</span>
         <span className="text-emerald-400 font-bold">{fps} FPS</span>

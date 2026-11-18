@@ -6,8 +6,11 @@ export type PathVisibilityMode = 'ALL' | 'SELECTED_ONLY' | 'OFF';
 
 export class PathSystem {
   public group: THREE.Group;
-  private pathLineMap: Map<string, THREE.Line> = new Map();
-  private pathMatMap: Map<string, THREE.LineDashedMaterial> = new Map();
+  private pathLineMap: Map<string, THREE.Mesh> = new Map();
+  private pathMatMap: Map<string, THREE.MeshBasicMaterial> = new Map();
+  private pathPointsMap: Map<string, THREE.Vector3[]> = new Map();
+  private pathSignatureMap: Map<string, string> = new Map();
+  private pathSelectedMap: Map<string, boolean> = new Map();
   
   private visibilityMode: PathVisibilityMode = 'ALL';
   private selectedRobotId: string | null = null;
@@ -33,7 +36,20 @@ export class PathSystem {
   }
 
   public setSelectedRobot(robotId: string | null): void {
+    const previousSelectedRobotId = this.selectedRobotId;
     this.selectedRobotId = robotId;
+    [previousSelectedRobotId, robotId].forEach(id => {
+      if (!id || id === previousSelectedRobotId && id === robotId) return;
+      const material = this.pathMatMap.get(id);
+      const line = this.pathLineMap.get(id);
+      const points = this.pathPointsMap.get(id);
+      if (material) this.applyStyle(id, material);
+      if (line && points) {
+        line.geometry.dispose();
+        line.geometry = this.createPathGeometry(points, id === this.selectedRobotId);
+        this.pathSelectedMap.set(id, id === this.selectedRobotId);
+      }
+    });
   }
 
   /**
@@ -62,37 +78,48 @@ export class PathSystem {
       }
 
       // Convert grid points array [(x1,y1), (x2,y2)...] to 3D Vector3 points
-      const points: THREE.Vector3[] = robot.path.map(pt => {
-        const w = gridToWorld(pt[0], pt[1]);
-        return new THREE.Vector3(w.x, 0.08, w.z); // Slightly above floor to prevent z-fighting
-      });
+      const pathSignature = robot.path.map(([x, y]) => `${x},${y}`).join(';');
+      const pathChanged = this.pathSignatureMap.get(robot.id) !== pathSignature;
+      if (pathChanged) {
+        const points: THREE.Vector3[] = robot.path.map(pt => {
+          const w = gridToWorld(pt[0], pt[1]);
+          return new THREE.Vector3(w.x, 0.14, w.z); // Clearly above floor and robot rings
+        });
+        this.pathPointsMap.set(robot.id, points);
+        this.pathSignatureMap.set(robot.id, pathSignature);
+      }
 
       let line = this.pathLineMap.get(robot.id);
       if (!line) {
-        const colorHex = this.pathColors[idx % this.pathColors.length];
-        const geometry = new THREE.BufferGeometry().setFromPoints(points);
+        const points = this.pathPointsMap.get(robot.id)!;
+        const numericId = Number(robot.id.match(/\d+/)?.[0] ?? idx);
+        const colorHex = this.pathColors[Math.max(0, numericId - 1) % this.pathColors.length];
+        const selected = robot.id === this.selectedRobotId;
+        const geometry = this.createPathGeometry(points, selected);
 
-        const material = new THREE.LineDashedMaterial({
+        const material = new THREE.MeshBasicMaterial({
           color: colorHex,
-          linewidth: 3,
-          scale: 1,
-          dashSize: 0.6,
-          gapSize: 0.3,
           transparent: true,
-          opacity: 0.85
+          opacity: selected ? 1.0 : 0.78,
+          depthWrite: false
         });
 
-        line = new THREE.Line(geometry, material);
-        line.computeLineDistances();
+        line = new THREE.Mesh(geometry, material);
 
         this.pathLineMap.set(robot.id, line);
         this.pathMatMap.set(robot.id, material);
+        this.pathSelectedMap.set(robot.id, selected);
         this.group.add(line);
       } else {
-        // Update line geometry points
-        line.geometry.dispose();
-        line.geometry = new THREE.BufferGeometry().setFromPoints(points);
-        line.computeLineDistances();
+        const selected = robot.id === this.selectedRobotId;
+        const wasSelected = this.pathSelectedMap.get(robot.id) ?? false;
+        if (pathChanged || wasSelected !== selected) {
+          const points = this.pathPointsMap.get(robot.id)!;
+          line.geometry.dispose();
+          line.geometry = this.createPathGeometry(points, selected);
+          this.pathSelectedMap.set(robot.id, selected);
+        }
+        this.applyStyle(robot.id, this.pathMatMap.get(robot.id)!);
       }
     });
 
@@ -106,11 +133,13 @@ export class PathSystem {
 
   public update(deltaTimeSec: number): void {
     // Animate directional dash offset flow along path lines
-    this.pathMatMap.forEach(mat => {
-      if (mat.dashSize !== undefined) {
-        mat.dashSize = (mat.dashSize + deltaTimeSec * 0.5) % 2;
-      }
-    });
+    // Keep this loop intentionally small and allocation-free for a 20-robot fleet.
+    this.pathMatMap.forEach((mat, id) => this.applyStyle(id, mat));
+  }
+
+  private applyStyle(id: string, material: THREE.MeshBasicMaterial): void {
+    const selected = id === this.selectedRobotId;
+    material.opacity = selected ? 1.0 : 0.78;
   }
 
   private removePath(id: string): void {
@@ -121,6 +150,19 @@ export class PathSystem {
       this.group.remove(line);
       this.pathLineMap.delete(id);
       this.pathMatMap.delete(id);
+      this.pathPointsMap.delete(id);
+      this.pathSignatureMap.delete(id);
+      this.pathSelectedMap.delete(id);
     }
+  }
+
+  private createPathGeometry(points: THREE.Vector3[], selected: boolean): THREE.TubeGeometry {
+    return new THREE.TubeGeometry(
+      new THREE.CatmullRomCurve3(points),
+      Math.max(1, points.length - 1),
+      selected ? 0.14 : 0.07,
+      6,
+      false
+    );
   }
 }
