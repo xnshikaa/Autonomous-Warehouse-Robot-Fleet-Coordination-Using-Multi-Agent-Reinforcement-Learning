@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
 from dataclasses import fields
 from pathlib import Path
@@ -15,7 +16,11 @@ def load_episode_records(paths: list[Path]) -> list[EpisodeRecord]:
     records: list[EpisodeRecord] = []
     record_fields = {field.name for field in fields(EpisodeRecord)}
     for path in paths:
-        document = json.loads(path.read_text(encoding="utf-8"))
+        if path.suffix == ".gz":
+            with gzip.open(path, "rt", encoding="utf-8") as stream:
+                document = json.load(stream)
+        else:
+            document = json.loads(path.read_text(encoding="utf-8"))
         for episode in document.get("episodes", []):
             records.append(
                 EpisodeRecord(**{

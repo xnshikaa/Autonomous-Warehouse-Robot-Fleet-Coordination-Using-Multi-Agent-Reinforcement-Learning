@@ -7,7 +7,9 @@ does not alter the warehouse environment or algorithm implementations.
 from __future__ import annotations
 
 import argparse
+import gzip
 import json
+import logging
 import random
 from pathlib import Path
 from typing import Any, Callable
@@ -21,6 +23,7 @@ from src.marl.environment_adapter import MARLEnvironmentAdapter
 from src.marl.iql_learner import IQLLearner
 from src.marl.observation_encoder import ObservationEncoder
 from src.marl.qmix_controller import QMIXController
+from src.evaluation.metrics import infer_robot_robot_collisions
 from src.warehouse.task_generation import generate_task_assignments
 
 
@@ -63,13 +66,27 @@ def _record_episode(
     max_steps: int,
     task_seed: int,
     action_provider: Callable[[WarehouseEnvironment], dict[int, int]],
+    scenario: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     environment = WarehouseEnvironment(
         num_robots=fleet_size,
         max_steps=max_steps,
     )
+    environment.logger.setLevel(logging.ERROR)
     environment.reset()
-    initial_tasks = _add_seeded_tasks(environment, task_seed)
+    if scenario is None:
+        initial_tasks = _add_seeded_tasks(environment, task_seed)
+    else:
+        if scenario.get("layout_id") != environment.get_active_layout().layout_id:
+            raise ValueError("Scenario layout does not match the active warehouse layout")
+        initial_tasks = scenario.get("initial_tasks")
+        if not isinstance(initial_tasks, list) or not initial_tasks:
+            raise ValueError("Scenario must contain a non-empty initial_tasks list")
+        for task in initial_tasks:
+            environment.add_task(
+                task["task_id"], task["pickup_position"], task["delivery_position"],
+                task.get("assigned_robot"),
+            )
 
     task_snapshots: list[list[dict[str, Any]]] = [_task_snapshot(environment)]
     collision_events: list[dict[str, Any]] = []
@@ -77,11 +94,16 @@ def _record_episode(
     action_trace: list[dict[str, Any]] = []
     steps = 0
     terminated = False
+    episode_team_reward = 0.0
 
     while not terminated and steps < max_steps:
         actions = action_provider(environment)
+        previous_positions = {
+            robot.robot_id: tuple(robot.position) for robot in environment.robots
+        }
         _, rewards, terminated, _ = environment.step(actions)
         steps += 1
+        episode_team_reward += float(np.mean(list(rewards.values()))) if rewards else 0.0
         action_trace.append({
             "step": steps,
             "requested_actions": actions,
@@ -95,6 +117,13 @@ def _record_episode(
             },
             "agent_rewards": rewards,
         })
+        actual_positions = {
+            robot.robot_id: tuple(robot.position) for robot in environment.robots
+        }
+        collision_events.extend(
+            {**event, "step": steps}
+            for event in infer_robot_robot_collisions(previous_positions, actual_positions)
+        )
         safety_conflict_events.extend(
             {
                 "type": "robot_robot_conflict",
@@ -114,6 +143,7 @@ def _record_episode(
         "fleet_size": fleet_size,
         "episode": episode_number,
         "task_seed": task_seed,
+        "layout_id": environment.get_active_layout().layout_id,
         "initial_tasks": initial_tasks,
         "action_trace": action_trace,
         "task_snapshots": task_snapshots,
@@ -121,6 +151,8 @@ def _record_episode(
         "safety_conflict_events": safety_conflict_events,
         "safety_overrides": environment.safety_overrides,
         "steps": steps,
+        "max_steps": max_steps,
+        "team_reward": episode_team_reward,
     }
 
 
@@ -182,20 +214,25 @@ def generate_rule_based(
     episodes: int,
     max_steps: int,
     seed: int,
+    scenarios: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
+    if scenarios is not None and len(scenarios) != episodes:
+        raise ValueError("scenario count must match episodes")
     random.seed(seed)
     np.random.seed(seed)
-    return [
+    traces = [
         _record_episode(
             "Rule-Based",
             fleet_size,
             episode,
             max_steps,
-            seed + episode - 1,
+            scenarios[episode - 1]["task_seed"] if scenarios else seed + episode - 1,
             _rule_based_provider,
+            scenarios[episode - 1] if scenarios else None,
         )
         for episode in range(1, episodes + 1)
     ]
+    return traces
 
 
 def generate_traces(
@@ -205,11 +242,14 @@ def generate_traces(
     max_steps: int,
     seed: int,
     checkpoint: str | Path | None = None,
+    scenarios: list[dict[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     """Generate seeded traces by running the requested policy checkpoint."""
+    if scenarios is not None and len(scenarios) != episodes:
+        raise ValueError("scenario count must match episodes")
     normalized = algorithm.lower().replace("_", "-")
     if normalized in {"rule-based", "rule"}:
-        return generate_rule_based(fleet_size, episodes, max_steps, seed)
+        return generate_rule_based(fleet_size, episodes, max_steps, seed, scenarios)
     if checkpoint is None:
         raise ValueError(f"A trained {algorithm} checkpoint is required for evaluation.")
     if normalized == "qmix":
@@ -221,29 +261,36 @@ def generate_traces(
     else:
         raise ValueError(f"Unsupported evaluation algorithm: {algorithm}")
 
-    return [
+    traces = [
         _record_episode(
             canonical,
             fleet_size,
             episode,
             max_steps,
-            seed + episode - 1,
+            scenarios[episode - 1]["task_seed"] if scenarios else seed + episode - 1,
             provider,
+            scenarios[episode - 1] if scenarios else None,
         )
         for episode in range(1, episodes + 1)
     ]
+    for trace in traces:
+        trace["policy_checkpoint_id"] = str(checkpoint)
+    return traces
 
 
 def write_traces(
     traces: list[dict[str, Any]],
     output_path: str | Path,
+    manifest: dict[str, Any] | None = None,
 ) -> Path:
     destination = Path(output_path)
     destination.parent.mkdir(parents=True, exist_ok=True)
-    destination.write_text(
-        json.dumps({"episodes": traces}, indent=2),
-        encoding="utf-8",
-    )
+    serialized = json.dumps({"manifest": manifest or {}, "episodes": traces}, indent=2)
+    if destination.suffix == ".gz":
+        with gzip.open(destination, "wt", encoding="utf-8") as stream:
+            stream.write(serialized)
+    else:
+        destination.write_text(serialized, encoding="utf-8")
     return destination
 
 

@@ -208,6 +208,48 @@ training example; EPyMARL is not vendored here.
 
 ---
 
+## Reproducible policy evaluation (P2)
+
+Before training a new policy, generate and commit a fresh evaluation manifest.
+Do not train or tune on its task queues. It materializes 20 scenarios per fleet
+size and hashes the layout/configuration and scenario-generation code.
+
+```bash
+.venv/bin/python -m src.evaluation.scenario_manifest \
+  --fleet-sizes 5 10 20 --episodes 20 --max-steps 100 --seed 976304181 \
+  --output results/evaluation/p2_holdout_2026_11/scenario_manifest.json
+```
+
+After committing the manifest and training, evaluate the same frozen scenarios
+with QMIX, IQL, and the rule-based baseline at N=5, 10, and 20. The command writes compressed
+per-step traces, checkpoint/config/source hashes, aggregate metrics,
+episode-bootstrap 95% confidence intervals, paired sign-flip comparisons,
+Holm-adjusted p-values, and the specification's scalability plots. The
+checkpoint paths must match the local training outputs.
+
+```bash
+MLFLOW_DISABLE_AGENT_HINT=1 .venv/bin/python -m src.evaluation.run_benchmark \
+  --fleet-sizes 5 10 20 \
+  --algorithms QMIX IQL Rule-Based \
+  --qmix-checkpoint 5=artifacts/checkpoints/qmix/p1_pathcost_n5_refine500/checkpoint_3600 \
+  --qmix-checkpoint 10=artifacts/checkpoints/qmix/p2_qmix_n10_seed300010/latest \
+  --qmix-checkpoint 20=artifacts/checkpoints/qmix/p2_qmix_n20_seed300020/latest \
+  --iql-checkpoint 5=artifacts/checkpoints/iql/p2_iql_n5_seed400005 \
+  --iql-checkpoint 10=artifacts/checkpoints/iql/p2_iql_n10_seed400010 \
+  --iql-checkpoint 20=artifacts/checkpoints/iql/p2_iql_n20_seed400020 \
+  --episodes 20 --max-steps 100 \
+  --scenario-manifest results/evaluation/p2_holdout_2026_11/scenario_manifest.json \
+  --output results/evaluation/p2_benchmark
+```
+
+`manifest.json`, `summary.json`, `report.md`, and `scalability.png` are the report files;
+`safety_gate.json` records the separate 20-episode aggressive corridor-entry
+gate. `traces/` contains gzip-compressed raw episodes and can be loaded by
+`src.evaluation.run_evaluation`. Collision counts represent actual collision
+events. Safety-blocked conflicts and overrides are reported separately. The
+benchmark is an evaluation harness, not evidence that a policy converged; use
+the completion metrics and traces to assess the selected checkpoints.
+
 ## ⚡ Technical Performance Optimizations
 
 - **`InstancedMesh`**: Used for all storage rack tiers and crates, reducing draw calls from hundreds down to 2 draw calls.
