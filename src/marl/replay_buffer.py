@@ -61,6 +61,7 @@ class ReplayBuffer:
         next_observations: np.ndarray | torch.Tensor,
         next_global_state: np.ndarray | torch.Tensor,
         terminated: bool | float | int,
+        next_action_masks: np.ndarray | torch.Tensor | None = None,
     ) -> None:
         """Add a single transition to the replay buffer."""
 
@@ -70,6 +71,11 @@ class ReplayBuffer:
         next_obs_arr = np.asarray(next_observations, dtype=np.float32)
         next_state_arr = np.asarray(next_global_state, dtype=np.float32)
         term_val = float(terminated)
+        masks_arr = (
+            np.ones((self.num_agents, 4), dtype=np.bool_)
+            if next_action_masks is None
+            else np.asarray(next_action_masks, dtype=np.bool_)
+        )
 
         # Validate shapes
         if obs_arr.shape != (self.num_agents, self.observation_dim):
@@ -99,6 +105,13 @@ class ReplayBuffer:
                 f"Expected next_global_state shape ({self.state_dim},), got {next_state_arr.shape}"
             )
 
+        if masks_arr.shape != (self.num_agents, 4):
+            raise ValueError(
+                f"Expected next_action_masks shape ({self.num_agents}, 4), got {masks_arr.shape}"
+            )
+        if not masks_arr.any(axis=1).all():
+            raise ValueError("Every agent must have at least one legal next action.")
+
         transition = {
             "observations": obs_arr,
             "global_states": state_arr,
@@ -107,6 +120,7 @@ class ReplayBuffer:
             "next_observations": next_obs_arr,
             "next_global_states": next_state_arr,
             "terminated": np.float32(term_val),
+            "next_action_masks": masks_arr,
         }
 
         if len(self.storage) < self.capacity:
@@ -146,6 +160,9 @@ class ReplayBuffer:
         next_obs_batch = np.stack([s["next_observations"] for s in samples], axis=0)
         next_state_batch = np.stack([s["next_global_states"] for s in samples], axis=0)
         terminated_batch = np.array([s["terminated"] for s in samples], dtype=np.float32)
+        next_action_masks_batch = np.stack(
+            [s["next_action_masks"] for s in samples], axis=0
+        )
 
         return {
             "observations": torch.tensor(obs_batch, dtype=torch.float32, device=device),
@@ -155,6 +172,9 @@ class ReplayBuffer:
             "next_observations": torch.tensor(next_obs_batch, dtype=torch.float32, device=device),
             "next_global_states": torch.tensor(next_state_batch, dtype=torch.float32, device=device),
             "terminated": torch.tensor(terminated_batch, dtype=torch.float32, device=device),
+            "next_action_masks": torch.tensor(
+                next_action_masks_batch, dtype=torch.bool, device=device
+            ),
         }
 
     def __len__(self) -> int:

@@ -53,19 +53,45 @@ A premium, research-grade 3D visualization layer built for university project de
 
 ## 🚀 How to Run
 
+Use Python 3.11 and Node.js 22 LTS. From the repository root, install the
+backend and frontend dependencies:
+
 ```bash
-# 1. Install dependencies
-npm install
+# Python backend and test dependencies
+python3.11 -m venv .venv
+source .venv/bin/activate
+python -m pip install -r requirements.txt
 
-# 2. Start local development server
-npm run dev
-
-# 3. Type check & production build verification
-npx tsc --noEmit
-npx vite build
+# Frontend dependencies (package-lock.json pins the npm dependency tree)
+npm ci
 ```
 
-Open [http://localhost:3000](http://localhost:3000) in your browser.
+Start each service in a separate terminal from the repository root. Activate
+`.venv` in the backend terminal:
+
+```bash
+source .venv/bin/activate
+python -m src.api.warehouse_backend
+```
+
+```bash
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000). To run the available
+baseline checks:
+
+```bash
+source .venv/bin/activate
+python -m pytest -q
+npm run lint
+npm run build
+```
+
+`requirements.txt` specifies minimum Python package versions rather than an
+exact lock, so a Python dependency installation is not byte-for-byte pinned.
+The repository does not define a frontend unit-test script; `npm run lint` and
+`npm run build` are its available frontend checks.
 
 ---
 
@@ -158,9 +184,10 @@ EPyMARL training loop. It keeps the frontend, policy, and environment on the
 same episode state. The backend uses the QMIX learner for action selection by
 default; `policy_source="demo"` remains available as a deterministic fallback.
 
-Start the backend with:
+Start the backend from the repository root with:
 
-```powershell
+```bash
+source .venv/bin/activate
 python -m src.api.warehouse_backend
 ```
 
@@ -170,8 +197,8 @@ does not currently contain a trained QMIX checkpoint, so the default live
 connection is a real QMIX inference path with initial (untrained) weights. A
 trained checkpoint can be supplied with:
 
-```powershell
-$env:QMIX_CHECKPOINT = "C:\path\to\qmix_checkpoint.pt"
+```bash
+export QMIX_CHECKPOINT="/path/to/qmix_checkpoint.pt"
 python -m src.api.warehouse_backend
 ```
 

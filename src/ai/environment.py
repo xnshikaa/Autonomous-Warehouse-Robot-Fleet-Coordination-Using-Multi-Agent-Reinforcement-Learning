@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from collections import deque
 from pathlib import Path
 from typing import Any, Dict, List, Sequence
 
@@ -55,6 +56,7 @@ class WarehouseEnvironment:
         layout.validate(required_robots=self.num_robots)
         self._active_layout = layout
         self.warehouse_width, self.warehouse_height = layout.dimensions
+        self._distance_maps: dict[Cell, dict[Cell, int]] = {}
         self.corridor = CorridorModule(layout.human_corridors, enabled=self.corridor_enabled,
                                        warehouse_size=layout.dimensions)
         self.safety_layer = SafetyLayer(self.corridor, self.get_target_cell)
@@ -140,6 +142,11 @@ class WarehouseEnvironment:
     def _get_robot_task(self, robot_id: int):
         return next((task for task in self.tasks if task.assigned_robot == robot_id and not task.completed), None)
 
+    @staticmethod
+    def _task_target(robot: RobotState, task: TaskState) -> Cell:
+        """Return the pickup or delivery target for the robot's current task phase."""
+        return task.delivery_position if robot.carrying_item else task.pickup_position
+
     def _occupancy_category(self, robot: RobotState, cell: Cell) -> int:
         if cell == robot.position:
             return 0
@@ -157,7 +164,7 @@ class WarehouseEnvironment:
         observations = []
         for robot in self.robots:
             task = self._get_robot_task(robot.robot_id)
-            target = None if task is None else (task.delivery_position if robot.position == task.pickup_position else task.pickup_position)
+            target = None if task is None else self._task_target(robot, task)
             rx, ry = robot.position
             observations.append(RobotObservation(
                 robot.robot_id,
@@ -186,6 +193,26 @@ class WarehouseEnvironment:
         target = robot.position[0] + dx, robot.position[1] + dy
         return target if self.is_within_bounds(target) else None
 
+    def get_action_masks(self) -> list[list[bool]]:
+        """Return per-robot actions that obey static warehouse constraints."""
+        masks = []
+        for robot in self.robots:
+            legal = []
+            for action in self.ACTIONS:
+                target = self.get_target_cell(robot, action)
+                legal.append(
+                    target is not None
+                    and self.is_walkable(target)
+                    and not (
+                        self.corridor_enabled
+                        and target in self._active_layout.human_corridors
+                    )
+                )
+            if not any(legal):
+                raise RuntimeError(f"Robot {robot.robot_id} has no legal movement actions.")
+            masks.append(legal)
+        return masks
+
     calculate_target_cell = get_target_cell
 
     def _get_next_position(self, robot: RobotState, action: int) -> Cell:
@@ -195,6 +222,28 @@ class WarehouseEnvironment:
     @staticmethod
     def _manhattan_distance(a, b) -> int:
         return abs(a[0] - b[0]) + abs(a[1] - b[1])
+
+    def _path_distance(self, start: Cell, goal: Cell) -> int:
+        """Shortest static travel distance, excluding shelves and worker zones."""
+        distances = self._distance_maps.get(goal)
+        if distances is None:
+            blocked = set(self._active_layout.obstacles) | set(self._active_layout.human_corridors)
+            distances = {}
+            if goal not in blocked and self.is_walkable(goal):
+                queue = deque([goal])
+                distances[goal] = 0
+                while queue:
+                    cell = queue.popleft()
+                    for dx, dy in self.ACTION_DELTAS.values():
+                        neighbor = (cell[0] + dx, cell[1] + dy)
+                        if (neighbor not in distances and neighbor not in blocked
+                                and self.is_within_bounds(neighbor) and self.is_walkable(neighbor)):
+                            distances[neighbor] = distances[cell] + 1
+                            queue.append(neighbor)
+            self._distance_maps[goal] = distances
+        # Keep invalid task coordinates finite; add_task validation is handled
+        # separately from the progress potential.
+        return distances.get(start, self._manhattan_distance(start, goal))
 
     # Step ----------------------------------------------------------------------
     @staticmethod
@@ -215,13 +264,14 @@ class WarehouseEnvironment:
         previous_distances = {}
         for robot in self.robots:
             task = self._get_robot_task(robot.robot_id)
-            target = None if task is None else (task.delivery_position if robot.position == task.pickup_position else task.pickup_position)
-            previous_distances[robot.robot_id] = 0 if target is None else self._manhattan_distance(robot.position, target)
+            target = None if task is None else self._task_target(robot, task)
+            previous_distances[robot.robot_id] = 0 if target is None else self._path_distance(robot.position, target)
 
         # Safety checks happen for every robot before any position is mutated.
         self._last_safety_events = []
         safe_actions: dict[int, int | None] = {}
         danger = {robot.robot_id: False for robot in self.robots}
+        blocked_motion = {robot.robot_id: False for robot in self.robots}
         for robot in self.robots:
             decision = self.safety_layer.check_action(robot, actions[robot.robot_id])
             event = SafetyOverrideEvent.from_decision(
@@ -240,14 +290,22 @@ class WarehouseEnvironment:
             self._safety_event_history.append(event)
             if event.overridden:
                 self.safety_overrides += 1
-                danger[robot.robot_id] = True
+                danger[robot.robot_id] = event.reason == "human_corridor"
+                blocked_motion[robot.robot_id] = event.reason in {"out_of_bounds", "obstacle"}
 
         proposed = {robot.robot_id: robot.position if safe_actions[robot.robot_id] is None
                     else self._get_next_position(robot, safe_actions[robot.robot_id]) for robot in self.robots}
         target_map: dict[Cell, list[int]] = {}
         for robot_id, position in proposed.items():
             target_map.setdefault(position, []).append(robot_id)
-        collision_robots = {robot_id for ids in target_map.values() if len(ids) > 1 for robot_id in ids}
+        # Resolve same-cell contention deterministically: one robot may claim
+        # a free destination while the others wait. Freezing every contender
+        # made a single conflict a persistent deadlock for the whole group.
+        collision_robots = {
+            robot_id
+            for ids in target_map.values() if len(ids) > 1
+            for robot_id in sorted(ids)[1:]
+        }
         for index, a in enumerate(self.robots):
             for b in self.robots[index + 1:]:
                 if (proposed[a.robot_id] == previous[b.robot_id] and proposed[b.robot_id] == previous[a.robot_id]
@@ -274,7 +332,6 @@ class WarehouseEnvironment:
                 self._safety_event_history.append(event)
                 safe_actions[robot_id] = None
                 self.safety_overrides += 1
-                danger[robot_id] = True
 
         for event in self._last_safety_events:
             if event.overridden:
@@ -301,10 +358,12 @@ class WarehouseEnvironment:
             robot.blocked_reason = event.reason if blocked else None
 
         delivered = set()
+        picked_up = set()
         for robot in self.robots:
             task = self._get_robot_task(robot.robot_id)
-            if task and not task.completed and robot.position == task.pickup_position:
+            if task and not task.completed and not robot.carrying_item and robot.position == task.pickup_position:
                 robot.carrying_item = True
+                picked_up.add(robot.robot_id)
 
         for task in self.tasks:
             if not task.completed and task.assigned_robot is not None:
@@ -317,9 +376,14 @@ class WarehouseEnvironment:
         rewards = {}
         for robot in self.robots:
             task = self._get_robot_task(robot.robot_id)
-            target = None if task is None else (task.delivery_position if robot.position == task.pickup_position else task.pickup_position)
+            target = None if task is None else self._task_target(robot, task)
+            current_distance = (
+                0 if robot.robot_id in picked_up or target is None
+                else self._path_distance(robot.position, target)
+            )
             rewards[robot.robot_id] = self.reward_function.calculate(
-                previous_distances[robot.robot_id], 0 if target is None else self._manhattan_distance(robot.position, target),
-                delivered=robot.robot_id in delivered, collision=robot.robot_id in collision_robots, danger=danger[robot.robot_id])
+                previous_distances[robot.robot_id], current_distance,
+                delivered=robot.robot_id in delivered, collision=robot.robot_id in collision_robots,
+                danger=danger[robot.robot_id], blocked=blocked_motion[robot.robot_id])
         terminated = self.episode_manager.is_terminated(sum(not task.completed for task in self.tasks))
         return self.get_observations(), rewards, terminated, self.get_global_state()

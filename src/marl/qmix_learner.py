@@ -1,4 +1,5 @@
 from copy import deepcopy
+from typing import Optional
 
 import torch
 import torch.nn.functional as F
@@ -68,6 +69,7 @@ class QMIXLearner:
         self,
         observations: torch.Tensor,
         epsilon: float = 0.0,
+        action_masks: Optional[torch.Tensor] = None,
     ) -> torch.Tensor:
         """
         Select one action for each agent using epsilon-greedy policy.
@@ -100,6 +102,16 @@ class QMIXLearner:
                 observations
             )
 
+        if action_masks is not None:
+            if action_masks.shape != (self.num_agents, self.action_dim):
+                raise ValueError(
+                    f"action_masks must have shape ({self.num_agents}, {self.action_dim})"
+                )
+            action_masks = action_masks.to(dtype=torch.bool, device=q_values.device)
+            if not torch.all(action_masks.any(dim=-1)):
+                raise ValueError("Every agent must have at least one legal action.")
+            q_values = q_values.masked_fill(~action_masks, -torch.inf)
+
         greedy_actions = q_values.argmax(
             dim=-1
         )
@@ -107,14 +119,20 @@ class QMIXLearner:
         if epsilon <= 0:
             return greedy_actions
 
-        random_actions = torch.randint(
-            low=0,
-            high=self.action_dim,
-            size=(self.num_agents,),
-        )
+        if action_masks is None:
+            random_actions = torch.randint(
+                low=0,
+                high=self.action_dim,
+                size=(self.num_agents,),
+                device=q_values.device,
+            )
+        else:
+            random_actions = torch.multinomial(
+                action_masks.float(), num_samples=1
+            ).squeeze(-1)
 
         random_mask = (
-            torch.rand(self.num_agents)
+            torch.rand(self.num_agents, device=q_values.device)
             < epsilon
         )
 
@@ -133,6 +151,7 @@ class QMIXLearner:
         global_states: torch.Tensor,
         next_global_states: torch.Tensor,
         terminated: torch.Tensor,
+        next_action_masks: Optional[torch.Tensor] = None,
     ):
         """
         Perform one QMIX training update.
@@ -211,6 +230,19 @@ class QMIXLearner:
                 )
             )
 
+            if next_action_masks is not None:
+                expected_mask_shape = (
+                    observations.size(0), self.num_agents, self.action_dim
+                )
+                if next_action_masks.shape != expected_mask_shape:
+                    raise ValueError(
+                        f"next_action_masks must have shape {expected_mask_shape}"
+                    )
+                next_q_values = next_q_values.masked_fill(
+                    ~next_action_masks.to(dtype=torch.bool, device=next_q_values.device),
+                    -torch.inf,
+                )
+
             next_max_q_values = (
                 next_q_values.max(
                     dim=2
@@ -234,7 +266,9 @@ class QMIXLearner:
         # TD loss
         # ---------------------------------------------
 
-        loss = F.mse_loss(
+        # Huber TD loss is quadratic for small errors and linear for large
+        # errors, limiting the effect of unstable long-horizon targets.
+        loss = F.smooth_l1_loss(
             q_total,
             target,
         )

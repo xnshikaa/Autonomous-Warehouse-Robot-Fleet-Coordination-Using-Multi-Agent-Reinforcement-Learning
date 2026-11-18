@@ -11,7 +11,7 @@ def test_progress_reward():
         current_distance=9
     )
 
-    assert reward == pytest.approx(0.09)
+    assert reward == pytest.approx(0.99)
 
 
 def test_delivery_reward():
@@ -50,6 +50,18 @@ def test_danger_penalty():
     assert reward == pytest.approx(-20.01)
 
 
+def test_blocked_action_penalty_is_separate_from_collision_and_corridor_penalties():
+    reward_function = RewardFunction()
+
+    reward = reward_function.calculate(
+        previous_distance=10,
+        current_distance=10,
+        blocked=True,
+    )
+
+    assert reward == pytest.approx(-0.11)
+
+
 def test_combined_reward():
     reward_function = RewardFunction()
 
@@ -59,4 +71,4 @@ def test_combined_reward():
         delivered=True
     )
 
-    assert reward == pytest.approx(10.09)
+    assert reward == pytest.approx(10.99)

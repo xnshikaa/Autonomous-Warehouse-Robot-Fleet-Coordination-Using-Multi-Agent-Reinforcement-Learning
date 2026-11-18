@@ -158,8 +158,10 @@ def run_infrastructure_smoke_test():
     print("=" * 80)
     print("  INFRASTRUCTURE SMOKE TEST PASSED SUCCESSFULLY!")
     print("=" * 80)
-    print(f"MLflow Run Data: file:///{os.path.abspath('mlruns').replace('\\', '/')}")
-    print(f"Checkpoints:    file:///{os.path.abspath(checkpoint_mgr.run_dir).replace('\\', '/')}")
+    mlflow_path = os.path.abspath("mlruns").replace("\\", "/")
+    checkpoint_path = os.path.abspath(checkpoint_mgr.run_dir).replace("\\", "/")
+    print(f"MLflow Run Data: file:///{mlflow_path}")
+    print(f"Checkpoints:    file:///{checkpoint_path}")
     print("=" * 80)
 
     return True

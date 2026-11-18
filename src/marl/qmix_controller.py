@@ -22,7 +22,6 @@ class QMIXController:
     weights are initialised and therefore are not learned warehouse policy.
     """
 
-    OBSERVATION_DIM = 50
     ACTION_DIM = 4
 
     def __init__(
@@ -35,17 +34,23 @@ class QMIXController:
         self.epsilon = float(epsilon)
         self.checkpoint_path = str(checkpoint_path) if checkpoint_path else None
         self.checkpoint_loaded = False
+        self.encoder = None
         self.learner = self._new_learner()
         if checkpoint_path:
             self.load_checkpoint(checkpoint_path)
 
     def _new_learner(self) -> QMIXLearner:
         num_agents = self.adapter.get_num_agents()
+        layout = self.adapter.environment.get_active_layout()
+        self.encoder = ObservationEncoder(
+            layout.width, layout.height, include_static_map=True,
+            include_path_costs=True,
+        )
         return QMIXLearner(
             num_agents=num_agents,
-            observation_dim=self.OBSERVATION_DIM,
+            observation_dim=self.encoder.observation_dim,
             action_dim=self.ACTION_DIM,
-            state_dim=self.OBSERVATION_DIM * num_agents,
+            state_dim=11 * num_agents,
         )
 
     def reset_for_fleet(self) -> None:
@@ -76,11 +81,23 @@ class QMIXController:
         agent_state = payload.get("agent_network") or payload.get("model_state_dict")
         if agent_state is None:
             raise ValueError("QMIX checkpoint is missing 'agent_network'")
-        self.learner.agent_network.load_state_dict(agent_state)
+        try:
+            self.learner.agent_network.load_state_dict(agent_state)
+        except RuntimeError as error:
+            raise ValueError(
+                "QMIX checkpoint observation/network dimensions are incompatible "
+                "with the current map-aware policy input. Retrain the policy."
+            ) from error
 
         mixer_state = payload.get("mixer")
         if mixer_state is not None:
-            self.learner.mixer.load_state_dict(mixer_state)
+            try:
+                self.learner.mixer.load_state_dict(mixer_state)
+            except RuntimeError as error:
+                raise ValueError(
+                    "QMIX checkpoint mixer dimensions are incompatible with the "
+                    "current centralized-state configuration. Retrain the policy."
+                ) from error
 
         self.learner.agent_network.eval()
         self.learner.mixer.eval()
@@ -90,12 +107,16 @@ class QMIXController:
     def _observations(self) -> torch.Tensor:
         environment = self.adapter.environment
         layout = environment.get_active_layout()
-        encoder = ObservationEncoder(
-            grid_width=layout.width,
-            grid_height=layout.height,
-        )
+        if self.encoder is None or (
+            self.encoder.grid_width,
+            self.encoder.grid_height,
+        ) != layout.dimensions:
+            self.encoder = ObservationEncoder(
+                layout.width, layout.height, include_static_map=True,
+                include_path_costs=True,
+            )
         encoded = [
-            encoder.encode(
+            self.encoder.encode(
                 robot,
                 environment.robots,
                 environment.tasks,
@@ -109,7 +130,12 @@ class QMIXController:
         """Return one QMIX action for each currently active robot."""
 
         observations = self._observations()
-        actions = self.learner.select_actions(observations, epsilon=self.epsilon)
+        action_masks = torch.as_tensor(
+            self.adapter.environment.get_action_masks(), dtype=torch.bool
+        )
+        actions = self.learner.select_actions(
+            observations, epsilon=self.epsilon, action_masks=action_masks
+        )
         return {
             robot_id: int(action)
             for robot_id, action in zip(

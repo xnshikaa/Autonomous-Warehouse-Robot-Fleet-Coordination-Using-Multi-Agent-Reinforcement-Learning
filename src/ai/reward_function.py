@@ -18,7 +18,8 @@ class RewardFunction:
         current_distance,
         delivered=False,
         collision=False,
-        danger=False
+        danger=False,
+        blocked=False,
     ):
         """
         Calculate the reward for one environment step.
@@ -51,5 +52,10 @@ class RewardFunction:
         # Penalize dangerous movement.
         if danger:
             reward += self.rewards["danger_penalty"]
+
+        # Invalid wall/obstacle moves should cost more than idling, but remain
+        # distinct from robot collisions and worker-corridor intrusions.
+        if blocked:
+            reward += self.rewards["blocked_action_penalty"]
 
         return reward

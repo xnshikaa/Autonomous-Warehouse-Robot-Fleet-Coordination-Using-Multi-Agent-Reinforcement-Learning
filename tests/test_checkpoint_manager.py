@@ -18,7 +18,8 @@ def test_save_and_load_checkpoint(tmp_checkpoint_mgr):
     data = {
         "model_weights": [1.0, 2.0, 3.0],
         "optimizer_state": {"lr": 0.001},
-        "step": 100
+        "step": 100,
+        "config": {"observation_dim": 456},
     }
     saved_dir = tmp_checkpoint_mgr.save_checkpoint(data, step=100)
     assert os.path.exists(saved_dir)
@@ -27,7 +28,7 @@ def test_save_and_load_checkpoint(tmp_checkpoint_mgr):
     loaded = tmp_checkpoint_mgr.load_checkpoint(100)
     assert loaded["metadata"]["step"] == 100
     assert loaded["metadata"]["algorithm"] == "QMIX"
-    assert loaded["metadata"]["observation_vector"] == "50-D"
+    assert loaded["metadata"]["observation_vector"] == "456-D"
     assert loaded["metadata"]["action_space"] == "Discrete(4)"
     assert loaded["checkpoint_data"]["model_weights"] == [1.0, 2.0, 3.0]
 

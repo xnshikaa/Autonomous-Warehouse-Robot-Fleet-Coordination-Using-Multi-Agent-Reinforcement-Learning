@@ -40,9 +40,27 @@ def test_qmix_trainer_reproducible_setup():
 
     assert trainer.seed == 42
     assert trainer.num_agents == 5
-    assert trainer.observation_dim == 50
+    assert trainer.observation_dim == 456
     assert trainer.action_dim == 4
-    assert trainer.state_dim == 250
+    assert trainer.state_dim == 55
+
+
+def test_first_training_observation_includes_assigned_task():
+    trainer = QMIXTrainer(episodes=1, max_steps=1, seed=42)
+    captured = []
+    select_actions = trainer.learner.select_actions
+
+    def capture_observations(observations, epsilon=0.0, action_masks=None):
+        captured.append(observations.clone())
+        return select_actions(
+            observations, epsilon=epsilon, action_masks=action_masks
+        )
+
+    trainer.learner.select_actions = capture_observations
+    trainer.train()
+
+    assert len(captured) == 1
+    assert torch.all(captured[0][:, 48] == 1.0)
 
 
 def test_global_state_dimension():
@@ -52,15 +70,28 @@ def test_global_state_dimension():
         seed=42,
     )
 
-    observation = np.zeros(
-        (5, 50),
-        dtype=np.float32,
-    )
+    environment = trainer.env.adapter.environment
+    environment.reset()
+    environment.add_task(1, (2, 1), (2, 15), assigned_robot=0)
+    state = trainer._build_global_state(environment.get_global_state())
 
-    state = trainer._build_global_state(observation)
-
-    assert state.shape == (250,)
+    assert state.shape == (55,)
     assert state.dtype == np.float32
+    assert state[15] == 1.0  # First task slot is present.
+    assert state[18] == pytest.approx(2 / 19)  # Pickup x is in the global state.
+    assert state[20] == pytest.approx(2 / 19)  # Delivery x is in the global state.
+
+
+def test_global_state_dimension_scales_with_fleet_size():
+    trainer = QMIXTrainer(num_agents=10, episodes=1, max_steps=1, seed=42)
+    environment = trainer.env.adapter.environment
+    environment.reset()
+    environment.add_task(1, (2, 1), (2, 15), assigned_robot=0)
+
+    state = trainer._build_global_state(environment.get_global_state())
+
+    assert state.shape == (110,)
+    assert state[30] == 1.0  # Task slots follow the 3 features per robot.
 
 
 def test_qmix_trainer_mlflow_and_checkpoint_integration(tmp_path):
@@ -126,7 +157,9 @@ def test_qmix_trainer_checkpoint_resume(tmp_path):
 
     weights_after = trainer2.learner.agent_network.network[0].weight.clone()
     assert torch.equal(weights_before, weights_after)
+    assert trainer2.episode_offset == 4
 
     # Resume training
     history2 = trainer2.train()
     assert len(history2) == 2
+    assert [episode["episode"] for episode in history2] == [5, 6]

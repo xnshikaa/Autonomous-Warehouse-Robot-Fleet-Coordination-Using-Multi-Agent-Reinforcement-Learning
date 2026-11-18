@@ -1,6 +1,10 @@
+import pytest
+import torch
+
 from src.ai.environment import WarehouseEnvironment
 from src.marl.environment_adapter import MARLEnvironmentAdapter
 from src.marl.qmix_controller import QMIXController
+from src.marl.qmix_learner import QMIXLearner
 
 
 def test_qmix_controller_selects_valid_actions_for_shared_environment():
@@ -29,3 +33,16 @@ def test_qmix_controller_actions_use_the_environment_step_boundary():
     assert len(rewards) == 1
     assert isinstance(terminated, bool)
     assert len(global_state.robots) == 1
+
+
+def test_qmix_controller_rejects_pre_map_checkpoint(tmp_path):
+    old_learner = QMIXLearner(
+        num_agents=5, observation_dim=50, action_dim=4, state_dim=250
+    )
+    checkpoint = tmp_path / "old_qmix.pt"
+    torch.save({"agent_network": old_learner.agent_network.state_dict()}, checkpoint)
+    environment = WarehouseEnvironment(num_robots=5)
+    adapter = MARLEnvironmentAdapter(environment=environment)
+
+    with pytest.raises(ValueError, match="incompatible"):
+        QMIXController(adapter, checkpoint_path=checkpoint)

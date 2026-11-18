@@ -23,26 +23,34 @@ class WarehouseGymEnv(gym.Env):
         self,
         num_agents: int = 5,
         max_steps: int = 100,
+        include_static_map: bool = False,
+        include_path_costs: bool = False,
     ):
         super().__init__()
-
-        self.spec_config = MARLEnvironmentSpec(
-            num_agents=num_agents,
-            max_steps=max_steps,
-        )
 
         self.adapter = MARLEnvironmentAdapter(
             num_agents=num_agents,
             max_steps=max_steps,
         )
 
-        self.encoder = ObservationEncoder()
+        layout = self.adapter.environment.get_active_layout()
+        self.include_static_map = include_static_map
+        self.include_path_costs = include_path_costs
+        self.encoder = ObservationEncoder(
+            layout.width, layout.height, include_static_map=include_static_map,
+            include_path_costs=include_path_costs,
+        )
+        self.spec_config = MARLEnvironmentSpec(
+            num_agents=num_agents,
+            observation_dim=self.encoder.observation_dim,
+            max_steps=max_steps,
+        )
 
         self.num_agents = num_agents
         self.observation_dim = self.spec_config.observation_dim
         self.action_dim = self.spec_config.action_dim
 
-        # One 50-dimensional observation for one robot.
+        # One local policy observation for one robot.
         self.observation_space = spaces.Box(
             low=-1.0,
             high=1.0,
@@ -133,6 +141,13 @@ class WarehouseGymEnv(gym.Env):
         """
 
         environment = self.adapter.environment
+        layout = environment.get_active_layout()
+        self.encoder = ObservationEncoder(
+            layout.width,
+            layout.height,
+            include_static_map=self.include_static_map,
+            include_path_costs=self.include_path_costs,
+        )
 
         robots = environment.robots
         tasks = environment.tasks
@@ -147,6 +162,7 @@ class WarehouseGymEnv(gym.Env):
                 robot,
                 robots,
                 tasks,
+                layout=layout,
             )
 
             vector = np.asarray(

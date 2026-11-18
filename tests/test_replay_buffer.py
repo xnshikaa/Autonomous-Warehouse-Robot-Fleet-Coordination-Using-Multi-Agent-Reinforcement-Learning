@@ -65,6 +65,8 @@ def test_replay_buffer_sampling_shapes_and_types():
     assert batch["next_observations"].shape == (4, 5, 50)
     assert batch["next_global_states"].shape == (4, 250)
     assert batch["terminated"].shape == (4,)
+    assert batch["next_action_masks"].shape == (4, 5, 4)
+    assert batch["next_action_masks"].dtype == torch.bool
 
     assert batch["observations"].dtype == torch.float32
     assert batch["actions"].dtype == torch.long

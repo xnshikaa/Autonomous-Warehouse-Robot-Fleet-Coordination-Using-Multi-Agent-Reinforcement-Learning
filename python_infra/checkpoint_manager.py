@@ -96,12 +96,16 @@ class CheckpointManager:
         self._save_payload(state_file, checkpoint_data)
 
         # Build clean metadata
+        checkpoint_config = checkpoint_data.get("config") or {}
+        observation_dim = checkpoint_config.get("observation_dim")
         metadata = {
             "step": step,
             "algorithm": self.algorithm,
             "run_id": self.run_id,
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
-            "observation_vector": "50-D",
+            "observation_vector": (
+                f"{observation_dim}-D" if observation_dim is not None else "unknown"
+            ),
             "action_space": "Discrete(4)",
             "is_best": is_best,
             "best_metric_val": best_metric_val,

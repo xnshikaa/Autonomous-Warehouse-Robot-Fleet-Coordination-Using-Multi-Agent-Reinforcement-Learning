@@ -11,6 +11,7 @@ from python_infra.experiment_tracker import ExperimentTracker
 from src.marl.gymnasium_env import WarehouseGymEnv
 from src.marl.qmix_learner import QMIXLearner
 from src.marl.replay_buffer import ReplayBuffer
+from src.warehouse.task_generation import generate_task_assignments
 
 
 class QMIXTrainer:
@@ -28,13 +29,13 @@ class QMIXTrainer:
     def __init__(
         self,
         num_agents: int = 5,
-        observation_dim: int = 50,
+        observation_dim: Optional[int] = None,
         action_dim: int = 4,
-        state_dim: int = 250,
+        state_dim: Optional[int] = None,
         learning_rate: float = 1e-3,
         gamma: float = 0.99,
         target_update_interval: int = 10,
-        max_steps: int = 20,
+        max_steps: int = 100,
         episodes: int = 5,
         batch_size: int = 32,
         replay_buffer_capacity: int = 5000,
@@ -50,14 +51,13 @@ class QMIXTrainer:
         checkpoint_interval: int = 10,
     ):
         self.num_agents = num_agents
-        self.observation_dim = observation_dim
         self.action_dim = action_dim
-        self.state_dim = state_dim
         self.learning_rate = learning_rate
         self.gamma = gamma
         self.target_update_interval = target_update_interval
         self.max_steps = max_steps
         self.episodes = episodes
+        self.episode_offset = 0
         self.batch_size = batch_size
         self.replay_buffer_capacity = replay_buffer_capacity
         self.replay_warmup_size = replay_warmup_size
@@ -78,13 +78,24 @@ class QMIXTrainer:
         self.env = WarehouseGymEnv(
             num_agents=num_agents,
             max_steps=max_steps,
+            include_static_map=True,
+            include_path_costs=True,
         )
+        self.observation_dim = self.env.observation_dim
+        if observation_dim is not None and observation_dim != self.observation_dim:
+            raise ValueError(
+                f"QMIX observation_dim must match the map-aware environment "
+                f"({self.observation_dim}), got {observation_dim}."
+            )
+        # The centralized state has 3 robot features and 8 task features per
+        # agent, independent of the decentralized observation size.
+        self.state_dim = state_dim if state_dim is not None else 11 * num_agents
 
         self.learner = QMIXLearner(
             num_agents=num_agents,
-            observation_dim=observation_dim,
+            observation_dim=self.observation_dim,
             action_dim=action_dim,
-            state_dim=state_dim,
+            state_dim=self.state_dim,
             learning_rate=learning_rate,
             gamma=gamma,
             target_update_interval=target_update_interval,
@@ -93,8 +104,8 @@ class QMIXTrainer:
         self.replay_buffer = ReplayBuffer(
             capacity=replay_buffer_capacity,
             num_agents=num_agents,
-            observation_dim=observation_dim,
-            state_dim=state_dim,
+            observation_dim=self.observation_dim,
+            state_dim=self.state_dim,
             seed=seed,
         )
 
@@ -113,17 +124,52 @@ class QMIXTrainer:
         """Linearly decay epsilon across training episodes."""
         if self.episodes <= 1:
             return self.epsilon_end
-        progress = episode / (self.episodes - 1)
+        progress = min(1.0, max(0.0, episode / (self.episodes - 1)))
         return self.epsilon_start + progress * (self.epsilon_end - self.epsilon_start)
 
-    def _build_global_state(self, observation: np.ndarray) -> np.ndarray:
-        """Concatenate agent observations into global state vector."""
-        state = observation.reshape(-1)
-        if state.shape[0] != self.state_dim:
+    def _build_global_state(self, warehouse_state: Any) -> np.ndarray:
+        """Encode all robot poses and the complete bounded task queue for QMIX."""
+        environment = self.env.adapter.environment
+        width, height = environment.get_dimensions()
+        max_x, max_y = max(1, width - 1), max(1, height - 1)
+        robots = warehouse_state.robots
+        tasks = sorted(warehouse_state.tasks, key=lambda task: task.task_id)
+
+        if len(robots) != self.num_agents:
+            raise ValueError(f"Expected {self.num_agents} robots in global state, received {len(robots)}")
+        if len(tasks) > self.num_agents:
             raise ValueError(
-                f"Expected global state dimension {self.state_dim}, received {state.shape[0]}"
+                f"Global-state encoding supports at most {self.num_agents} queued tasks; received {len(tasks)}"
             )
-        return state.astype(np.float32)
+
+        features: list[float] = []
+        for robot in robots:
+            features.extend((
+                robot.position[0] / max_x,
+                robot.position[1] / max_y,
+                float(robot.carrying_item),
+            ))
+
+        max_task_id = max((task.task_id for task in tasks), default=1)
+        for task in tasks:
+            features.extend((
+                1.0,
+                task.task_id / max(1, max_task_id),
+                -1.0 if task.assigned_robot is None else task.assigned_robot / max(1, self.num_agents - 1),
+                task.pickup_position[0] / max_x,
+                task.pickup_position[1] / max_y,
+                task.delivery_position[0] / max_x,
+                task.delivery_position[1] / max_y,
+                float(task.completed),
+            ))
+
+        if len(features) > self.state_dim:
+            raise ValueError(
+                f"Global state requires {len(features)} features, configured state_dim is {self.state_dim}"
+            )
+        state = np.zeros(self.state_dim, dtype=np.float32)
+        state[:len(features)] = features
+        return state
 
     def _get_checkpoint_payload(self, episode: int, epsilon: float) -> Dict[str, Any]:
         """Construct checkpoint payload compatible with QMIXController and CheckpointManager."""
@@ -145,6 +191,7 @@ class QMIXTrainer:
                 "learning_rate": self.learning_rate,
                 "gamma": self.gamma,
                 "batch_size": self.batch_size,
+                "target_update_interval": self.target_update_interval,
             },
             "replay_buffer": self.replay_buffer.state_dict(),
         }
@@ -213,19 +260,31 @@ class QMIXTrainer:
 
         # 3. Main Episode Training Loop
         for episode in range(self.episodes):
+            global_episode = self.episode_offset + episode
             observation, _ = self.env.reset()
 
-            # Ensure deterministic task allocation for cooperative evaluation
+            # Vary safe task coordinates with a reproducible episode seed so
+            # agents learn task-conditioned navigation instead of one route.
             if not self.env.adapter.environment.tasks:
-                for r_id in range(self.num_agents):
+                task_rng = random.Random(self.seed + global_episode)
+                for task in generate_task_assignments(
+                    self.env.adapter.environment, task_rng
+                ):
                     self.env.adapter.environment.add_task(
-                        task_id=r_id + 1,
-                        pickup_position=((r_id + 1) * 2, 1),
-                        delivery_position=((r_id + 1) * 2, 15),
-                        assigned_robot=r_id,
+                        task.task_id,
+                        task.pickup_position,
+                        task.delivery_position,
+                        task.assigned_robot,
                     )
+                # Tasks are assigned after reset, so refresh the first local
+                # observation before collecting the initial action.
+                observation = self.env._encode_observations()
 
-            epsilon = self._epsilon_for_episode(episode)
+            global_state = self._build_global_state(
+                self.env.adapter.environment.get_global_state()
+            )
+
+            epsilon = self._epsilon_for_episode(global_episode)
             episode_reward = 0.0
             losses = []
             step_count = 0
@@ -233,12 +292,19 @@ class QMIXTrainer:
             for step in range(self.max_steps):
                 step_count += 1
                 obs_tensor = torch.tensor(observation, dtype=torch.float32)
-                actions = self.learner.select_actions(obs_tensor, epsilon=epsilon)
+                environment = self.env.adapter.environment
+                action_masks = torch.as_tensor(
+                    environment.get_action_masks(), dtype=torch.bool
+                )
+                actions = self.learner.select_actions(
+                    obs_tensor, epsilon=epsilon, action_masks=action_masks
+                )
 
-                next_observation, reward, terminated, truncated, _ = self.env.step(actions.tolist())
-
-                global_state = self._build_global_state(observation)
-                next_global_state = self._build_global_state(next_observation)
+                next_observation, reward, terminated, truncated, info = self.env.step(actions.tolist())
+                next_global_state = self._build_global_state(info["global_state"])
+                next_action_masks = torch.as_tensor(
+                    environment.get_action_masks(), dtype=torch.bool
+                )
                 done = terminated or truncated
 
                 # Push to Experience Replay Buffer
@@ -250,7 +316,9 @@ class QMIXTrainer:
                     next_observations=next_observation,
                     next_global_state=next_global_state,
                     terminated=done,
+                    next_action_masks=next_action_masks.numpy(),
                 )
+                global_state = next_global_state
 
                 # Train on sampled mini-batch if replay buffer has sufficient data
                 if (
@@ -266,6 +334,7 @@ class QMIXTrainer:
                         global_states=batch["global_states"],
                         next_global_states=batch["next_global_states"],
                         terminated=batch["terminated"],
+                        next_action_masks=batch["next_action_masks"],
                     )
                     losses.append(update_res["loss"])
 
@@ -286,7 +355,7 @@ class QMIXTrainer:
             throughput = (completed_tasks / step_count * 100.0) if step_count > 0 else 0.0
 
             ep_metrics = {
-                "episode": episode + 1,
+                "episode": global_episode + 1,
                 "steps": step_count,
                 "epsilon": float(epsilon),
                 "reward": episode_reward,
@@ -311,20 +380,20 @@ class QMIXTrainer:
                     episode_length=step_count,
                     extra_metrics={"training_loss": avg_loss, "epsilon": float(epsilon)},
                 )
-                self.tracker.log_metrics(metrics_obj, step=episode + 1)
+                self.tracker.log_metrics(metrics_obj, step=global_episode + 1)
 
             # Save Checkpoint
             if self.save_checkpoints and self.checkpoint_manager:
-                payload = self._get_checkpoint_payload(episode + 1, epsilon)
+                payload = self._get_checkpoint_payload(global_episode + 1, epsilon)
                 is_best = episode_reward > best_reward
                 if is_best:
                     best_reward = episode_reward
 
                 # Periodic or final step save
-                if (episode + 1) % self.checkpoint_interval == 0 or (episode + 1) == self.episodes:
+                if (global_episode + 1) % self.checkpoint_interval == 0 or (episode + 1) == self.episodes:
                     self.checkpoint_manager.save_checkpoint(
                         checkpoint_data=payload,
-                        step=episode + 1,
+                        step=global_episode + 1,
                         is_best=is_best,
                         best_metric_val=episode_reward,
                         tracker=self.tracker,
@@ -332,7 +401,7 @@ class QMIXTrainer:
                 elif is_best:
                     self.checkpoint_manager.save_best_checkpoint(
                         checkpoint_data=payload,
-                        step=episode + 1,
+                        step=global_episode + 1,
                         current_metric_value=episode_reward,
                         mode="max",
                         tracker=self.tracker,
@@ -379,5 +448,9 @@ class QMIXTrainer:
 
         if "update_count" in payload:
             self.learner.update_count = payload["update_count"]
+
+        completed_episodes = payload.get("episode", 0)
+        if isinstance(completed_episodes, int) and completed_episodes >= 0:
+            self.episode_offset = completed_episodes
 
         return checkpoint

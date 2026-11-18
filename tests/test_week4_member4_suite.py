@@ -344,9 +344,7 @@ def test_INTEGRATION_10_epymarl_qmix_compatibility():
     """INTEGRATION-10: QMIX network, learner, trainer smoke test & MLflow logging."""
     trainer = QMIXTrainer(
         num_agents=5,
-        observation_dim=50,
         action_dim=4,
-        state_dim=250,
         max_steps=10,
         episodes=2
     )

@@ -165,7 +165,9 @@ def get_default_layout_library() -> LayoutLibrary:
         frozenset((x, y) for x in (1, 2, 5, 6, 11, 12, 16, 17) for y in range(2, 8)),
         tuple([(0, y) for y in range(8)] + [(4, y) for y in range(8)] + [(9, y) for y in range(4)]),
         (LayoutTask(1, (3, 2), (0, 19)), LayoutTask(2, (7, 3), (4, 19)), LayoutTask(3, (13, 4), (9, 19)), LayoutTask(4, (18, 5), (14, 19))),
-        frozenset((x, 9) for x in range(20)))
+        # Aisle crossings remain open so protected worker corridors do not
+        # disconnect pickup cells from dispatch zones.
+        frozenset((x, 9) for x in range(20) if x not in {0, 4, 9, 14, 19}))
     cross_dock = WarehouseLayout("cross_dock", "Cross-Dock Warehouse", 20, 20,
         frozenset((x, y) for x in (2, 3, 6, 7, 14, 15, 17, 18) for y in range(3, 9)),
         tuple([(0, y) for y in range(8)] + [(4, y) for y in range(8)] + [(8, y) for y in range(4)]),

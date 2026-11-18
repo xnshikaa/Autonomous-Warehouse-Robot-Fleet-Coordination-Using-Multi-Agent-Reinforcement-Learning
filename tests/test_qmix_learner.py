@@ -25,6 +25,20 @@ def test_qmix_action_selection():
     )
 
 
+def test_qmix_action_selection_respects_legal_action_masks():
+    learner = QMIXLearner(
+        num_agents=2, observation_dim=50, action_dim=4, state_dim=22
+    )
+    observations = torch.zeros(2, 50)
+    masks = torch.tensor([[False, True, False, False], [False, False, True, False]])
+
+    for epsilon in (0.0, 1.0):
+        actions = learner.select_actions(
+            observations, epsilon=epsilon, action_masks=masks
+        )
+        assert actions.tolist() == [1, 2]
+
+
 def test_qmix_training_update():
     learner = QMIXLearner(
         num_agents=5,
@@ -77,6 +91,29 @@ def test_qmix_training_update():
     assert "target_mean" in result
 
     assert result["loss"] >= 0.0
+
+
+def test_qmix_huber_loss_limits_large_td_residuals():
+    learner = QMIXLearner(
+        num_agents=1,
+        observation_dim=50,
+        action_dim=4,
+        state_dim=50,
+    )
+    observations = torch.zeros(1, 1, 50)
+    global_states = torch.zeros(1, 50)
+
+    result = learner.train_batch(
+        observations=observations,
+        actions=torch.zeros(1, 1, dtype=torch.long),
+        rewards=torch.tensor([1_000_000.0]),
+        next_observations=observations,
+        global_states=global_states,
+        next_global_states=global_states,
+        terminated=torch.ones(1),
+    )
+
+    assert result["loss"] < 1_100_000.0
 
     assert torch.isfinite(
         torch.tensor(result["loss"])
