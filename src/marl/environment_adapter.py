@@ -11,7 +11,7 @@ class MARLEnvironmentAdapter:
     in a structure suitable for later QMIX/EPyMARL integration.
     """
 
-    def __init__(self, num_agents=5, max_steps=100, environment=None):
+    def __init__(self, num_agents=5, max_steps=100, environment=None, reward_overrides=None):
         if environment is not None:
             self.environment = environment
             self.num_agents = environment.num_robots
@@ -19,7 +19,8 @@ class MARLEnvironmentAdapter:
             self.num_agents = num_agents
             self.environment = WarehouseEnvironment(
                 num_robots=num_agents,
-                max_steps=max_steps
+                max_steps=max_steps,
+                reward_overrides=reward_overrides,
             )
 
     def reset(self):

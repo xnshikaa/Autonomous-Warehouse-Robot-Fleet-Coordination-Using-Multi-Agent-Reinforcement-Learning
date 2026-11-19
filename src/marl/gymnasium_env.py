@@ -25,12 +25,14 @@ class WarehouseGymEnv(gym.Env):
         max_steps: int = 100,
         include_static_map: bool = False,
         include_path_costs: bool = False,
+        reward_overrides=None,
     ):
         super().__init__()
 
         self.adapter = MARLEnvironmentAdapter(
             num_agents=num_agents,
             max_steps=max_steps,
+            reward_overrides=reward_overrides,
         )
 
         layout = self.adapter.environment.get_active_layout()
@@ -120,10 +122,24 @@ class WarehouseGymEnv(gym.Env):
         # termination flag. Truncation is therefore False here.
         truncated = False
 
+        environment = self.adapter.environment
+        component_names = next(iter(environment.last_reward_components.values()), {}).keys()
+        team_reward_components = {
+            name: float(np.mean([
+                values.get(name, 0.0)
+                for values in environment.last_reward_components.values()
+            ]))
+            for name in component_names
+        }
+
         info = {
             "global_state": global_state,
             "agent_rewards": rewards,
             "agent_observations": observation_dict,
+            "agent_reward_components": environment.last_reward_components,
+            "team_reward_components": team_reward_components,
+            "safety_overrides_step": sum(event.overridden for event in environment.get_safety_events()),
+            "collision_intent_groups_step": len(environment.last_collision_intent_groups),
         }
 
         return (

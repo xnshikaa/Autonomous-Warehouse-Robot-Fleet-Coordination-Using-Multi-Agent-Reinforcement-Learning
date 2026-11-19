@@ -1,5 +1,6 @@
 import os
 import random
+from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import numpy as np
@@ -49,6 +50,8 @@ class QMIXTrainer:
         save_checkpoints: bool = False,
         checkpoint_dir: str = "artifacts/checkpoints",
         checkpoint_interval: int = 10,
+        reward_overrides: Optional[Dict[str, float]] = None,
+        episode_callback=None,
     ):
         self.num_agents = num_agents
         self.action_dim = action_dim
@@ -58,6 +61,7 @@ class QMIXTrainer:
         self.max_steps = max_steps
         self.episodes = episodes
         self.episode_offset = 0
+        self.resume_epsilon: Optional[float] = None
         self.batch_size = batch_size
         self.replay_buffer_capacity = replay_buffer_capacity
         self.replay_warmup_size = replay_warmup_size
@@ -72,6 +76,8 @@ class QMIXTrainer:
         self.save_checkpoints = save_checkpoints
         self.checkpoint_dir = checkpoint_dir
         self.checkpoint_interval = checkpoint_interval
+        self.reward_overrides = dict(reward_overrides or {})
+        self.episode_callback = episode_callback
 
         self._set_seed(seed)
 
@@ -80,6 +86,7 @@ class QMIXTrainer:
             max_steps=max_steps,
             include_static_map=True,
             include_path_costs=True,
+            reward_overrides=self.reward_overrides,
         )
         self.observation_dim = self.env.observation_dim
         if observation_dim is not None and observation_dim != self.observation_dim:
@@ -122,6 +129,11 @@ class QMIXTrainer:
 
     def _epsilon_for_episode(self, episode: int) -> float:
         """Linearly decay epsilon across training episodes."""
+        if self.episode_offset > 0 and self.resume_epsilon is not None:
+            if self.episodes <= 1:
+                return self.epsilon_end
+            progress = min(1.0, max(0.0, (episode - self.episode_offset) / (self.episodes - 1)))
+            return self.resume_epsilon + progress * (self.epsilon_end - self.resume_epsilon)
         if self.episodes <= 1:
             return self.epsilon_end
         progress = min(1.0, max(0.0, episode / (self.episodes - 1)))
@@ -183,6 +195,11 @@ class QMIXTrainer:
             "episode": episode,
             "epsilon": epsilon,
             "seed": self.seed,
+            "rng_state": {
+                "python": random.getstate(),
+                "numpy": np.random.get_state(),
+                "torch": torch.get_rng_state(),
+            },
             "config": {
                 "num_agents": self.num_agents,
                 "observation_dim": self.observation_dim,
@@ -192,6 +209,7 @@ class QMIXTrainer:
                 "gamma": self.gamma,
                 "batch_size": self.batch_size,
                 "target_update_interval": self.target_update_interval,
+                "reward_overrides": self.reward_overrides,
             },
             "replay_buffer": self.replay_buffer.state_dict(),
         }
@@ -287,6 +305,9 @@ class QMIXTrainer:
             epsilon = self._epsilon_for_episode(global_episode)
             episode_reward = 0.0
             losses = []
+            reward_component_totals: dict[str, float] = {}
+            safety_override_events = 0
+            collision_intent_groups = 0
             step_count = 0
 
             for step in range(self.max_steps):
@@ -301,6 +322,10 @@ class QMIXTrainer:
                 )
 
                 next_observation, reward, terminated, truncated, info = self.env.step(actions.tolist())
+                for name, value in info["team_reward_components"].items():
+                    reward_component_totals[name] = reward_component_totals.get(name, 0.0) + float(value)
+                safety_override_events += int(info["safety_overrides_step"])
+                collision_intent_groups += int(info["collision_intent_groups_step"])
                 next_global_state = self._build_global_state(info["global_state"])
                 next_action_masks = torch.as_tensor(
                     environment.get_action_masks(), dtype=torch.bool
@@ -362,10 +387,15 @@ class QMIXTrainer:
                 "completed_tasks": completed_tasks,
                 "task_completion_rate": completion_rate,
                 "collision_or_conflict_count": conflicts,
+                "safety_override_events": safety_override_events,
+                "collision_intent_groups": collision_intent_groups,
+                "team_reward_component_totals": reward_component_totals,
                 "throughput": throughput,
                 "loss": avg_loss,
             }
             history.append(ep_metrics)
+            if self.episode_callback is not None:
+                self.episode_callback(self, ep_metrics)
 
             # Log to MLflow
             if self.tracker:
@@ -417,15 +447,40 @@ class QMIXTrainer:
         """
         Load training checkpoint state and restore QMIX learner components.
         """
-        if not self.checkpoint_manager:
-            self.checkpoint_manager = CheckpointManager(
-                base_dir=self.checkpoint_dir,
-                algorithm="QMIX",
-                run_id=self.run_id or self.run_name or f"qmix_run_seed_{self.seed}",
-            )
+        checkpoint_path = Path(str(checkpoint_target))
+        if checkpoint_path.is_file():
+            payload = torch.load(checkpoint_path, map_location="cpu", weights_only=False)
+            checkpoint = {"checkpoint_data": payload, "source": str(checkpoint_path)}
+        else:
+            if not self.checkpoint_manager:
+                self.checkpoint_manager = CheckpointManager(
+                    base_dir=self.checkpoint_dir,
+                    algorithm="QMIX",
+                    run_id=self.run_id or self.run_name or f"qmix_run_seed_{self.seed}",
+                )
+            checkpoint = self.checkpoint_manager.load_checkpoint(checkpoint_target)
+            payload = checkpoint["checkpoint_data"]
 
-        checkpoint = self.checkpoint_manager.load_checkpoint(checkpoint_target)
-        payload = checkpoint["checkpoint_data"]
+        config = payload.get("config") or {}
+        expected = {
+            "num_agents": self.num_agents,
+            "observation_dim": self.observation_dim,
+            "state_dim": self.state_dim,
+            "action_dim": self.action_dim,
+            "learning_rate": self.learning_rate,
+            "target_update_interval": self.target_update_interval,
+        }
+        mismatches = {
+            key: (config[key], value)
+            for key, value in expected.items()
+            if key in config and config[key] != value
+        }
+        if mismatches:
+            raise ValueError(f"QMIX resume checkpoint is incompatible: {mismatches}")
+        if config.get("reward_overrides", {}) != self.reward_overrides:
+            raise ValueError("QMIX resume checkpoint reward overrides do not match trainer")
+        if payload.get("replay_buffer") is None:
+            raise ValueError("QMIX resume checkpoint has no replay buffer; exact continuation is unavailable")
 
         agent_state = payload.get("agent_network") or payload.get("model_state_dict")
         if agent_state:
@@ -452,5 +507,17 @@ class QMIXTrainer:
         completed_episodes = payload.get("episode", 0)
         if isinstance(completed_episodes, int) and completed_episodes >= 0:
             self.episode_offset = completed_episodes
+        checkpoint_epsilon = payload.get("epsilon")
+        if isinstance(checkpoint_epsilon, (int, float)):
+            self.resume_epsilon = float(checkpoint_epsilon)
+
+        rng_state = payload.get("rng_state")
+        if isinstance(rng_state, dict):
+            if "python" in rng_state:
+                random.setstate(rng_state["python"])
+            if "numpy" in rng_state:
+                np.random.set_state(rng_state["numpy"])
+            if "torch" in rng_state:
+                torch.set_rng_state(rng_state["torch"])
 
         return checkpoint

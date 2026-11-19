@@ -76,5 +76,9 @@ def test_gymnasium_step():
     robot_0 = env.adapter.environment.robots[0]
 
     assert robot_0.position == (1, 0)
+    assert info["team_reward_components"]["total"] == reward
+    assert info["team_reward_components"]["collision_penalty"] <= 0.0
+    assert isinstance(info["safety_overrides_step"], int)
+    assert isinstance(info["collision_intent_groups_step"], int)
 
     env.close()

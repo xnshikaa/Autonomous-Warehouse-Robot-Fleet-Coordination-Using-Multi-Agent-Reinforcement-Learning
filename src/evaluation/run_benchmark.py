@@ -43,6 +43,9 @@ def _checkpoint_files(algorithm: str, checkpoint: Path) -> list[Path]:
         files = sorted(checkpoint.glob("iql_robot_*.pt"))
         if not files:
             raise FileNotFoundError(f"No IQL robot checkpoints found in {checkpoint}")
+        metadata = checkpoint / "iql_manifest.json"
+        if metadata.is_file():
+            files.append(metadata)
         return files
     if checkpoint.is_dir():
         files = [checkpoint / name for name in ("checkpoint_state.pt", "checkpoint_state.pkl")]
@@ -70,6 +73,10 @@ def _checkpoint_manifest(
             "training_seed": payload.get("seed"),
             "training_config": payload.get("config"),
         }
+    elif algorithm == "IQL":
+        metadata_path = checkpoint / "iql_manifest.json"
+        if metadata_path.is_file():
+            metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
     def portable_path(path: Path) -> str:
         resolved = path.resolve()
         try:
@@ -100,6 +107,7 @@ def _episode_values(record: EpisodeRecord) -> dict[str, float | None]:
         ),
         "collision_rate_per_episode": row["collision_rate_per_episode"],
         "safety_conflict_events": float(row["safety_conflict_events"]),
+        "collision_intent_groups_per_episode": float(row["collision_intent_groups_per_episode"]),
         "safety_overrides": float(row["safety_overrides"]),
         "team_reward": row["mean_episode_reward"],
     }
@@ -123,8 +131,9 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
         "## Metrics",
         "",
         "| Algorithm | N | Completed/tasks | Completion (95% CI) | Delivery steps (95% CI) | "
-        "Collisions/episode (95% CI) | Safety conflicts/episode | Throughput/100 steps |",
-        "|---|---:|---:|---:|---:|---:|---:|---:|",
+        "Collisions/episode (95% CI) | Blocked intent groups/episode (95% CI) | "
+        "Safety conflicts/episode | Throughput/100 steps |",
+        "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in sorted(report["summary"], key=lambda item: (item["fleet_size"], item["algorithm"])):
         algorithm, size = row["algorithm"], row["fleet_size"]
@@ -142,6 +151,7 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
             f"{estimate('completion_rate', row['completion_rate'])} | "
             f"{estimate('average_completion_time_steps', row['average_completion_time_steps'], 2)} | "
             f"{estimate('collision_rate_per_episode', row['collision_rate_per_episode'])} | "
+            f"{estimate('collision_intent_groups_per_episode', row['collision_intent_groups_per_episode'])} | "
             f"{row['safety_conflict_rate_per_episode']:.2f} | "
             f"{row['throughput_tasks_per_100_steps']:.3f} |"
         )
@@ -169,24 +179,116 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
             f"{item['holm_adjusted_p_value']:.5g} |"
         )
 
+    qmix_n5 = next((row for row in report["summary"]
+                    if row["algorithm"] == "QMIX" and row["fleet_size"] == 5), None)
+    n5_ci = ci_map.get(("QMIX", 5, "completion_rate"))
+    if qmix_n5 is None:
+        n5_finding = "- N=5 QMIX completion target: no QMIX N=5 result was included."
+    else:
+        completion = float(qmix_n5["completion_rate"])
+        verdict = "PASS" if completion >= 0.80 else "FAIL"
+        interval = (
+            f"95% bootstrap CI {n5_ci['lower']:.3f}-{n5_ci['upper']:.3f}"
+            if n5_ci else "95% bootstrap CI unavailable"
+        )
+        n5_finding = (
+            f"- N=5 QMIX completion target (>=80%): {verdict} at {completion:.1%}; {interval}."
+        )
+
+    scenario_id = report.get("scenario_manifest_id")
+    if scenario_id:
+        holdout_finding = (
+            f"- Used the supplied frozen scenario manifest `{scenario_id}`; "
+            "the benchmark manifest records its hash."
+        )
+    else:
+        holdout_finding = (
+            "- No pre-created scenario manifest was supplied; this fixed-seed run is "
+            "validation evidence, not a sealed held-out evaluation."
+        )
+
+    completion_gaps = [
+        item for item in report["paired_comparisons"]
+        if item.get("algorithm_a") == "QMIX"
+        and item.get("algorithm_b") == "IQL"
+        and item.get("metric") == "completion_rate"
+        and "difference_a_minus_b" in item
+    ]
+    completion_gaps.sort(key=lambda item: item["fleet_size"])
+    if len(completion_gaps) >= 2:
+        gaps_maintained = all(
+            later["difference_a_minus_b"] >= earlier["difference_a_minus_b"]
+            for earlier, later in zip(completion_gaps, completion_gaps[1:])
+        )
+        gap_finding = (
+            "- QMIX-IQL completion gap is maintained or increases across the included fleet sizes."
+            if gaps_maintained else
+            "- QMIX-IQL completion gap is not maintained across the included fleet sizes."
+        )
+    else:
+        gap_finding = "- QMIX-IQL scalability gap is unavailable for these policies/fleet sizes."
+
+    physical_contacts = sum(int(row["collision_events"]) for row in report["summary"])
+    qmix_n10 = next((row for row in report["summary"]
+                     if row["algorithm"] == "QMIX" and row["fleet_size"] == 10), None)
+    iql_n10 = next((row for row in report["summary"]
+                    if row["algorithm"] == "IQL" and row["fleet_size"] == 10), None)
+    collision_findings = []
+    if physical_contacts == 0:
+        collision_findings.append(
+            "- No physical robot-robot contacts were observed; safety-prevented conflicts "
+            "are reported separately and are not physical collisions."
+        )
+    else:
+        collision_findings.append(
+            f"- {physical_contacts} physical robot-robot contact events were recorded."
+        )
+    if qmix_n10 is not None and iql_n10 is not None:
+        qmix_collision = float(qmix_n10["collision_rate_per_episode"])
+        iql_collision = float(iql_n10["collision_rate_per_episode"])
+        if iql_collision == 0.0:
+            collision_findings.append(
+                "- N=10 physical QMIX/IQL collision-rate ratio is unavailable because "
+                "IQL recorded zero physical collisions."
+            )
+        else:
+            ratio = qmix_collision / iql_collision
+            collision_findings.append(
+                f"- N=10 QMIX/IQL physical collision-rate ratio is {ratio:.3f} "
+                f"({'PASS' if ratio <= 0.5 else 'FAIL'} for <=0.5)."
+            )
+        proxy_ratio = (
+            float(qmix_n10["safety_conflict_rate_per_episode"])
+            / float(iql_n10["safety_conflict_rate_per_episode"])
+            if iql_n10["safety_conflict_rate_per_episode"] else None
+        )
+        if proxy_ratio is not None:
+            collision_findings.append(
+                f"- N=10 blocked safety-override proxy ratio is {proxy_ratio:.3f}; "
+                "this does not substitute for the physical-collision requirement."
+            )
+
+    iql_n20 = next((row for row in report["summary"]
+                    if row["algorithm"] == "IQL" and row["fleet_size"] == 20), None)
+    delivery_finding = (
+        "- IQL N=20 delivery-time metrics are unavailable because no task was completed."
+        if iql_n20 is not None and iql_n20["completed_tasks"] == 0 else
+        "- Delivery-time metrics are based on completed tasks; unavailable groups are shown as n/a."
+    )
+
     lines.extend([
         "",
         "## Findings and Limits",
         "",
-        "- The numeric N=5 QMIX point estimate meets the 80% completion target; "
-        "its 95% interval extends below 80%.",
-        "- The evaluation manifest was created after these checkpoints were trained. "
-        "It records the tested scenarios and hashes but does not prove a pre-training sealed holdout.",
-        "- The QMIX-IQL completion gap is not maintained as fleet size grows; "
-        "the paired estimates are shown above.",
+        n5_finding,
+        holdout_finding,
+        gap_finding,
         f"- Dedicated corridor gate: {report['safety_gate']['attempted_corridor_entries']} "
         f"aggressive entries blocked, {report['safety_gate']['intrusions']} intrusions "
         f"in {report['safety_gate']['episodes']} episodes "
         f"({'PASS' if report['safety_gate']['passed'] else 'FAIL'}).",
-        "- No robot-robot contact events were observed. Safety-prevented conflicts "
-        "are measured separately and must not be interpreted as physical collisions.",
-        "- Metrics requiring completed deliveries are unavailable for IQL at N=20 "
-        "because it completed no tasks.",
+        *collision_findings,
+        delivery_finding,
         "- See `scalability.png` for all fleet-size curves. These results describe "
         "the supplied checkpoints and do not establish convergence.",
         "",
@@ -265,7 +367,11 @@ def run_benchmark(
         "src/evaluation/safety_gate.py",
         "src/evaluation/scenario_manifest.py",
         "src/ai/environment.py",
+        "src/ai/reward_function.py",
         "src/marl/environment_adapter.py",
+        "src/marl/gymnasium_env.py",
+        "src/marl/qmix_trainer.py",
+        "src/marl/iql_trainer.py",
         "src/marl/observation_encoder.py",
         "src/marl/iql_learner.py",
         "src/marl/qmix_controller.py",
@@ -281,6 +387,26 @@ def run_benchmark(
         }
         for size in fleet_sizes for algorithm in canonical
     ]
+    # Fail before touching scenarios when learned policies are incompatible.
+    # Pairing different encoders, fleet sizes, or reward shaping makes the
+    # QMIX/IQL comparisons uninterpretable.
+    for size in fleet_sizes:
+        qmix = next((run["checkpoint"] for run in run_specs
+                     if run["fleet_size"] == size and run["algorithm"] == "QMIX"), None)
+        iql = next((run["checkpoint"] for run in run_specs
+                    if run["fleet_size"] == size and run["algorithm"] == "IQL"), None)
+        if qmix is None or iql is None:
+            continue
+        qmix_config = (qmix or {}).get("metadata", {}).get("training_config")
+        iql_config = (iql or {}).get("metadata")
+        if not isinstance(qmix_config, dict) or not isinstance(iql_config, dict):
+            raise ValueError(f"QMIX and IQL checkpoints for N={size} require training metadata")
+        if qmix_config.get("num_agents") != size or iql_config.get("num_robots") != size:
+            raise ValueError(f"Checkpoint fleet size does not match requested N={size}")
+        if qmix_config.get("observation_dim") != iql_config.get("observation_dim"):
+            raise ValueError(f"QMIX/IQL observation dimensions differ for N={size}")
+        if (qmix_config.get("reward_overrides") or {}) != (iql_config.get("reward_overrides") or {}):
+            raise ValueError(f"QMIX/IQL reward overrides differ for N={size}")
     base_manifest = {
         "schema_version": 1,
         "episodes": episodes,
@@ -374,6 +500,7 @@ def run_benchmark(
         "completion_rate", "average_completion_time_steps",
         "completed_task_makespan_steps", "throughput_tasks_per_100_steps",
         "collision_rate_per_episode", "safety_conflict_events",
+        "collision_intent_groups_per_episode",
         "safety_overrides", "team_reward",
     )
     if "Rule-Based" in canonical:
@@ -414,6 +541,7 @@ def run_benchmark(
     safety_path.write_text(json.dumps(safety_gate, indent=2, allow_nan=False), encoding="utf-8")
     report = {
         "manifest_id": manifest_id,
+        "scenario_manifest_id": scenario_document["manifest_id"] if scenario_document else None,
         "episodes_per_run": episodes,
         "fleet_sizes": fleet_sizes,
         "algorithms": canonical,

@@ -1,6 +1,7 @@
 import json
 
 import torch
+import pytest
 
 from src.evaluation.run_benchmark import run_benchmark
 from src.evaluation.run_evaluation import load_episode_records
@@ -11,7 +12,10 @@ from src.marl.qmix_trainer import QMIXTrainer
 
 def test_benchmark_writes_matched_traces_manifest_and_statistics(tmp_path):
     iql_dir = tmp_path / "iql"
-    iql = IQLTrainer(num_robots=5, episodes=1, max_steps=1, seed=7)
+    iql = IQLTrainer(
+        num_robots=5, episodes=1, max_steps=1, seed=7,
+        include_static_map=True, include_path_costs=True,
+    )
     iql.save_agents(str(iql_dir))
 
     qmix = QMIXTrainer(num_agents=5, episodes=1, max_steps=1, seed=7)
@@ -46,10 +50,15 @@ def test_benchmark_writes_matched_traces_manifest_and_statistics(tmp_path):
     assert report["safety_gate"]["passed"] is True
     assert report["safety_gate"]["episodes"] == 20
     assert report["safety_gate"]["intrusions"] == 0
-    assert (tmp_path / "evaluation" / "report.md").read_text().startswith(
+    report_text = (tmp_path / "evaluation" / "report.md").read_text()
+    assert report_text.startswith(
         "# Warehouse Fleet Scalability Evaluation"
     )
-    assert "1 matched episodes" in (tmp_path / "evaluation" / "report.md").read_text()
+    assert "1 matched episodes" in report_text
+    assert "N=5 QMIX completion target (>=80%): FAIL" in report_text
+    assert "No pre-created scenario manifest was supplied" in report_text
+    assert "N=10 physical QMIX/IQL collision-rate ratio is unavailable" in report_text
+    assert "point estimate meets the 80%" not in report_text
     trace_path = tmp_path / "evaluation" / "traces" / "qmix_n5.json.gz"
     assert trace_path.is_file()
     assert len(load_episode_records([trace_path])) == 1
@@ -78,9 +87,36 @@ def test_benchmark_consumes_and_copies_frozen_scenario_manifest(tmp_path):
         permutation_samples=20,
     )
     assert report["manifest"]["scenario_manifest_id"] == scenario_manifest["manifest_id"]
+    assert report["scenario_manifest_id"] == scenario_manifest["manifest_id"]
     assert (tmp_path / "scenario_evaluation" / "scenario_manifest.json").is_file()
     trace = load_episode_records([
         tmp_path / "scenario_evaluation" / "traces" / "rule_based_n5.json.gz"
     ])[0]
     assert trace.task_seed == scenario_manifest["scenarios"]["5"][0]["task_seed"]
     assert report["summary"][0]["episodes"] == 20
+    assert f"Used the supplied frozen scenario manifest `{scenario_manifest['manifest_id']}`" in (
+        (tmp_path / "scenario_evaluation" / "report.md").read_text()
+    )
+
+
+def test_benchmark_rejects_mismatched_learned_observation_dimensions(tmp_path):
+    iql_dir = tmp_path / "iql"
+    iql = IQLTrainer(num_robots=5, episodes=1, max_steps=1, seed=7)
+    iql.save_agents(str(iql_dir))
+    qmix = QMIXTrainer(num_agents=5, episodes=1, max_steps=1, seed=7)
+    qmix_path = tmp_path / "qmix.pt"
+    torch.save({
+        "agent_network": qmix.learner.agent_network.state_dict(),
+        "mixer": qmix.learner.mixer.state_dict(),
+        "config": {"num_agents": 5, "observation_dim": 456},
+        "episode": 1,
+        "seed": 7,
+    }, qmix_path)
+
+    with pytest.raises(ValueError, match="observation dimensions differ"):
+        run_benchmark(
+            fleet_sizes=[5], algorithms=["QMIX", "IQL"], episodes=1,
+            max_steps=1, seed=42, qmix_checkpoints={5: qmix_path},
+            iql_checkpoints={5: iql_dir}, output_dir=tmp_path / "mismatch",
+            bootstrap_resamples=20, permutation_samples=20,
+        )

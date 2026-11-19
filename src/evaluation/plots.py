@@ -19,6 +19,8 @@ def write_results_csv(rows: list[dict[str, Any]], path: str | Path) -> Path:
         "completion_rate", "average_completion_time_steps", "unfinished_tasks",
         "collision_events", "collision_rate_per_episode",
         "robot_robot_collision_events", "safety_overrides",
+        "safety_conflict_events", "safety_conflict_rate_per_episode",
+        "collision_intent_groups", "collision_intent_groups_per_episode",
     ]
     with destination.open("w", newline="", encoding="utf-8") as handle:
         writer = csv.DictWriter(handle, fieldnames=fieldnames)

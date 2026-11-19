@@ -72,3 +72,25 @@ def test_combined_reward():
     )
 
     assert reward == pytest.approx(10.99)
+
+
+def test_reward_overrides_apply_and_reject_unknown_or_non_finite_values():
+    reward_function = RewardFunction({"collision_penalty": 0.0})
+    assert reward_function.calculate(10, 10, collision=True) == pytest.approx(-0.01)
+    with pytest.raises(ValueError, match="Unknown reward settings"):
+        RewardFunction({"invented_reward": 1.0})
+    with pytest.raises(ValueError, match="finite"):
+        RewardFunction({"collision_penalty": float("nan")})
+
+
+def test_reward_components_sum_to_calculated_reward():
+    reward_function = RewardFunction()
+    components = reward_function.calculate_components(
+        10, 8, delivered=True, collision=True, danger=True, blocked=True
+    )
+    assert components["total"] == pytest.approx(sum(
+        value for name, value in components.items() if name != "total"
+    ))
+    assert components["total"] == pytest.approx(reward_function.calculate(
+        10, 8, delivered=True, collision=True, danger=True, blocked=True
+    ))

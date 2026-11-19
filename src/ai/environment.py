@@ -4,7 +4,7 @@ from __future__ import annotations
 
 from collections import deque
 from pathlib import Path
-from typing import Any, Dict, List, Sequence
+from typing import Any, Dict, List, Mapping, Sequence
 
 from src.ai.episode import EpisodeManager
 from src.ai.reward_function import RewardFunction
@@ -28,7 +28,8 @@ class WarehouseEnvironment:
 
     def __init__(self, num_robots: int = 5, max_steps: int = 100, *, layout_id: str | None = None,
                  layout_library: LayoutLibrary | None = None, load_layout_tasks: bool = False,
-                 logger: Any | None = None):
+                 logger: Any | None = None,
+                 reward_overrides: Mapping[str, float] | None = None):
         if isinstance(num_robots, bool) or num_robots <= 0:
             raise ValueError("num_robots must be greater than zero.")
         if isinstance(max_steps, bool) or max_steps <= 0:
@@ -39,7 +40,8 @@ class WarehouseEnvironment:
         self.logger = logger or get_logger("warehouse_safety")
         self.robots: List[RobotState] = []
         self.tasks: List[TaskState] = []
-        self.reward_function = RewardFunction()
+        self.reward_overrides = dict(reward_overrides or {})
+        self.reward_function = RewardFunction(self.reward_overrides)
         project_root = Path(__file__).resolve().parents[2]
         self._config = load_config(project_root / "config" / "environment.json")
         self.corridor_enabled = bool(self._config.get("human_corridors", {}).get("enabled", True))
@@ -50,6 +52,8 @@ class WarehouseEnvironment:
         self.safety_overrides = 0
         self._last_safety_events: list[SafetyOverrideEvent] = []
         self._safety_event_history: list[SafetyOverrideEvent] = []
+        self._last_collision_intent_groups: list[tuple[int, ...]] = []
+        self.last_reward_components: dict[int, dict[str, float]] = {}
 
     def _configure_layout(self, layout_id: str) -> None:
         layout = self.layout_library.get(layout_id)
@@ -65,6 +69,11 @@ class WarehouseEnvironment:
     def get_active_layout(self) -> WarehouseLayout:
         return self._active_layout
 
+    @property
+    def last_collision_intent_groups(self) -> tuple[tuple[int, ...], ...]:
+        """Robot groups whose simultaneous requested moves required blocking."""
+        return tuple(self._last_collision_intent_groups)
+
     def get_layout_ids(self) -> tuple[str, ...]:
         return self.layout_library.ids()
 
@@ -72,6 +81,8 @@ class WarehouseEnvironment:
         self._configure_layout(layout_id)
         self.robots, self.tasks = [], []
         self._last_safety_events, self._safety_event_history = [], []
+        self._last_collision_intent_groups = []
+        self.last_reward_components = {}
         self.safety_overrides = 0
 
     def set_num_robots(self, num_robots: int) -> None:
@@ -123,6 +134,8 @@ class WarehouseEnvironment:
         self.episode += 1
         self.safety_overrides = 0
         self._last_safety_events, self._safety_event_history = [], []
+        self._last_collision_intent_groups = []
+        self.last_reward_components = {}
         self.episode_manager = EpisodeManager(max_steps=self.max_steps)
         return self.get_global_state(), self.get_observations()
 
@@ -261,6 +274,8 @@ class WarehouseEnvironment:
             if isinstance(action, bool) or action not in self.ACTIONS:
                 raise ValueError(f"Invalid action: {action}")
         previous = {robot.robot_id: robot.position for robot in self.robots}
+        self._last_collision_intent_groups = []
+        self.last_reward_components = {}
         previous_distances = {}
         for robot in self.robots:
             task = self._get_robot_task(robot.robot_id)
@@ -306,11 +321,13 @@ class WarehouseEnvironment:
             for ids in target_map.values() if len(ids) > 1
             for robot_id in sorted(ids)[1:]
         }
+        conflict_groups = [set(ids) for ids in target_map.values() if len(ids) > 1]
         for index, a in enumerate(self.robots):
             for b in self.robots[index + 1:]:
                 if (proposed[a.robot_id] == previous[b.robot_id] and proposed[b.robot_id] == previous[a.robot_id]
                         and proposed[a.robot_id] != previous[a.robot_id]):
                     collision_robots.update((a.robot_id, b.robot_id))
+                    conflict_groups.append({a.robot_id, b.robot_id})
         # A robot must not move into a cell occupied by another robot whose
         # own movement was already blocked. Resolve this until no new blocked
         # robot can create an overlap.
@@ -324,7 +341,24 @@ class WarehouseEnvironment:
                        and other.robot_id in collision_robots for other in self.robots
                        if other.robot_id != robot.robot_id):
                     collision_robots.add(robot.robot_id)
+                    conflict_groups.append({robot.robot_id, *(
+                        other.robot_id for other in self.robots
+                        if other.robot_id != robot.robot_id
+                        and other.robot_id in collision_robots
+                        and proposed[robot.robot_id] == previous[other.robot_id]
+                    )})
                     changed = True
+        # Merge overlapping pairs into one group per connected conflict intent.
+        merged: list[set[int]] = []
+        for group in conflict_groups:
+            overlaps = [existing for existing in merged if existing & group]
+            if overlaps:
+                combined = group.union(*overlaps)
+                merged = [existing for existing in merged if existing not in overlaps]
+                merged.append(combined)
+            else:
+                merged.append(group)
+        self._last_collision_intent_groups = [tuple(sorted(group)) for group in merged]
         for robot_id in sorted(collision_robots):
             if safe_actions[robot_id] is not None:
                 event = self._blocked_event(self._last_safety_events[robot_id], "robot_collision")
@@ -381,9 +415,10 @@ class WarehouseEnvironment:
                 0 if robot.robot_id in picked_up or target is None
                 else self._path_distance(robot.position, target)
             )
-            rewards[robot.robot_id] = self.reward_function.calculate(
+            self.last_reward_components[robot.robot_id] = self.reward_function.calculate_components(
                 previous_distances[robot.robot_id], current_distance,
                 delivered=robot.robot_id in delivered, collision=robot.robot_id in collision_robots,
                 danger=danger[robot.robot_id], blocked=blocked_motion[robot.robot_id])
+            rewards[robot.robot_id] = self.last_reward_components[robot.robot_id]["total"]
         terminated = self.episode_manager.is_terminated(sum(not task.completed for task in self.tasks))
         return self.get_observations(), rewards, terminated, self.get_global_state()

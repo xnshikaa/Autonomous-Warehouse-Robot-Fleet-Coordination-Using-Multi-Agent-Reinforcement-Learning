@@ -48,6 +48,7 @@ class EpisodeRecord:
     collision_events: Sequence[Any] = field(default_factory=tuple)
     safety_overrides: int = 0
     safety_conflict_events: Sequence[Any] = field(default_factory=tuple)
+    collision_intent_groups: Sequence[Any] = field(default_factory=tuple)
     task_seed: int | str | None = None
     steps: int | None = None
     team_reward: float | None = None
@@ -139,6 +140,7 @@ def _episode_metric(record: EpisodeRecord, metric: str) -> float | None:
         "throughput_tasks_per_100_steps": 100.0 * len(completed) / steps if steps else 0.0,
         "collision_rate_per_episode": float(len(record.collision_events)),
         "safety_conflict_events": float(len(record.safety_conflict_events)),
+        "collision_intent_groups": float(len(record.collision_intent_groups)),
         "safety_overrides": float(record.safety_overrides),
         "team_reward": record.team_reward,
     }
@@ -288,6 +290,7 @@ def evaluate_episodes(episodes: Iterable[EpisodeRecord]) -> list[dict[str, Any]]
             if _collision_type(event) in {"robot_robot", "robot-robot", "robot_robot_collision"}
         ]
         conflict_count = sum(len(record.safety_conflict_events) for record in group)
+        intent_group_count = sum(len(record.collision_intent_groups) for record in group)
         total_steps = sum(
             record.steps if record.steps is not None
             else max(0, len(record.task_snapshots) - 1)
@@ -347,6 +350,8 @@ def evaluate_episodes(episodes: Iterable[EpisodeRecord]) -> list[dict[str, Any]]
                 "safety_overrides": collision.safety_overrides,
                 "safety_conflict_events": collision.safety_conflict_events,
                 "safety_conflict_rate_per_episode": collision.safety_conflict_events / len(group),
+                "collision_intent_groups": intent_group_count,
+                "collision_intent_groups_per_episode": intent_group_count / len(group),
                 "throughput_tasks_per_100_steps": mean(episode_throughputs) if episode_throughputs else 0.0,
                 "task_weighted_completion_rate": (
                     completion.completed_tasks / len(timings) if timings else None

@@ -1,4 +1,5 @@
 import random
+import json
 from typing import Dict, List, Optional
 
 import numpy as np
@@ -19,7 +20,7 @@ class IQLTrainer:
     def __init__(
         self,
         num_robots: int = 5,
-        observation_dim: int = 50,
+        observation_dim: Optional[int] = None,
         action_dim: int = 4,
         episodes: int = 100,
         max_steps: int = 100,
@@ -30,11 +31,15 @@ class IQLTrainer:
         epsilon_decay: float = 0.995,
         target_update_frequency: int = 10,
         seed: Optional[int] = None,
+        include_static_map: bool = False,
+        include_path_costs: bool = False,
+        reward_overrides: Optional[Dict[str, float]] = None,
+        episode_callback=None,
     ):
         if num_robots <= 0:
             raise ValueError("num_robots must be greater than zero.")
 
-        if observation_dim <= 0:
+        if observation_dim is not None and observation_dim <= 0:
             raise ValueError(
                 "observation_dim must be greater than zero."
             )
@@ -80,11 +85,17 @@ class IQLTrainer:
             )
 
         self.num_robots = num_robots
-        self.observation_dim = observation_dim
         self.action_dim = action_dim
         self.seed = 42 if seed is None else seed
         self.episodes = episodes
         self.max_steps = max_steps
+        self.learning_rate = learning_rate
+        self.gamma = gamma
+        self.include_static_map = include_static_map
+        self.include_path_costs = include_path_costs
+        self.reward_overrides = dict(reward_overrides or {})
+        self.episode_callback = episode_callback
+        self.training_episodes_completed = 0
 
         self.epsilon_start = epsilon_start
         self.epsilon_end = epsilon_end
@@ -101,12 +112,20 @@ class IQLTrainer:
         self.env = WarehouseGymEnv(
             num_agents=num_robots,
             max_steps=max_steps,
+            include_static_map=include_static_map,
+            include_path_costs=include_path_costs,
+            reward_overrides=self.reward_overrides,
         )
+        self.observation_dim = self.env.observation_dim
+        if observation_dim is not None and observation_dim != self.observation_dim:
+            raise ValueError(
+                f"observation_dim must match environment encoder ({self.observation_dim}), got {observation_dim}"
+            )
 
         # One independent learner per robot.
         self.learners = [
             IQLLearner(
-                observation_dim=observation_dim,
+                observation_dim=self.observation_dim,
                 action_dim=action_dim,
                 learning_rate=learning_rate,
                 gamma=gamma,
@@ -138,6 +157,7 @@ class IQLTrainer:
     def _select_actions(
         self,
         observations: np.ndarray,
+        action_masks: np.ndarray | None = None,
     ) -> List[int]:
         """
         Select one action independently for each robot.
@@ -170,6 +190,7 @@ class IQLTrainer:
             action = self.learners[robot_id].select_action(
                 observation,
                 epsilon=self.epsilon,
+                action_mask=None if action_masks is None else action_masks[robot_id],
             )
 
             actions.append(action)
@@ -192,21 +213,32 @@ class IQLTrainer:
 
             episode_reward = 0.0
             episode_losses = []
+            reward_component_totals: Dict[str, float] = {}
+            safety_override_events = 0
+            collision_intent_groups = 0
             steps = 0
 
             for step in range(1, self.max_steps + 1):
 
-                actions = self._select_actions(
-                    observations
+                action_masks = np.asarray(
+                    self.env.adapter.environment.get_action_masks(), dtype=np.bool_
                 )
+                actions = self._select_actions(observations, action_masks)
 
                 (
                     next_observations,
                     team_reward,
                     terminated,
                     truncated,
-                    _,
+                    info,
                 ) = self.env.step(actions)
+                for name, value in info["team_reward_components"].items():
+                    reward_component_totals[name] = reward_component_totals.get(name, 0.0) + float(value)
+                safety_override_events += int(info["safety_overrides_step"])
+                collision_intent_groups += int(info["collision_intent_groups_step"])
+                next_action_masks = np.asarray(
+                    self.env.adapter.environment.get_action_masks(), dtype=np.bool_
+                )
 
                 episode_reward += float(team_reward)
 
@@ -231,6 +263,7 @@ class IQLTrainer:
                             robot_id
                         ],
                         terminated=episode_done,
+                        next_action_mask=next_action_masks[robot_id],
                     )
 
                     episode_losses.append(
@@ -272,8 +305,14 @@ class IQLTrainer:
                     "epsilon": self.epsilon,
                     "reward": episode_reward,
                     "loss": average_loss,
+                    "safety_override_events": safety_override_events,
+                    "collision_intent_groups": collision_intent_groups,
+                    "team_reward_component_totals": reward_component_totals,
                 }
             )
+            self.training_episodes_completed += 1
+            if self.episode_callback is not None:
+                self.episode_callback(self, history[-1])
 
         return history
 
@@ -308,9 +347,10 @@ class IQLTrainer:
 
                 for _ in range(self.max_steps):
 
-                    actions = self._select_actions(
-                        observations
+                    action_masks = np.asarray(
+                        self.env.adapter.environment.get_action_masks(), dtype=np.bool_
                     )
+                    actions = self._select_actions(observations, action_masks)
 
                     (
                         next_observations,
@@ -381,6 +421,31 @@ class IQLTrainer:
                     / f"iql_robot_{robot_id}.pt"
                 )
             )
+
+        metadata = {
+            "schema_version": 1,
+            "algorithm": "IQL",
+            "num_robots": self.num_robots,
+            "observation_dim": self.observation_dim,
+            "action_dim": self.action_dim,
+            "include_static_map": self.include_static_map,
+            "include_path_costs": self.include_path_costs,
+            "seed": self.seed,
+            "episodes_completed": self.training_episodes_completed,
+            "max_steps": self.max_steps,
+            "learning_rate": self.learning_rate,
+            "gamma": self.gamma,
+            "epsilon_start": self.epsilon_start,
+            "epsilon_end": self.epsilon_end,
+            "epsilon_decay": self.epsilon_decay,
+            "target_update_frequency": self.target_update_frequency,
+            "td_loss": self.learners[0].td_loss,
+            "gradient_clip_norm": self.learners[0].gradient_clip_norm,
+            "reward_overrides": self.reward_overrides,
+        }
+        (save_directory / "iql_manifest.json").write_text(
+            json.dumps(metadata, indent=2), encoding="utf-8"
+        )
 
     def load_agents(
         self,

@@ -182,6 +182,7 @@ def test_same_cell_conflict_allows_one_robot_to_progress_safely():
     assert environment.get_robot_state(1).position == (2, 0)
     assert environment.get_safety_events()[0].overridden is False
     assert environment.get_safety_events()[1].reason == "robot_collision"
+    assert environment._last_collision_intent_groups == [(0, 1)]
     assert rewards[0] == pytest.approx(-0.01)
     assert rewards[1] == pytest.approx(-10.01)
 

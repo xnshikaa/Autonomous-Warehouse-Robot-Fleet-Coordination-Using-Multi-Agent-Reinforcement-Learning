@@ -1,4 +1,5 @@
 import pytest
+import json
 
 from src.marl.iql_trainer import IQLTrainer
 
@@ -30,9 +31,10 @@ def test_iql_training_starts_with_seeded_task_observations():
     captured = []
     select_actions = trainer._select_actions
 
-    def capture(observations):
+    def capture(observations, action_masks=None):
         captured.append(observations.copy())
-        return select_actions(observations)
+        assert action_masks is not None
+        return select_actions(observations, action_masks)
 
     trainer._select_actions = capture
     trainer.train()
@@ -40,6 +42,33 @@ def test_iql_training_starts_with_seeded_task_observations():
     assert captured[0].shape == (5, 50)
     assert (captured[0][:, 48] == 1.0).all()
     assert len(trainer.env.adapter.environment.tasks) == 5
+
+
+def test_iql_can_train_with_qmix_observation_and_action_mask_parity():
+    trainer = IQLTrainer(
+        episodes=1,
+        max_steps=2,
+        seed=21,
+        include_static_map=True,
+        include_path_costs=True,
+    )
+    assert trainer.observation_dim == 456
+    history = trainer.train()
+    assert len(history) == 1
+    assert all(learner.observation_dim == 456 for learner in trainer.learners)
+
+
+def test_iql_checkpoint_saves_observation_and_seed_metadata(tmp_path):
+    trainer = IQLTrainer(
+        episodes=1, max_steps=1, seed=123,
+        include_static_map=True, include_path_costs=True,
+    )
+    trainer.train()
+    trainer.save_agents(str(tmp_path))
+    metadata = json.loads((tmp_path / "iql_manifest.json").read_text())
+    assert metadata["seed"] == 123
+    assert metadata["observation_dim"] == 456
+    assert metadata["include_path_costs"] is True
 
 
 def test_iql_training():

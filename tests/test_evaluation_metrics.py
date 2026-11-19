@@ -120,6 +120,18 @@ def test_safety_prevented_robot_conflicts_are_separate_from_collisions():
     assert row["safety_conflict_rate_per_episode"] == 2.0
 
 
+def test_collision_intent_groups_report_unique_groups_and_episode_rate():
+    record = EpisodeRecord(
+        algorithm="QMIX", fleet_size=5, episode=1,
+        collision_events=[], collision_intent_groups=[
+            {"robots": [0, 1], "step": 3}, {"robots": [2, 3], "step": 4},
+        ],
+    )
+    row = evaluate_episodes([record])[0]
+    assert row["collision_intent_groups"] == 2
+    assert row["collision_intent_groups_per_episode"] == 2.0
+
+
 def _paired_record(algorithm, episode, task_seed, completed):
     return EpisodeRecord(
         algorithm=algorithm,

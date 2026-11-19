@@ -91,6 +91,7 @@ def _record_episode(
     task_snapshots: list[list[dict[str, Any]]] = [_task_snapshot(environment)]
     collision_events: list[dict[str, Any]] = []
     safety_conflict_events: list[dict[str, Any]] = []
+    collision_intent_groups: list[dict[str, Any]] = []
     action_trace: list[dict[str, Any]] = []
     steps = 0
     terminated = False
@@ -136,6 +137,10 @@ def _record_episode(
             for event in environment.get_safety_events()
             if event.reason == "robot_collision"
         )
+        collision_intent_groups.extend(
+            {"robots": list(group), "step": steps, "status": "prevented_by_safety"}
+            for group in environment.last_collision_intent_groups
+        )
         task_snapshots.append(_task_snapshot(environment))
 
     return {
@@ -149,6 +154,7 @@ def _record_episode(
         "task_snapshots": task_snapshots,
         "collision_events": collision_events,
         "safety_conflict_events": safety_conflict_events,
+        "collision_intent_groups": collision_intent_groups,
         "safety_overrides": environment.safety_overrides,
         "steps": steps,
         "max_steps": max_steps,
@@ -188,21 +194,35 @@ def _iql_provider(checkpoint: str | Path, fleet_size: int):
     directory = Path(checkpoint)
     if not directory.is_dir():
         raise FileNotFoundError(f"IQL checkpoint directory not found: {directory}")
-    learners = [IQLLearner(observation_dim=50, action_dim=4) for _ in range(fleet_size)]
+    metadata_path = directory / "iql_manifest.json"
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8")) if metadata_path.is_file() else {}
+    observation_dim = int(metadata.get("observation_dim", 50))
+    learners = [
+        IQLLearner(observation_dim=observation_dim, action_dim=4)
+        for _ in range(fleet_size)
+    ]
     for robot_id, learner in enumerate(learners):
         learner.load(str(directory / f"iql_robot_{robot_id}.pt"))
 
     def provide(environment: WarehouseEnvironment) -> dict[int, int]:
         layout = environment.get_active_layout()
-        encoder = ObservationEncoder(layout.width, layout.height)
+        encoder = ObservationEncoder(
+            layout.width,
+            layout.height,
+            include_static_map=bool(metadata.get("include_static_map", False)),
+            include_path_costs=bool(metadata.get("include_path_costs", False)),
+        )
         actions = {}
+        action_masks = environment.get_action_masks()
         for robot in environment.robots:
             observation = torch.as_tensor(
                 encoder.encode(robot, environment.robots, environment.tasks, layout=layout),
                 dtype=torch.float32,
             )
             actions[robot.robot_id] = learners[robot.robot_id].select_action(
-                observation, epsilon=0.0
+                observation,
+                epsilon=0.0,
+                action_mask=action_masks[robot.robot_id],
             )
         return actions
 

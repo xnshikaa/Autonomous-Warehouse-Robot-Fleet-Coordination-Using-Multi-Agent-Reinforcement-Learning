@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "purpose": "supplemental reward shaping comparison on the committed held-out N=10 scenarios; policies selected on exposed validation first",
+  "scenario_manifest_id": "877e21e36bf45cb717d3e456b3d046b2545ead5a9e66347767a13f0da248e5f4",
+  "scenario_manifest_sha256": "ab1d2a9cb0c890ece61ea90d0b79d6511fd31a4069fba334d468320ba907d25b",
+  "fleet_size": 10,
+  "episodes": 20,
+  "max_steps": 100,
+  "policies": {
+    "artifacts/checkpoints/qmix/p2_stable_n10_seed650010/snapshots/episode_01000/checkpoint_state.pt": "86409d18e3193b7a0dde2682ddf006482e5d924c5a51292846c2e890facb9be8",
+    "artifacts/checkpoints/qmix/p2_stable_ablation_n10_seed650010/snapshots/episode_00200/checkpoint_state.pt": "98b215248f866cf6223e2265f629ef2722a25aaed866e884c03890c965f0c076"
+  },
+  "summary": [
+    {
+      "algorithm": "QMIX-default",
+      "fleet_size": 10,
+      "episodes": 20,
+      "tasks": 200,
+      "completed_tasks": 100,
+      "completion_rate": 0.5,
+      "average_completion_time_steps": 40.638333333333335,
+      "mean_completed_task_makespan_steps": 50.5,
+      "unfinished_tasks": 100,
+      "collision_events": 0,
+      "collision_rate_per_episode": 0.0,
+      "robot_robot_collision_events": 0,
+      "safety_overrides": 67,
+      "safety_conflict_events": 67,
+      "safety_conflict_rate_per_episode": 3.35,
+      "collision_intent_groups": 63,
+      "collision_intent_groups_per_episode": 3.15,
+      "throughput_tasks_per_100_steps": 5.480392156862745,
+      "task_weighted_completion_rate": 0.5,
+      "mean_episode_reward": 25.829499999999996
+    },
+    {
+      "algorithm": "QMIX-no-collision-penalty",
+      "fleet_size": 10,
+      "episodes": 20,
+      "tasks": 200,
+      "completed_tasks": 140,
+      "completion_rate": 0.7,
+      "average_completion_time_steps": 34.2471626984127,
+      "mean_completed_task_makespan_steps": 48.25,
+      "unfinished_tasks": 60,
+      "collision_events": 0,
+      "collision_rate_per_episode": 0.0,
+      "robot_robot_collision_events": 0,
+      "safety_overrides": 5765,
+      "safety_conflict_events": 5765,
+      "safety_conflict_rate_per_episode": 288.25,
+      "collision_intent_groups": 2484,
+      "collision_intent_groups_per_episode": 124.2,
+      "throughput_tasks_per_100_steps": 7.5,
+      "task_weighted_completion_rate": 0.7,
+      "mean_episode_reward": -254.78499999999994
+    }
+  ],
+  "paired_comparisons": [
+    {
+      "algorithm_a": "QMIX-no-collision-penalty",
+      "algorithm_b": "QMIX-default",
+      "fleet_size": 10,
+      "metric": "completion_rate",
+      "difference_a_minus_b": 0.19999999999999998,
+      "paired_bootstrap_ci": {
+        "estimate": 0.19999999999999998,
+        "lower": 0.09,
+        "upper": 0.31,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "paired_sign_flip_p_value": 0.0036998150092495377,
+      "paired_episodes": 20,
+      "excluded_undefined_pairs": 0,
+      "permutation_samples": 20000
+    },
+    {
+      "algorithm_a": "QMIX-no-collision-penalty",
+      "algorithm_b": "QMIX-default",
+      "fleet_size": 10,
+      "metric": "safety_conflict_events",
+      "difference_a_minus_b": 284.9,
+      "paired_bootstrap_ci": {
+        "estimate": 284.9,
+        "lower": 229.04875,
+        "upper": 340.00374999999997,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "paired_sign_flip_p_value": 4.999750012499375e-05,
+      "paired_episodes": 20,
+      "excluded_undefined_pairs": 0,
+      "permutation_samples": 20000
+    },
+    {
+      "algorithm_a": "QMIX-no-collision-penalty",
+      "algorithm_b": "QMIX-default",
+      "fleet_size": 10,
+      "metric": "collision_intent_groups",
+      "difference_a_minus_b": 121.05,
+      "paired_bootstrap_ci": {
+        "estimate": 121.05,
+        "lower": 101.29875000000001,
+        "upper": 141.05,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "paired_sign_flip_p_value": 4.999750012499375e-05,
+      "paired_episodes": 20,
+      "excluded_undefined_pairs": 0,
+      "permutation_samples": 20000
+    },
+    {
+      "algorithm_a": "QMIX-no-collision-penalty",
+      "algorithm_b": "QMIX-default",
+      "fleet_size": 10,
+      "metric": "collision_rate_per_episode",
+      "difference_a_minus_b": 0.0,
+      "paired_bootstrap_ci": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "paired_sign_flip_p_value": 1.0,
+      "paired_episodes": 20,
+      "excluded_undefined_pairs": 0,
+      "permutation_samples": 20000
+    }
+  ]
+}

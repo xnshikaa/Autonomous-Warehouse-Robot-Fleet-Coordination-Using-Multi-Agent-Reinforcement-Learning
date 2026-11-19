@@ -33,6 +33,8 @@ class IQLLearner:
         self.observation_dim = observation_dim
         self.action_dim = action_dim
         self.gamma = gamma
+        self.gradient_clip_norm = 10.0
+        self.td_loss = "smooth_l1"
 
         self.device = torch.device(device)
 
@@ -57,12 +59,15 @@ class IQLLearner:
             lr=learning_rate,
         )
 
-        self.loss_function = nn.MSELoss()
+        # TD targets can spike under shared-reward multi-agent learning. Huber
+        # loss and clipped gradients limit one bad transition's influence.
+        self.loss_function = nn.SmoothL1Loss()
 
     def select_action(
         self,
         observation: torch.Tensor,
         epsilon: float = 0.0,
+        action_mask=None,
     ) -> int:
         """
         Select an action using epsilon-greedy policy.
@@ -77,12 +82,21 @@ class IQLLearner:
                 dtype=torch.float32,
             )
 
+        valid_actions = list(range(self.action_dim))
+        if action_mask is not None:
+            mask = torch.as_tensor(action_mask, dtype=torch.bool).reshape(-1)
+            if mask.numel() != self.action_dim or not bool(mask.any()):
+                raise ValueError("action_mask must identify at least one valid action")
+            valid_actions = torch.nonzero(mask, as_tuple=False).flatten().tolist()
+
         if random.random() < epsilon:
-            return random.randrange(self.action_dim)
+            return random.choice(valid_actions)
 
         with torch.no_grad():
             observation = observation.to(self.device)
             q_values = self.q_network(observation)
+            if action_mask is not None:
+                q_values = q_values.masked_fill(~mask.to(self.device), -torch.inf)
 
             return int(torch.argmax(q_values).item())
 
@@ -93,6 +107,7 @@ class IQLLearner:
         reward: float,
         next_observation: torch.Tensor,
         terminated: bool,
+        next_action_mask=None,
     ) -> Dict[str, float]:
         """
         Perform one Q-learning update.
@@ -130,6 +145,11 @@ class IQLLearner:
 
         with torch.no_grad():
             next_q_values = self.target_network(next_observation)
+            if next_action_mask is not None:
+                mask = torch.as_tensor(next_action_mask, dtype=torch.bool, device=self.device).reshape(-1)
+                if mask.numel() != self.action_dim or not bool(mask.any()):
+                    raise ValueError("next_action_mask must identify at least one valid action")
+                next_q_values = next_q_values.masked_fill(~mask, -torch.inf)
             max_next_q = torch.max(next_q_values)
 
             if terminated:
@@ -144,6 +164,9 @@ class IQLLearner:
 
         self.optimizer.zero_grad()
         loss.backward()
+        torch.nn.utils.clip_grad_norm_(
+            self.q_network.parameters(), max_norm=self.gradient_clip_norm
+        )
         self.optimizer.step()
 
         return {
