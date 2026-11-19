@@ -57,7 +57,7 @@ def test_benchmark_writes_matched_traces_manifest_and_statistics(tmp_path):
     assert "1 matched episodes" in report_text
     assert "N=5 QMIX completion target (>=80%): FAIL" in report_text
     assert "No pre-created scenario manifest was supplied" in report_text
-    assert "N=10 physical QMIX/IQL collision-rate ratio is unavailable" in report_text
+    assert "N=10 physical QMIX/IQL collision-rate comparison was not included" in report_text
     assert "point estimate meets the 80%" not in report_text
     trace_path = tmp_path / "evaluation" / "traces" / "qmix_n5.json.gz"
     assert trace_path.is_file()

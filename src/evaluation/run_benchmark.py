@@ -267,6 +267,10 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
                 f"- N=10 blocked safety-override proxy ratio is {proxy_ratio:.3f}; "
                 "this does not substitute for the physical-collision requirement."
             )
+    else:
+        collision_findings.append(
+            "- N=10 physical QMIX/IQL collision-rate comparison was not included."
+        )
 
     iql_n20 = next((row for row in report["summary"]
                     if row["algorithm"] == "IQL" and row["fleet_size"] == 20), None)

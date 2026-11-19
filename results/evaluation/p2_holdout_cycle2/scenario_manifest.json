@@ -1,0 +1,8855 @@
+{
+  "manifest_id": "64e1a531970bba12870f9820f07730314f3dc4bd9de38dd2f2ab56f6af520b71",
+  "schema_version": 1,
+  "created_utc": "2026-11-19T03:49:46.180577+00:00",
+  "purpose": "held_out_evaluation; commit this file before training",
+  "episodes_per_fleet": 20,
+  "max_steps": 100,
+  "evaluation_seed": 20261121,
+  "task_seed_rule": "evaluation_seed + episode_index - 1",
+  "fleet_sizes": [
+    5,
+    10,
+    20
+  ],
+  "environment_config_sha256": {
+    "config/environment.json": "c8106b6418b9efbafb5aefae46442f8a8668779db052175fd76a808fa9468ce2"
+  },
+  "source_sha256": {
+    "src/evaluation/scenario_manifest.py": "a621f1c8c5bb18743c123f0488f56f11d1be078fe1a78e9268b1ed24bb4ce688",
+    "src/evaluation/trace_generator.py": "e4d9162f8e618ed8a7efee7c20c8d67c66a0059daa37a0f4c6dd7423506bc9d1",
+    "src/warehouse/task_generation.py": "bb6236945fcc58d98a68cf132ce4198575b6266d5b38f57154a61fe66c32671c",
+    "src/warehouse/layouts.py": "4f8d42e1ac04dd4173bec9a0b7b689dcc48aa71ac9269a057e775e959407c564"
+  },
+  "runtime": {
+    "python": "3.11.9 (v3.11.9:de54cf5be3, Apr  2 2024, 07:12:50) [Clang 13.0.0 (clang-1300.0.29.30)]"
+  },
+  "scenarios": {
+    "5": [
+      {
+        "episode": 1,
+        "task_seed": 20261121,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              8,
+              19
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              17,
+              11
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              7
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              14,
+              3
+            ],
+            "delivery_position": [
+              4,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              17,
+              15
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 2,
+        "task_seed": 20261122,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              2,
+              10
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              10,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              16,
+              8
+            ],
+            "delivery_position": [
+              18,
+              17
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              17,
+              8
+            ],
+            "delivery_position": [
+              19,
+              19
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              3,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 3,
+        "task_seed": 20261123,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              4,
+              7
+            ],
+            "delivery_position": [
+              6,
+              18
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              9,
+              2
+            ],
+            "delivery_position": [
+              8,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              3,
+              8
+            ],
+            "delivery_position": [
+              3,
+              16
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              13,
+              13
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              16,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 4,
+        "task_seed": 20261124,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              2,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              12,
+              0
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              17,
+              0
+            ],
+            "delivery_position": [
+              8,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              13,
+              11
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              8,
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 5,
+        "task_seed": 20261125,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              18,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              3,
+              6
+            ],
+            "delivery_position": [
+              7,
+              10
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              13,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              9,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 6,
+        "task_seed": 20261126,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              5
+            ],
+            "delivery_position": [
+              0,
+              19
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              7,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              4,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              0,
+              7
+            ],
+            "delivery_position": [
+              13,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              14,
+              15
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 7,
+        "task_seed": 20261127,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              4,
+              2
+            ],
+            "delivery_position": [
+              4,
+              15
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              15,
+              5
+            ],
+            "delivery_position": [
+              5,
+              14
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              0,
+              6
+            ],
+            "delivery_position": [
+              17,
+              18
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              0,
+              7
+            ],
+            "delivery_position": [
+              16,
+              17
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              7,
+              5
+            ],
+            "delivery_position": [
+              1,
+              16
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 8,
+        "task_seed": 20261128,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              15,
+              8
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              14,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              4
+            ],
+            "delivery_position": [
+              17,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              17,
+              11
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              16,
+              0
+            ],
+            "delivery_position": [
+              8,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 9,
+        "task_seed": 20261129,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              0,
+              5
+            ],
+            "delivery_position": [
+              4,
+              12
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              10,
+              6
+            ],
+            "delivery_position": [
+              17,
+              12
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              5,
+              15
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              8,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              13,
+              1
+            ],
+            "delivery_position": [
+              3,
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 10,
+        "task_seed": 20261130,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              15,
+              4
+            ],
+            "delivery_position": [
+              4,
+              15
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              19,
+              5
+            ],
+            "delivery_position": [
+              17,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              2,
+              1
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              16,
+              11
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              8,
+              3
+            ],
+            "delivery_position": [
+              2,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 11,
+        "task_seed": 20261131,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              19,
+              8
+            ],
+            "delivery_position": [
+              8,
+              12
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              5,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              2,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 12,
+        "task_seed": 20261132,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              16,
+              1
+            ],
+            "delivery_position": [
+              2,
+              18
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              16,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              7,
+              7
+            ],
+            "delivery_position": [
+              9,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              7,
+              2
+            ],
+            "delivery_position": [
+              19,
+              16
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              8
+            ],
+            "delivery_position": [
+              14,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 13,
+        "task_seed": 20261133,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              18,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              15,
+              18
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              7,
+              10
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              10,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              6,
+              1
+            ],
+            "delivery_position": [
+              4,
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 14,
+        "task_seed": 20261134,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              7
+            ],
+            "delivery_position": [
+              14,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              12,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              3
+            ],
+            "delivery_position": [
+              19,
+              13
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              12,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 15,
+        "task_seed": 20261135,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              13,
+              2
+            ],
+            "delivery_position": [
+              2,
+              16
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              12,
+              0
+            ],
+            "delivery_position": [
+              10,
+              13
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              4,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              14,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 16,
+        "task_seed": 20261136,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              7
+            ],
+            "delivery_position": [
+              6,
+              10
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              9,
+              3
+            ],
+            "delivery_position": [
+              15,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              10,
+              1
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              12,
+              0
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              4,
+              1
+            ],
+            "delivery_position": [
+              8,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 17,
+        "task_seed": 20261137,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              18,
+              5
+            ],
+            "delivery_position": [
+              11,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              4,
+              7
+            ],
+            "delivery_position": [
+              0,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              5,
+              18
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              11,
+              0
+            ],
+            "delivery_position": [
+              7,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              7,
+              1
+            ],
+            "delivery_position": [
+              16,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 18,
+        "task_seed": 20261138,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              13,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              13,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              16,
+              0
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              6,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              2,
+              0
+            ],
+            "delivery_position": [
+              0,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 19,
+        "task_seed": 20261139,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              9,
+              6
+            ],
+            "delivery_position": [
+              14,
+              13
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              7,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              18,
+              5
+            ],
+            "delivery_position": [
+              6,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              14,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              14,
+              16
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 20,
+        "task_seed": 20261140,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              4,
+              0
+            ],
+            "delivery_position": [
+              5,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              2,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              2,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              16,
+              16
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              15,
+              10
+            ]
+          }
+        ]
+      }
+    ],
+    "10": [
+      {
+        "episode": 1,
+        "task_seed": 20261121,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              18,
+              6
+            ],
+            "delivery_position": [
+              13,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              14,
+              3
+            ],
+            "delivery_position": [
+              17,
+              11
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              9,
+              16
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              2,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              1,
+              16
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              5,
+              11
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              10,
+              7
+            ],
+            "delivery_position": [
+              10,
+              15
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              13,
+              7
+            ],
+            "delivery_position": [
+              6,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              4,
+              5
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              1,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 2,
+        "task_seed": 20261122,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              11,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              7,
+              1
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              9,
+              3
+            ],
+            "delivery_position": [
+              1,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              6,
+              1
+            ],
+            "delivery_position": [
+              15,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              18,
+              6
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              14,
+              3
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              10,
+              7
+            ],
+            "delivery_position": [
+              5,
+              17
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              4,
+              5
+            ],
+            "delivery_position": [
+              18,
+              18
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              12,
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 3,
+        "task_seed": 20261123,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              19,
+              19
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              4,
+              7
+            ],
+            "delivery_position": [
+              9,
+              15
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              17,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              10,
+              4
+            ],
+            "delivery_position": [
+              3,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              3,
+              1
+            ],
+            "delivery_position": [
+              1,
+              18
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              15,
+              18
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              8,
+              1
+            ],
+            "delivery_position": [
+              12,
+              18
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              13,
+              14
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              19,
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 4,
+        "task_seed": 20261124,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              8,
+              1
+            ],
+            "delivery_position": [
+              10,
+              12
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              6
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              16,
+              13
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              11,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              3
+            ],
+            "delivery_position": [
+              2,
+              16
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              3,
+              15
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              18,
+              13
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              13,
+              6
+            ],
+            "delivery_position": [
+              0,
+              10
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              5,
+              14
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              14,
+              3
+            ],
+            "delivery_position": [
+              0,
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 5,
+        "task_seed": 20261125,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              8,
+              3
+            ],
+            "delivery_position": [
+              16,
+              18
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              2,
+              10
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              4,
+              6
+            ],
+            "delivery_position": [
+              16,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              13,
+              2
+            ],
+            "delivery_position": [
+              10,
+              13
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              13,
+              1
+            ],
+            "delivery_position": [
+              19,
+              18
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              11,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              3,
+              3
+            ],
+            "delivery_position": [
+              19,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              19,
+              5
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 6,
+        "task_seed": 20261126,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              17,
+              8
+            ],
+            "delivery_position": [
+              3,
+              12
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              9,
+              3
+            ],
+            "delivery_position": [
+              1,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              19,
+              10
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              17,
+              0
+            ],
+            "delivery_position": [
+              14,
+              19
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              13,
+              19
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              2,
+              16
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              6,
+              0
+            ],
+            "delivery_position": [
+              2,
+              17
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              11,
+              12
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              19,
+              12
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              12,
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 7,
+        "task_seed": 20261127,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              15,
+              5
+            ],
+            "delivery_position": [
+              16,
+              13
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              8,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              1,
+              13
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              16,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              7,
+              2
+            ],
+            "delivery_position": [
+              4,
+              15
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              4,
+              17
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              17,
+              18
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              13,
+              12
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              6,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 8,
+        "task_seed": 20261128,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              10,
+              0
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              14,
+              14
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              17,
+              8
+            ],
+            "delivery_position": [
+              1,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              9,
+              8
+            ],
+            "delivery_position": [
+              18,
+              19
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              15,
+              5
+            ],
+            "delivery_position": [
+              15,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              4,
+              19
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              10,
+              5
+            ],
+            "delivery_position": [
+              19,
+              11
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              15,
+              8
+            ],
+            "delivery_position": [
+              2,
+              17
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              13,
+              14
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 9,
+        "task_seed": 20261129,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              0
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              3,
+              18
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              3,
+              0
+            ],
+            "delivery_position": [
+              17,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              15,
+              2
+            ],
+            "delivery_position": [
+              5,
+              13
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              12,
+              13
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              14,
+              18
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              2,
+              0
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              18,
+              1
+            ],
+            "delivery_position": [
+              11,
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 10,
+        "task_seed": 20261130,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              15,
+              15
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              19,
+              6
+            ],
+            "delivery_position": [
+              6,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              1
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              18,
+              5
+            ],
+            "delivery_position": [
+              7,
+              10
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              10,
+              6
+            ],
+            "delivery_position": [
+              13,
+              18
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              14,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              10,
+              10
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              9,
+              9
+            ],
+            "delivery_position": [
+              19,
+              14
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              14,
+              4
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 11,
+        "task_seed": 20261131,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              7,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              1
+            ],
+            "delivery_position": [
+              16,
+              17
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              18,
+              5
+            ],
+            "delivery_position": [
+              15,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              7,
+              5
+            ],
+            "delivery_position": [
+              13,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              11,
+              15
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              4,
+              13
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              14,
+              11
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              6,
+              1
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              8
+            ],
+            "delivery_position": [
+              6,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              5,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 12,
+        "task_seed": 20261132,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              4,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              3,
+              1
+            ],
+            "delivery_position": [
+              9,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              17,
+              8
+            ],
+            "delivery_position": [
+              0,
+              16
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              3
+            ],
+            "delivery_position": [
+              8,
+              14
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              5,
+              11
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              4,
+              10
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              8,
+              3
+            ],
+            "delivery_position": [
+              10,
+              13
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              3,
+              6
+            ],
+            "delivery_position": [
+              2,
+              19
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              13,
+              7
+            ],
+            "delivery_position": [
+              4,
+              18
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              18,
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 13,
+        "task_seed": 20261133,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              18,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              0,
+              18
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              3,
+              15
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              7,
+              16
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              7,
+              15
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              18,
+              4
+            ],
+            "delivery_position": [
+              1,
+              17
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              8,
+              3
+            ],
+            "delivery_position": [
+              7,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 14,
+        "task_seed": 20261134,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              8,
+              18
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              4,
+              5
+            ],
+            "delivery_position": [
+              15,
+              18
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              5,
+              10
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              7
+            ],
+            "delivery_position": [
+              11,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              10,
+              16
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              0,
+              15
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              14,
+              18
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              6,
+              10
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              19,
+              6
+            ],
+            "delivery_position": [
+              12,
+              18
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              9,
+              8
+            ],
+            "delivery_position": [
+              16,
+              16
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 15,
+        "task_seed": 20261135,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              5,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              17,
+              1
+            ],
+            "delivery_position": [
+              15,
+              11
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              15,
+              17
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              12,
+              0
+            ],
+            "delivery_position": [
+              14,
+              10
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              9,
+              7
+            ],
+            "delivery_position": [
+              11,
+              14
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              17,
+              16
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              5,
+              0
+            ],
+            "delivery_position": [
+              14,
+              12
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              10,
+              13
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 16,
+        "task_seed": 20261136,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              19,
+              10
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              11,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              13,
+              1
+            ],
+            "delivery_position": [
+              2,
+              15
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              0,
+              14
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              1
+            ],
+            "delivery_position": [
+              7,
+              12
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              13,
+              12
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              14,
+              9
+            ],
+            "delivery_position": [
+              11,
+              18
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              9,
+              8
+            ],
+            "delivery_position": [
+              4,
+              17
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              19,
+              0
+            ],
+            "delivery_position": [
+              9,
+              15
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              16,
+              15
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 17,
+        "task_seed": 20261137,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              7,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              17,
+              1
+            ],
+            "delivery_position": [
+              0,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              0,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              4
+            ],
+            "delivery_position": [
+              16,
+              11
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              12,
+              17
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              9,
+              1
+            ],
+            "delivery_position": [
+              5,
+              16
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              19,
+              5
+            ],
+            "delivery_position": [
+              6,
+              19
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              9,
+              0
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              2,
+              11
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              1,
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 18,
+        "task_seed": 20261138,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              6,
+              0
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              14,
+              9
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              16,
+              15
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              9,
+              1
+            ],
+            "delivery_position": [
+              2,
+              19
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              14,
+              5
+            ],
+            "delivery_position": [
+              4,
+              11
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              16,
+              16
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              10,
+              5
+            ],
+            "delivery_position": [
+              10,
+              16
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              3,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              9,
+              4
+            ],
+            "delivery_position": [
+              6,
+              19
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 19,
+        "task_seed": 20261139,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              14,
+              18
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              7
+            ],
+            "delivery_position": [
+              15,
+              17
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              13,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              17,
+              18
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              2,
+              0
+            ],
+            "delivery_position": [
+              15,
+              11
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              4,
+              7
+            ],
+            "delivery_position": [
+              15,
+              10
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              0,
+              13
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              1,
+              17
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              9,
+              0
+            ],
+            "delivery_position": [
+              5,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 20,
+        "task_seed": 20261140,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              6,
+              0
+            ],
+            "delivery_position": [
+              1,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              2,
+              8
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              4
+            ],
+            "delivery_position": [
+              11,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              9,
+              2
+            ],
+            "delivery_position": [
+              6,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              15,
+              1
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              4,
+              2
+            ],
+            "delivery_position": [
+              13,
+              11
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              12,
+              16
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              7
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              9,
+              4
+            ],
+            "delivery_position": [
+              7,
+              14
+            ]
+          }
+        ]
+      }
+    ],
+    "20": [
+      {
+        "episode": 1,
+        "task_seed": 20261121,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              13,
+              6
+            ],
+            "delivery_position": [
+              1,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              3,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              3,
+              13
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              1,
+              18
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              5,
+              12
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              13,
+              16
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              11,
+              10
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              9,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              15,
+              4
+            ],
+            "delivery_position": [
+              6,
+              13
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              3,
+              1
+            ],
+            "delivery_position": [
+              3,
+              18
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              5,
+              8
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              3,
+              2
+            ],
+            "delivery_position": [
+              13,
+              17
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              16,
+              8
+            ],
+            "delivery_position": [
+              14,
+              12
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              7,
+              7
+            ],
+            "delivery_position": [
+              19,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              10,
+              14
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              8,
+              12
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              1,
+              12
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              2,
+              11
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              8,
+              13
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 2,
+        "task_seed": 20261122,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              7,
+              1
+            ],
+            "delivery_position": [
+              18,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              18,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              0
+            ],
+            "delivery_position": [
+              16,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              17,
+              1
+            ],
+            "delivery_position": [
+              14,
+              19
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              9,
+              15
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              14,
+              15
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              15,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              18,
+              17
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              12,
+              18
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              16,
+              17
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              9,
+              17
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              12,
+              19
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              3,
+              8
+            ],
+            "delivery_position": [
+              0,
+              14
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              2,
+              15
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              18,
+              1
+            ],
+            "delivery_position": [
+              11,
+              11
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              14,
+              4
+            ],
+            "delivery_position": [
+              2,
+              14
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              13,
+              18
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              2,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 3,
+        "task_seed": 20261123,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              11,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              19,
+              9
+            ],
+            "delivery_position": [
+              8,
+              15
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              19,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              1,
+              16
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              1,
+              19
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              10,
+              11
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              14,
+              16
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              17,
+              8
+            ],
+            "delivery_position": [
+              18,
+              14
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              15,
+              10
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              4,
+              9
+            ],
+            "delivery_position": [
+              16,
+              14
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              14,
+              8
+            ],
+            "delivery_position": [
+              11,
+              19
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              10,
+              7
+            ],
+            "delivery_position": [
+              8,
+              14
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              13,
+              0
+            ],
+            "delivery_position": [
+              15,
+              16
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              3,
+              0
+            ],
+            "delivery_position": [
+              3,
+              13
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              7,
+              7
+            ],
+            "delivery_position": [
+              10,
+              17
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              1,
+              0
+            ],
+            "delivery_position": [
+              6,
+              18
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              19,
+              8
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              19,
+              3
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              13,
+              2
+            ],
+            "delivery_position": [
+              4,
+              19
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 4,
+        "task_seed": 20261124,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              12,
+              0
+            ],
+            "delivery_position": [
+              11,
+              18
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              17,
+              8
+            ],
+            "delivery_position": [
+              1,
+              17
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              5,
+              10
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              5,
+              11
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              18,
+              12
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              18,
+              4
+            ],
+            "delivery_position": [
+              5,
+              14
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              9,
+              12
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              15,
+              1
+            ],
+            "delivery_position": [
+              19,
+              15
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              9,
+              8
+            ],
+            "delivery_position": [
+              16,
+              15
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              6,
+              0
+            ],
+            "delivery_position": [
+              12,
+              10
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              9,
+              6
+            ],
+            "delivery_position": [
+              1,
+              13
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              11,
+              10
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              19,
+              2
+            ],
+            "delivery_position": [
+              11,
+              19
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              17,
+              18
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              7,
+              14
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              2,
+              0
+            ],
+            "delivery_position": [
+              11,
+              16
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              10,
+              5
+            ],
+            "delivery_position": [
+              19,
+              18
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              17,
+              17
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              7,
+              10
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 5,
+        "task_seed": 20261125,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              18,
+              17
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              18,
+              4
+            ],
+            "delivery_position": [
+              1,
+              11
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              1
+            ],
+            "delivery_position": [
+              0,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              6,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              9,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              3,
+              2
+            ],
+            "delivery_position": [
+              6,
+              16
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              13,
+              12
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              3
+            ],
+            "delivery_position": [
+              7,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              14,
+              10
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              14,
+              7
+            ],
+            "delivery_position": [
+              19,
+              10
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              10,
+              7
+            ],
+            "delivery_position": [
+              4,
+              12
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              1,
+              13
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              18,
+              1
+            ],
+            "delivery_position": [
+              10,
+              16
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              2,
+              13
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              15,
+              17
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              15,
+              2
+            ],
+            "delivery_position": [
+              11,
+              10
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              15,
+              1
+            ],
+            "delivery_position": [
+              16,
+              11
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              7,
+              13
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              2,
+              1
+            ],
+            "delivery_position": [
+              13,
+              19
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 6,
+        "task_seed": 20261126,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              13,
+              1
+            ],
+            "delivery_position": [
+              6,
+              12
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              18,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              18,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              12,
+              10
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              16,
+              8
+            ],
+            "delivery_position": [
+              16,
+              17
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              3,
+              2
+            ],
+            "delivery_position": [
+              1,
+              18
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              1,
+              11
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              14,
+              8
+            ],
+            "delivery_position": [
+              13,
+              13
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              14,
+              5
+            ],
+            "delivery_position": [
+              2,
+              14
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              9,
+              7
+            ],
+            "delivery_position": [
+              8,
+              17
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              15,
+              1
+            ],
+            "delivery_position": [
+              14,
+              11
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              19,
+              3
+            ],
+            "delivery_position": [
+              11,
+              17
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              11,
+              0
+            ],
+            "delivery_position": [
+              0,
+              19
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              11,
+              18
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              0,
+              17
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              6,
+              0
+            ],
+            "delivery_position": [
+              17,
+              16
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              13,
+              6
+            ],
+            "delivery_position": [
+              14,
+              19
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              10,
+              4
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 7,
+        "task_seed": 20261127,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              15,
+              5
+            ],
+            "delivery_position": [
+              16,
+              13
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              12,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              7,
+              1
+            ],
+            "delivery_position": [
+              7,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              13,
+              6
+            ],
+            "delivery_position": [
+              18,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              14,
+              9
+            ],
+            "delivery_position": [
+              3,
+              15
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              6,
+              18
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              3,
+              6
+            ],
+            "delivery_position": [
+              4,
+              18
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              10,
+              4
+            ],
+            "delivery_position": [
+              14,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              9,
+              9
+            ],
+            "delivery_position": [
+              16,
+              11
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              2,
+              1
+            ],
+            "delivery_position": [
+              7,
+              19
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              2,
+              19
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              9,
+              4
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              19,
+              2
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              2,
+              17
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              14,
+              15
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              0,
+              18
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              9,
+              16
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              4,
+              11
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 8,
+        "task_seed": 20261128,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              15,
+              7
+            ],
+            "delivery_position": [
+              3,
+              14
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              4,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              12,
+              14
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              2
+            ],
+            "delivery_position": [
+              16,
+              12
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              18,
+              15
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              4,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              5,
+              8
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              10,
+              17
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              19,
+              17
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              1,
+              19
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              3,
+              6
+            ],
+            "delivery_position": [
+              7,
+              13
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              7,
+              5
+            ],
+            "delivery_position": [
+              18,
+              12
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              4,
+              19
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              16,
+              8
+            ],
+            "delivery_position": [
+              12,
+              17
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              6,
+              18
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              6,
+              13
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              12,
+              0
+            ],
+            "delivery_position": [
+              18,
+              17
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              15,
+              16
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 9,
+        "task_seed": 20261129,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              0
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              0,
+              14
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              19,
+              2
+            ],
+            "delivery_position": [
+              16,
+              13
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              9,
+              18
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              12,
+              13
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              14,
+              8
+            ],
+            "delivery_position": [
+              0,
+              10
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              19,
+              7
+            ],
+            "delivery_position": [
+              16,
+              14
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              15,
+              1
+            ],
+            "delivery_position": [
+              8,
+              17
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              0,
+              16
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              1,
+              16
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              13,
+              16
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              13,
+              0
+            ],
+            "delivery_position": [
+              2,
+              15
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              0,
+              8
+            ],
+            "delivery_position": [
+              8,
+              18
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              0,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              2,
+              8
+            ],
+            "delivery_position": [
+              11,
+              16
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              1,
+              12
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              9,
+              17
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              10,
+              1
+            ],
+            "delivery_position": [
+              13,
+              11
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              3,
+              19
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 10,
+        "task_seed": 20261130,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              16,
+              0
+            ],
+            "delivery_position": [
+              12,
+              10
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              16,
+              1
+            ],
+            "delivery_position": [
+              3,
+              12
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              17,
+              1
+            ],
+            "delivery_position": [
+              15,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              13,
+              11
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              12,
+              16
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              15,
+              17
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              19,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              18,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              18,
+              4
+            ],
+            "delivery_position": [
+              15,
+              19
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              9,
+              9
+            ],
+            "delivery_position": [
+              4,
+              16
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              2,
+              13
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              19,
+              15
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              13,
+              19
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              5,
+              8
+            ],
+            "delivery_position": [
+              18,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              9,
+              19
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              11,
+              18
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              15,
+              5
+            ],
+            "delivery_position": [
+              3,
+              14
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              9,
+              14
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 11,
+        "task_seed": 20261131,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              19,
+              3
+            ],
+            "delivery_position": [
+              17,
+              15
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              4,
+              12
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              0,
+              18
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              9,
+              7
+            ],
+            "delivery_position": [
+              1,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              4,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              13,
+              12
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              6,
+              10
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              1,
+              12
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              6
+            ],
+            "delivery_position": [
+              8,
+              17
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              9,
+              8
+            ],
+            "delivery_position": [
+              17,
+              11
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              16,
+              16
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              5,
+              17
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              7,
+              17
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              0,
+              13
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              13,
+              19
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              14,
+              9
+            ],
+            "delivery_position": [
+              7,
+              19
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              13,
+              7
+            ],
+            "delivery_position": [
+              14,
+              13
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              15,
+              1
+            ],
+            "delivery_position": [
+              8,
+              12
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              14,
+              3
+            ],
+            "delivery_position": [
+              3,
+              18
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              17,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 12,
+        "task_seed": 20261132,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              2,
+              8
+            ],
+            "delivery_position": [
+              9,
+              19
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              0,
+              10
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              12,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              11,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              5,
+              19
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              13,
+              6
+            ],
+            "delivery_position": [
+              19,
+              12
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              13,
+              2
+            ],
+            "delivery_position": [
+              17,
+              15
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              5,
+              10
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              3,
+              8
+            ],
+            "delivery_position": [
+              4,
+              15
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              15,
+              17
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              3,
+              1
+            ],
+            "delivery_position": [
+              13,
+              11
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              19,
+              10
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              11,
+              8
+            ],
+            "delivery_position": [
+              16,
+              12
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              3,
+              3
+            ],
+            "delivery_position": [
+              15,
+              14
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              9,
+              10
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              7,
+              1
+            ],
+            "delivery_position": [
+              2,
+              17
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              9,
+              15
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              18,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 13,
+        "task_seed": 20261133,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              7,
+              2
+            ],
+            "delivery_position": [
+              5,
+              13
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              6,
+              1
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              1,
+              0
+            ],
+            "delivery_position": [
+              17,
+              16
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              10,
+              15
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              13,
+              5
+            ],
+            "delivery_position": [
+              12,
+              12
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              2,
+              8
+            ],
+            "delivery_position": [
+              11,
+              19
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              2,
+              1
+            ],
+            "delivery_position": [
+              8,
+              14
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              7,
+              0
+            ],
+            "delivery_position": [
+              16,
+              15
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              14,
+              5
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              11,
+              18
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              18,
+              18
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              12,
+              16
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              5,
+              11
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              8,
+              10
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              14,
+              17
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              9,
+              9
+            ],
+            "delivery_position": [
+              16,
+              12
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              13,
+              2
+            ],
+            "delivery_position": [
+              12,
+              13
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              10,
+              0
+            ],
+            "delivery_position": [
+              4,
+              14
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 14,
+        "task_seed": 20261134,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              16,
+              8
+            ],
+            "delivery_position": [
+              16,
+              16
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              15,
+              7
+            ],
+            "delivery_position": [
+              16,
+              14
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              6,
+              12
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              3,
+              10
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              15,
+              6
+            ],
+            "delivery_position": [
+              7,
+              11
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              1,
+              18
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              19,
+              6
+            ],
+            "delivery_position": [
+              1,
+              19
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              3,
+              0
+            ],
+            "delivery_position": [
+              3,
+              17
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              4,
+              8
+            ],
+            "delivery_position": [
+              13,
+              19
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              16,
+              13
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              3,
+              1
+            ],
+            "delivery_position": [
+              15,
+              11
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              11,
+              16
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              15,
+              5
+            ],
+            "delivery_position": [
+              17,
+              15
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              14,
+              2
+            ],
+            "delivery_position": [
+              6,
+              14
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              13,
+              6
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              1,
+              0
+            ],
+            "delivery_position": [
+              14,
+              10
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              0,
+              19
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              11,
+              13
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              12,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 15,
+        "task_seed": 20261135,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              10,
+              5
+            ],
+            "delivery_position": [
+              6,
+              19
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              3,
+              8
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              9,
+              5
+            ],
+            "delivery_position": [
+              7,
+              18
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              1,
+              14
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              9,
+              17
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              2,
+              1
+            ],
+            "delivery_position": [
+              9,
+              18
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              7,
+              3
+            ],
+            "delivery_position": [
+              15,
+              10
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              19,
+              5
+            ],
+            "delivery_position": [
+              16,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              6,
+              18
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              3,
+              4
+            ],
+            "delivery_position": [
+              11,
+              17
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              13,
+              2
+            ],
+            "delivery_position": [
+              8,
+              19
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              17,
+              1
+            ],
+            "delivery_position": [
+              14,
+              16
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              9,
+              8
+            ],
+            "delivery_position": [
+              8,
+              17
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              18,
+              17
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              18,
+              7
+            ],
+            "delivery_position": [
+              18,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              4,
+              10
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              2,
+              11
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              15,
+              8
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              17,
+              16
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              10,
+              1
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 16,
+        "task_seed": 20261136,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              10,
+              4
+            ],
+            "delivery_position": [
+              19,
+              10
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              19,
+              18
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              11,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              11,
+              0
+            ],
+            "delivery_position": [
+              11,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              15,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              6,
+              8
+            ],
+            "delivery_position": [
+              4,
+              12
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              9,
+              17
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              3,
+              2
+            ],
+            "delivery_position": [
+              0,
+              19
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              7,
+              2
+            ],
+            "delivery_position": [
+              1,
+              16
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              13,
+              1
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              10,
+              5
+            ],
+            "delivery_position": [
+              1,
+              12
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              15,
+              2
+            ],
+            "delivery_position": [
+              0,
+              13
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              16,
+              8
+            ],
+            "delivery_position": [
+              5,
+              12
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              7,
+              6
+            ],
+            "delivery_position": [
+              4,
+              10
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              1,
+              18
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              4,
+              17
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              15,
+              3
+            ],
+            "delivery_position": [
+              13,
+              14
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              8,
+              5
+            ],
+            "delivery_position": [
+              15,
+              12
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              5,
+              11
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              18,
+              0
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 17,
+        "task_seed": 20261137,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              18,
+              3
+            ],
+            "delivery_position": [
+              11,
+              13
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              16,
+              1
+            ],
+            "delivery_position": [
+              2,
+              10
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              14,
+              1
+            ],
+            "delivery_position": [
+              18,
+              19
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              5,
+              8
+            ],
+            "delivery_position": [
+              7,
+              19
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              19,
+              0
+            ],
+            "delivery_position": [
+              7,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              1,
+              8
+            ],
+            "delivery_position": [
+              6,
+              16
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              2,
+              15
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              8,
+              6
+            ],
+            "delivery_position": [
+              10,
+              16
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              8,
+              5
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              16,
+              0
+            ],
+            "delivery_position": [
+              10,
+              12
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              14,
+              9
+            ],
+            "delivery_position": [
+              1,
+              17
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              8,
+              11
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              0,
+              9
+            ],
+            "delivery_position": [
+              6,
+              17
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              6,
+              1
+            ],
+            "delivery_position": [
+              10,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              8,
+              7
+            ],
+            "delivery_position": [
+              11,
+              16
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              14,
+              8
+            ],
+            "delivery_position": [
+              15,
+              18
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              18,
+              6
+            ],
+            "delivery_position": [
+              15,
+              16
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              15,
+              0
+            ],
+            "delivery_position": [
+              13,
+              18
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              12,
+              18
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 18,
+        "task_seed": 20261138,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              0,
+              13
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              15,
+              2
+            ],
+            "delivery_position": [
+              2,
+              17
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              10,
+              6
+            ],
+            "delivery_position": [
+              19,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              19,
+              7
+            ],
+            "delivery_position": [
+              13,
+              13
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              10,
+              3
+            ],
+            "delivery_position": [
+              10,
+              14
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              7,
+              8
+            ],
+            "delivery_position": [
+              17,
+              11
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              18,
+              8
+            ],
+            "delivery_position": [
+              0,
+              11
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              11,
+              0
+            ],
+            "delivery_position": [
+              0,
+              15
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              12,
+              1
+            ],
+            "delivery_position": [
+              6,
+              10
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              18,
+              5
+            ],
+            "delivery_position": [
+              14,
+              18
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              16,
+              0
+            ],
+            "delivery_position": [
+              14,
+              13
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              19,
+              1
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              14,
+              0
+            ],
+            "delivery_position": [
+              7,
+              10
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              8,
+              1
+            ],
+            "delivery_position": [
+              2,
+              13
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              18,
+              16
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              8,
+              10
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              5,
+              0
+            ],
+            "delivery_position": [
+              13,
+              17
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              19,
+              12
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              7,
+              18
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              7,
+              2
+            ],
+            "delivery_position": [
+              7,
+              17
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 19,
+        "task_seed": 20261139,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              7,
+              15
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              10,
+              4
+            ],
+            "delivery_position": [
+              13,
+              10
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              9,
+              7
+            ],
+            "delivery_position": [
+              1,
+              11
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              8,
+              4
+            ],
+            "delivery_position": [
+              8,
+              12
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              16,
+              1
+            ],
+            "delivery_position": [
+              0,
+              11
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              12,
+              8
+            ],
+            "delivery_position": [
+              1,
+              10
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              14,
+              9
+            ],
+            "delivery_position": [
+              1,
+              16
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              9,
+              4
+            ],
+            "delivery_position": [
+              9,
+              11
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              13,
+              3
+            ],
+            "delivery_position": [
+              12,
+              16
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              10,
+              7
+            ],
+            "delivery_position": [
+              1,
+              13
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              10,
+              0
+            ],
+            "delivery_position": [
+              7,
+              19
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              10,
+              8
+            ],
+            "delivery_position": [
+              0,
+              12
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              1,
+              1
+            ],
+            "delivery_position": [
+              3,
+              15
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              19,
+              7
+            ],
+            "delivery_position": [
+              15,
+              13
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              2,
+              8
+            ],
+            "delivery_position": [
+              11,
+              11
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              5,
+              8
+            ],
+            "delivery_position": [
+              15,
+              15
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              8,
+              8
+            ],
+            "delivery_position": [
+              13,
+              13
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              6,
+              15
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              18,
+              4
+            ],
+            "delivery_position": [
+              6,
+              16
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              13,
+              8
+            ],
+            "delivery_position": [
+              17,
+              19
+            ]
+          }
+        ]
+      },
+      {
+        "episode": 20,
+        "task_seed": 20261140,
+        "layout_id": "standard",
+        "initial_tasks": [
+          {
+            "task_id": 1,
+            "assigned_robot": 0,
+            "pickup_position": [
+              5,
+              1
+            ],
+            "delivery_position": [
+              1,
+              14
+            ]
+          },
+          {
+            "task_id": 2,
+            "assigned_robot": 1,
+            "pickup_position": [
+              7,
+              4
+            ],
+            "delivery_position": [
+              10,
+              19
+            ]
+          },
+          {
+            "task_id": 3,
+            "assigned_robot": 2,
+            "pickup_position": [
+              10,
+              0
+            ],
+            "delivery_position": [
+              8,
+              14
+            ]
+          },
+          {
+            "task_id": 4,
+            "assigned_robot": 3,
+            "pickup_position": [
+              15,
+              4
+            ],
+            "delivery_position": [
+              8,
+              13
+            ]
+          },
+          {
+            "task_id": 5,
+            "assigned_robot": 4,
+            "pickup_position": [
+              3,
+              2
+            ],
+            "delivery_position": [
+              9,
+              19
+            ]
+          },
+          {
+            "task_id": 6,
+            "assigned_robot": 5,
+            "pickup_position": [
+              18,
+              2
+            ],
+            "delivery_position": [
+              16,
+              12
+            ]
+          },
+          {
+            "task_id": 7,
+            "assigned_robot": 6,
+            "pickup_position": [
+              3,
+              5
+            ],
+            "delivery_position": [
+              4,
+              13
+            ]
+          },
+          {
+            "task_id": 8,
+            "assigned_robot": 7,
+            "pickup_position": [
+              3,
+              7
+            ],
+            "delivery_position": [
+              14,
+              17
+            ]
+          },
+          {
+            "task_id": 9,
+            "assigned_robot": 8,
+            "pickup_position": [
+              11,
+              1
+            ],
+            "delivery_position": [
+              11,
+              16
+            ]
+          },
+          {
+            "task_id": 10,
+            "assigned_robot": 9,
+            "pickup_position": [
+              19,
+              6
+            ],
+            "delivery_position": [
+              0,
+              19
+            ]
+          },
+          {
+            "task_id": 11,
+            "assigned_robot": 10,
+            "pickup_position": [
+              5,
+              8
+            ],
+            "delivery_position": [
+              17,
+              16
+            ]
+          },
+          {
+            "task_id": 12,
+            "assigned_robot": 11,
+            "pickup_position": [
+              14,
+              4
+            ],
+            "delivery_position": [
+              11,
+              12
+            ]
+          },
+          {
+            "task_id": 13,
+            "assigned_robot": 12,
+            "pickup_position": [
+              13,
+              4
+            ],
+            "delivery_position": [
+              7,
+              11
+            ]
+          },
+          {
+            "task_id": 14,
+            "assigned_robot": 13,
+            "pickup_position": [
+              8,
+              2
+            ],
+            "delivery_position": [
+              4,
+              14
+            ]
+          },
+          {
+            "task_id": 15,
+            "assigned_robot": 14,
+            "pickup_position": [
+              8,
+              1
+            ],
+            "delivery_position": [
+              19,
+              15
+            ]
+          },
+          {
+            "task_id": 16,
+            "assigned_robot": 15,
+            "pickup_position": [
+              0,
+              8
+            ],
+            "delivery_position": [
+              10,
+              14
+            ]
+          },
+          {
+            "task_id": 17,
+            "assigned_robot": 16,
+            "pickup_position": [
+              2,
+              0
+            ],
+            "delivery_position": [
+              9,
+              13
+            ]
+          },
+          {
+            "task_id": 18,
+            "assigned_robot": 17,
+            "pickup_position": [
+              19,
+              4
+            ],
+            "delivery_position": [
+              12,
+              14
+            ]
+          },
+          {
+            "task_id": 19,
+            "assigned_robot": 18,
+            "pickup_position": [
+              8,
+              0
+            ],
+            "delivery_position": [
+              17,
+              14
+            ]
+          },
+          {
+            "task_id": 20,
+            "assigned_robot": 19,
+            "pickup_position": [
+              10,
+              2
+            ],
+            "delivery_position": [
+              11,
+              11
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}

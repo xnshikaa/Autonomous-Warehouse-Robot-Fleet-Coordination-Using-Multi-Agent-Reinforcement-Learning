@@ -293,7 +293,7 @@
   },
   "analysis_report": {
     "file": "report.md",
-    "sha256": "5c44470f1a7a6e118cd78dd1dfe7a1a5ef97e73d146eac378c4b483130bb4a69"
+    "sha256": "db72b91790367d852dde127624426850c5310cf596bf6abfd4d10b264cd12dca"
   },
   "safety_gate": {
     "file": "safety_gate.json",

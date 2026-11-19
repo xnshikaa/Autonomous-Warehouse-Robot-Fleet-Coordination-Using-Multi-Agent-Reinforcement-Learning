@@ -32,6 +32,8 @@ Manifest: `47c08ace928ea885`
 - Used the supplied frozen scenario manifest `877e21e36bf45cb717d3e456b3d046b2545ead5a9e66347767a13f0da248e5f4`; the benchmark manifest records its hash.
 - QMIX-IQL completion gap is not maintained across the included fleet sizes.
 - Dedicated corridor gate: 20 aggressive entries blocked, 0 intrusions in 20 episodes (PASS).
-- No robot-robot contact events were observed. Safety-prevented conflicts are reported separately and are not physical collisions.
+- No physical robot-robot contacts were observed; safety-prevented conflicts are reported separately and are not physical collisions.
+- N=10 physical QMIX/IQL collision-rate ratio is unavailable because IQL recorded zero physical collisions.
+- N=10 blocked safety-override proxy ratio is 0.030; this does not substitute for the physical-collision requirement.
 - Delivery-time metrics are based on completed tasks; unavailable groups are shown as n/a.
 - See `scalability.png` for all fleet-size curves. These results describe the supplied checkpoints and do not establish convergence.
