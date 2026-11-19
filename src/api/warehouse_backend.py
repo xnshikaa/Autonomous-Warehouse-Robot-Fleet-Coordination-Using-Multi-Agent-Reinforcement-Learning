@@ -4,9 +4,11 @@ from __future__ import annotations
 
 import asyncio
 import json
+import logging
+import math
 import os
 from collections import deque
-from typing import Any
+from typing import Any, Callable
 
 from src.ai.environment import WarehouseEnvironment
 from src.marl.environment_adapter import MARLEnvironmentAdapter
@@ -19,6 +21,100 @@ except ImportError:  # pragma: no cover - optional backend dependency
 
     class WebSocketDisconnect(Exception):
         pass
+
+
+logger = logging.getLogger(__name__)
+
+
+class CommandValidationError(ValueError):
+    """A client command was malformed or is not supported."""
+
+    def __init__(self, code: str, message: str):
+        super().__init__(message)
+        self.code = code
+
+
+def _parse_command(message: str) -> dict[str, Any]:
+    """Parse and validate one command without allowing bad input to escape."""
+    try:
+        command = json.loads(message)
+    except (json.JSONDecodeError, TypeError) as error:
+        raise CommandValidationError("invalid_json", "Message must contain valid JSON.") from error
+    if not isinstance(command, dict):
+        raise CommandValidationError("invalid_command", "Command must be a JSON object.")
+
+    command_type = command.get("type")
+    if not isinstance(command_type, str) or not command_type:
+        raise CommandValidationError("missing_type", "Command requires a non-empty string 'type'.")
+
+    if command_type not in {"reset", "pause", "resume", "set_speed", "set_fleet_size"}:
+        raise CommandValidationError("unsupported_command", f"Unsupported command type: {command_type}.")
+
+    if command_type == "set_speed":
+        speed = command.get("speed")
+        if isinstance(speed, bool) or not isinstance(speed, (int, float)):
+            raise CommandValidationError("invalid_speed", "'speed' must be a finite positive number.")
+        try:
+            speed = float(speed)
+        except (OverflowError, ValueError) as error:
+            raise CommandValidationError("invalid_speed", "'speed' must be a finite positive number.") from error
+        if not math.isfinite(speed) or speed <= 0:
+            raise CommandValidationError("invalid_speed", "'speed' must be a finite positive number.")
+        command["speed"] = speed
+
+    if command_type == "set_fleet_size":
+        size = command.get("size")
+        if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
+            raise CommandValidationError("invalid_fleet_size", "'size' must be a positive integer.")
+
+    return command
+
+
+def _process_command_message(
+    message: str,
+    environment: WarehouseEnvironment,
+    qmix_controller: QMIXController | None,
+    policy_getter: Callable[[], dict[str, object]],
+    interval_seconds: float,
+    simulation_delay: float,
+    speed_multiplier: float,
+    simulation_paused: bool,
+) -> tuple[dict[str, Any], float, float, bool]:
+    """Apply one client message and return a response plus updated loop state."""
+    try:
+        command = _parse_command(message)
+    except CommandValidationError as error:
+        return ({
+            "type": "command_error",
+            "error": {"code": error.code, "message": str(error)},
+        }, simulation_delay, speed_multiplier, simulation_paused)
+
+    try:
+        command_type = command["type"]
+        if command_type == "reset":
+            environment.reset()
+            simulation_paused = False
+        elif command_type == "set_fleet_size":
+            environment.set_num_robots(command["size"])
+            if qmix_controller is not None:
+                qmix_controller.reset_for_fleet()
+        elif command_type == "pause":
+            simulation_paused = True
+        elif command_type == "resume":
+            simulation_paused = False
+        elif command_type == "set_speed":
+            speed_multiplier = float(command["speed"])
+            simulation_delay = max(0.01, float(interval_seconds) / speed_multiplier)
+    except (KeyError, TypeError, ValueError) as error:
+        return ({
+            "type": "command_error",
+            "error": {"code": "invalid_command_value", "message": str(error)},
+        }, simulation_delay, speed_multiplier, simulation_paused)
+
+    payload = build_state_payload(
+        environment, policy_getter(), simulation_delay, speed_multiplier, simulation_paused
+    )
+    return payload, simulation_delay, speed_multiplier, simulation_paused
 
 
 def _next_policy_actions(environment: WarehouseEnvironment) -> dict[int, int]:
@@ -34,6 +130,13 @@ def _next_policy_actions(environment: WarehouseEnvironment) -> dict[int, int]:
     for robot in environment.robots:
         occupied = {other.position for other in environment.robots if other.robot_id != robot.robot_id}
         path = _planned_path(environment, robot, static_blocked | occupied | reserved)
+        if len(path) < 2:
+            # Other robots and reservations are transient. If they seal every
+            # route, plan against fixed hazards and let WarehouseEnvironment's
+            # simultaneous collision resolver accept or block the first step.
+            # Action 0 is UP, not a no-op, so it is never a safe substitute for
+            # an unavailable dynamic route.
+            path = _planned_path(environment, robot, static_blocked)
         if len(path) < 2:
             actions[robot.robot_id] = 0
             continue
@@ -87,6 +190,8 @@ def build_state_payload(
     environment: WarehouseEnvironment,
     policy_telemetry: dict[str, object] | None = None,
     update_interval_seconds: float = 0.1,
+    speed_multiplier: float = 1.0,
+    simulation_paused: bool = False,
 ) -> dict[str, Any]:
     """Build a JSON snapshot matching the existing React state contract."""
     policy = policy_telemetry or {
@@ -153,7 +258,8 @@ def build_state_payload(
         "policy": policy,
         "config": {"gridWidth": layout.width, "gridHeight": layout.height, "cellSize": 1,
                    "layoutId": layout.layout_id,
-                   "updateIntervalSeconds": max(0.01, float(update_interval_seconds))},
+                   "updateIntervalSeconds": max(0.01, float(update_interval_seconds)),
+                   "speedMultiplier": float(speed_multiplier)},
         "layout": layout.to_dict(), "robots": robots,
         "shelves": [{"id": f"S{i:02d}", "gridPos": list(c), "levels": 1, "aisleId": "LAYOUT"}
                     for i, c in enumerate(sorted(layout.obstacles), 1)],
@@ -175,6 +281,7 @@ def build_state_payload(
                                 if environment.last_reward_components else None),
                      "fps": None},
         "safetyOverrideActive": any(event["overridden"] for event in events), "isDemoMode": not is_qmix,
+        "simulationPaused": bool(simulation_paused),
         "isConnectedToBackend": True,
     }
 
@@ -182,7 +289,7 @@ def build_state_payload(
 def create_app(
     environment: WarehouseEnvironment | None = None,
     interval_seconds: float = 0.1,
-    policy_source: str = "qmix",
+    policy_source: str = "auto",
     checkpoint_path: str | None = None,
 ):
     """Create the FastAPI app used by the visualizer.
@@ -196,25 +303,38 @@ def create_app(
     except ImportError as error:  # pragma: no cover
         raise RuntimeError("FastAPI is required for the WebSocket bridge; install requirements.txt.") from error
     policy_source = policy_source.lower().strip()
-    if policy_source not in {"qmix", "demo"}:
-        raise ValueError("policy_source must be 'qmix' or 'demo'")
+    if policy_source not in {"auto", "qmix", "demo"}:
+        raise ValueError("policy_source must be 'auto', 'qmix', or 'demo'")
 
     env = environment or WarehouseEnvironment(load_layout_tasks=True)
     env.reset()
     adapter = MARLEnvironmentAdapter(environment=env)
     checkpoint_path = checkpoint_path or os.environ.get("QMIX_CHECKPOINT")
-    qmix_controller = (
-        QMIXController(
-            adapter,
-            checkpoint_path=checkpoint_path,
-            epsilon=float(os.environ.get("QMIX_EPSILON", "0")),
-        )
-        if policy_source == "qmix"
-        else None
-    )
+    requested_policy_source = policy_source
+    qmix_controller = None
+    if policy_source in {"auto", "qmix"}:
+        if not checkpoint_path:
+            if policy_source == "qmix":
+                raise ValueError("policy_source='qmix' requires a compatible QMIX_CHECKPOINT.")
+            logger.warning("No QMIX checkpoint configured; using the deterministic DEMO controller.")
+            policy_source = "demo"
+        else:
+            try:
+                qmix_controller = QMIXController(
+                    adapter,
+                    checkpoint_path=checkpoint_path,
+                    epsilon=float(os.environ.get("QMIX_EPSILON", "0")),
+                )
+            except (FileNotFoundError, ValueError) as error:
+                if requested_policy_source == "qmix":
+                    raise
+                logger.warning("QMIX checkpoint is unavailable or incompatible (%s); using DEMO controller.", error)
+                policy_source = "demo"
     app = FastAPI(title="Warehouse Environment Backend")
+    app.state.policy_source = "QMIX" if qmix_controller is not None else "DEMO"
     simulation_paused = False
     simulation_delay = max(0.01, float(interval_seconds))
+    speed_multiplier = 1.0
     simulation_driver: WebSocket | None = None
 
     def current_policy() -> dict[str, object]:
@@ -233,35 +353,29 @@ def create_app(
 
     @app.get("/state")
     async def state():
-        return build_state_payload(env, current_policy(), simulation_delay)
+        return build_state_payload(env, current_policy(), simulation_delay, speed_multiplier, simulation_paused)
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
-        nonlocal simulation_paused, simulation_delay, simulation_driver
+        nonlocal simulation_paused, simulation_delay, simulation_driver, speed_multiplier
         await websocket.accept()
         try:
             while True:
                 try:
-                    command = json.loads(await asyncio.wait_for(
+                    raw_message = await asyncio.wait_for(
                         websocket.receive_text(), timeout=simulation_delay
-                    ))
-                    if command.get("type") == "reset":
-                        env.reset()
-                        simulation_paused = False
-                    elif command.get("type") == "set_fleet_size":
-                        env.set_num_robots(int(command["size"]))
-                        if qmix_controller is not None:
-                            qmix_controller.reset_for_fleet()
-                    elif command.get("type") == "pause":
-                        simulation_paused = True
-                    elif command.get("type") == "resume":
-                        simulation_paused = False
-                    elif command.get("type") == "set_speed":
-                        simulation_delay = max(
-                            0.01,
-                            float(interval_seconds) / max(0.1, float(command.get("speed", 1))),
-                        )
-                    await websocket.send_json(build_state_payload(env, current_policy(), simulation_delay))
+                    )
+                    response, simulation_delay, speed_multiplier, simulation_paused = _process_command_message(
+                        raw_message,
+                        env,
+                        qmix_controller,
+                        current_policy,
+                        interval_seconds,
+                        simulation_delay,
+                        speed_multiplier,
+                        simulation_paused,
+                    )
+                    await websocket.send_json(response)
                 except asyncio.TimeoutError:
                     if simulation_driver is None:
                         simulation_driver = websocket
@@ -274,7 +388,9 @@ def create_app(
                         _, _, terminated, _ = adapter.step(actions)
                         if terminated:
                             env.reset()
-                    await websocket.send_json(build_state_payload(env, current_policy(), simulation_delay))
+                    await websocket.send_json(build_state_payload(
+                        env, current_policy(), simulation_delay, speed_multiplier, simulation_paused
+                    ))
         except WebSocketDisconnect:
             pass
         finally:

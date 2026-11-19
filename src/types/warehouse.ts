@@ -32,6 +32,8 @@ export interface WarehouseConfig {
   cellSize: number;
   /** Backend simulation tick interval; absent for local-only simulation state. */
   updateIntervalSeconds?: number;
+  /** Current speed multiplier reported by the backend. */
+  speedMultiplier?: number;
 }
 
 export type RobotStatus = 
@@ -172,6 +174,8 @@ export interface ShelfState {
 export interface WarehouseState {
   timestep: number;
   episode: number;
+  /** Present for backend state; local providers may omit it. */
+  simulationPaused?: boolean;
   algorithm: AlgorithmType;
   controllerType: ControllerType;
   config: WarehouseConfig;

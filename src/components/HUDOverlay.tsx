@@ -18,6 +18,7 @@ import {
   Route
 } from 'lucide-react';
 import { PathVisibilityMode } from '../scene/PathSystem';
+import { getBackendConnectionLabel } from '../api/connectionStatus';
 
 interface HUDOverlayProps {
   state: WarehouseState;
@@ -52,17 +53,22 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
 }) => {
   const { metrics, isConnectedToBackend, safetyOverrideActive } = state;
   const [showLegend, setShowLegend] = React.useState(true);
+  const connectionLabel = getBackendConnectionLabel(isConnectedToBackend, state.isDemoMode);
   const isLiveBackend = isConnectedToBackend && !state.isDemoMode && state.controllerType === 'RL_BACKEND';
   const policyLabel = isLiveBackend
     ? `${state.policy?.source ?? state.algorithm} / ${state.policy?.trained ? 'TRAINED CHECKPOINT' : 'INITIALIZED WEIGHTS'}`
-    : 'DEMO CONTROLLER / LOCAL SIM';
+    : isConnectedToBackend
+      ? 'DEMO CONTROLLER'
+      : 'LOCAL SIM FALLBACK';
   const trainingProgress = state.policy?.trainingProgress ?? null;
   const trainingLabel = trainingProgress
     ? `EP ${trainingProgress.episode} · REWARD ${trainingProgress.reward ?? 'N/A'} · LOSS ${trainingProgress.loss ?? 'N/A'}`
     : 'NOT STREAMED';
   const targetLabel = isLiveBackend
     ? `${state.controllerType} / ${state.algorithm}`
-    : 'DEMO CONTROLLER / LOCAL SIM';
+    : isConnectedToBackend
+      ? 'DEMO CONTROLLER'
+      : 'LOCAL SIM FALLBACK';
   const latestSafetyEvent = [...(state.safetyEvents ?? [])]
     .filter(event => event.overridden)
     .sort((a, b) => b.timestep - a.timestep)[0];
@@ -119,15 +125,20 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
 
           {/* Connection Telemetry Tag */}
           <div className="flex items-center space-x-2">
-            {isConnectedToBackend ? (
-              <span className="px-3 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 font-bold flex items-center gap-1.5">
-                <Radio className="w-3.5 h-3.5 animate-pulse" /> LIVE BACKEND
-              </span>
-            ) : (
-              <span className="px-3 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-400 flex items-center gap-1.5">
-                <Zap className="w-3.5 h-3.5 text-industrial-accent" /> LOCAL SIM
-              </span>
-            )}
+            <span className={`px-3 py-1 rounded-lg border font-bold flex items-center gap-1.5 ${
+              connectionLabel === 'LIVE BACKEND'
+                ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400'
+                : connectionLabel === 'DEMO CONTROLLER'
+                  ? 'bg-amber-500/10 border-amber-500/30 text-amber-300'
+                  : 'bg-slate-900 border-slate-800 text-slate-400'
+            }`}>
+              {connectionLabel === 'LIVE BACKEND'
+                ? <Radio className="w-3.5 h-3.5 animate-pulse" />
+                : connectionLabel === 'DEMO CONTROLLER'
+                  ? <Bot className="w-3.5 h-3.5" />
+                  : <Zap className="w-3.5 h-3.5 text-industrial-accent" />}
+              {connectionLabel}
+            </span>
           </div>
         </div>
 

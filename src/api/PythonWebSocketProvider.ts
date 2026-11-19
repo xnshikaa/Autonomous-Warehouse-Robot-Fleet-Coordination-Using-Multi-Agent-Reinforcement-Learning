@@ -1,5 +1,6 @@
 import { WarehouseState, StateProvider } from '../types/warehouse';
 import { DemoStateProvider } from '../state/DemoStateProvider';
+import { markBackendConnected, markLocalFallback } from './connectionStatus';
 
 export class PythonWebSocketProvider implements StateProvider {
   private ws: WebSocket | null = null;
@@ -11,7 +12,7 @@ export class PythonWebSocketProvider implements StateProvider {
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   private disposed = false;
 
-  constructor(url: string = 'ws://127.0.0.1:8000/ws') {
+  constructor(url: string = import.meta.env.VITE_WAREHOUSE_WS_URL || 'ws://127.0.0.1:8000/ws') {
     this.url = url;
     this.fallbackProvider = new DemoStateProvider();
     this.activeState = this.fallbackProvider.getState();
@@ -25,6 +26,12 @@ export class PythonWebSocketProvider implements StateProvider {
     });
 
     this.connect();
+  }
+
+  private activateFallback(): void {
+    this.activeState = markLocalFallback(this.fallbackProvider.getState());
+    this.fallbackProvider.resume();
+    this.notifySubscribers();
   }
 
   public getState(): WarehouseState {
@@ -104,6 +111,10 @@ export class PythonWebSocketProvider implements StateProvider {
 
   private connect(): void {
     if (this.disposed) return;
+    if (this.ws && (
+      this.ws.readyState === WebSocket.CONNECTING ||
+      this.ws.readyState === WebSocket.OPEN
+    )) return;
     try {
       this.ws = new WebSocket(this.url);
 
@@ -115,34 +126,29 @@ export class PythonWebSocketProvider implements StateProvider {
       this.ws.onmessage = event => {
         try {
           const payload = JSON.parse(event.data);
-          if (payload.type === 'state_update' || payload.robots) {
+          if ((payload.type === 'state_update' || Array.isArray(payload.robots)) &&
+              typeof payload.isDemoMode === 'boolean') {
             this.activeState = {
-              ...payload,
-              isConnectedToBackend: true,
-              isDemoMode: false
+              ...markBackendConnected(payload),
             };
             this.notifySubscribers();
+          } else {
+            console.error('[WebSocket] Ignoring incomplete backend telemetry.');
           }
         } catch (e) {
           console.error('[WebSocket] Failed to parse message:', e);
         }
       };
 
-      this.ws.onerror = err => {
+      this.ws.onerror = () => {
         console.warn('[WebSocket] Backend connection error. Using local DemoMode fallback.');
-        this.activeState.isConnectedToBackend = false;
-        this.activeState.isDemoMode = true;
-        this.fallbackProvider.resume();
-        this.notifySubscribers();
+        this.activateFallback();
       };
 
       this.ws.onclose = () => {
         if (this.disposed) return;
         console.warn('[WebSocket] Backend disconnected. Reconnecting in 5s...');
-        this.activeState.isConnectedToBackend = false;
-        this.activeState.isDemoMode = true;
-        this.fallbackProvider.resume();
-        this.notifySubscribers();
+        this.activateFallback();
         this.reconnectTimer = setTimeout(() => {
           this.reconnectTimer = null;
           this.connect();
@@ -150,6 +156,7 @@ export class PythonWebSocketProvider implements StateProvider {
       };
     } catch (e) {
       console.warn('[WebSocket] Unable to instantiate WebSocket. Using DemoMode.');
+      this.activateFallback();
     }
   }
 

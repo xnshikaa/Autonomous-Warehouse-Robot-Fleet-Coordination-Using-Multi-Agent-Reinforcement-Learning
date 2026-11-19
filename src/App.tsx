@@ -45,6 +45,15 @@ export default function App() {
   }, []);
 
   useEffect(() => {
+    if (typeof state?.config.speedMultiplier === 'number') {
+      setSpeedMultiplier(state.config.speedMultiplier);
+    }
+    if (typeof state?.simulationPaused === 'boolean') {
+      setIsPaused(state.simulationPaused);
+    }
+  }, [state?.config.speedMultiplier, state?.simulationPaused]);
+
+  useEffect(() => {
     const handleFullscreenChange = () => {
       setIsWarehouseFullscreen(document.fullscreenElement === warehouseRootRef.current);
     };
@@ -63,26 +72,31 @@ export default function App() {
 
   const handlePauseToggle = () => {
     if (!providerRef.current) return;
-    if (isPaused) {
+    const connected = state?.isConnectedToBackend ?? false;
+    const paused = connected ? (state?.simulationPaused ?? isPaused) : isPaused;
+    if (paused) {
       providerRef.current.resume();
-      setIsPaused(false);
+      if (!connected) setIsPaused(false);
     } else {
       providerRef.current.pause();
-      setIsPaused(true);
+      if (!connected) setIsPaused(true);
     }
   };
 
   const handleReset = () => {
     if (providerRef.current) {
       providerRef.current.reset();
-      setIsPaused(false);
+      if (!state?.isConnectedToBackend) {
+        providerRef.current.resume();
+        setIsPaused(false);
+      }
     }
   };
 
   const handleSpeedChange = (speed: number) => {
-    setSpeedMultiplier(speed);
     if (providerRef.current) {
       providerRef.current.setSpeed(speed);
+      if (!state?.isConnectedToBackend) setSpeedMultiplier(speed);
     }
   };
 
