@@ -35,6 +35,20 @@ def test_qmix_controller_actions_use_the_environment_step_boundary():
     assert len(global_state.robots) == 1
 
 
+def test_qmix_controller_rebuilds_for_live_fleet_resize():
+    environment = WarehouseEnvironment(num_robots=5)
+    adapter = MARLEnvironmentAdapter(environment=environment)
+    adapter.reset()
+    controller = QMIXController(adapter)
+
+    environment.set_num_robots(10)
+    controller.reset_for_fleet()
+    actions = controller.select_actions()
+
+    assert controller.learner.num_agents == 10
+    assert set(actions) == set(range(10))
+
+
 def test_qmix_controller_rejects_pre_map_checkpoint(tmp_path):
     old_learner = QMIXLearner(
         num_agents=5, observation_dim=50, action_dim=4, state_dim=250

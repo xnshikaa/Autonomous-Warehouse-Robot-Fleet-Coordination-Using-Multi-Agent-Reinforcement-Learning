@@ -114,25 +114,42 @@ The repository does not define a frontend unit-test script; `npm run lint` and
 
 ## 📡 Python WebSocket Backend API Specification
 
-The visualizer connects to `ws://localhost:8000/ws` and expects JSON payloads conforming to the `WarehouseState` schema:
+The visualizer connects to `ws://localhost:8000/ws` and receives snapshots in
+the `WarehouseState` shape. The following abbreviated example shows telemetry
+values supplied by the current backend (counts and positions vary at runtime):
 
 ```json
 {
   "type": "state_update",
-  "timestep": 1432,
-  "episode": 812,
+  "timestep": 1,
+  "episode": 1,
   "algorithm": "QMIX",
+  "controllerType": "RL_BACKEND",
+  "policy": {
+    "source": "QMIX",
+    "checkpointLoaded": false,
+    "trained": false,
+    "checkpointPath": null,
+    "trainingProgress": null
+  },
+  "config": {
+    "gridWidth": 20,
+    "gridHeight": 20,
+    "cellSize": 1,
+    "updateIntervalSeconds": 0.1
+  },
   "robots": [
     {
       "id": "R01",
       "position": [5, 7],
       "targetPosition": [12, 14],
-      "rotation": 1.57,
+      "rotation": null,
       "status": "MOVING",
       "taskId": "T04",
       "hasCargo": true,
-      "battery": 92,
+      "battery": null,
       "path": [[5, 7], [6, 7], [7, 7], [8, 7], [9, 7]],
+      "pathSource": "BFS_ESTIMATE",
       "safetyAlert": false
     }
   ],
@@ -140,9 +157,7 @@ The visualizer connects to `ws://localhost:8000/ws` and expects JSON payloads co
     {
       "id": "T04",
       "pickupPos": [5, 7],
-      "pickupShelfId": "S14",
       "deliveryPos": [3, 18],
-      "deliveryZoneId": "D01",
       "assignedRobotId": "R01",
       "status": "IN_PROGRESS"
     }
@@ -152,18 +167,36 @@ The visualizer connects to `ws://localhost:8000/ws` and expects JSON payloads co
   "metrics": {
     "activeRobots": 10,
     "totalRobots": 10,
-    "activeTasks": 7,
-    "completedTasks": 142,
-    "throughputPerHour": 180,
-    "averageDeliveryTimeSec": 12.4,
+    "activeTasks": 10,
+    "completedTasks": 0,
+    "throughputPerHour": null,
+    "averageDeliveryTimeSec": null,
+    "collisionAttempts": null,
+    "conflictingProposals": null,
     "totalCollisions": 0,
-    "safetyOverrides": 2,
-    "timestep": 1432,
-    "episode": 812
+    "safetyOverrides": 0,
+    "physicalCollisions": 0,
+    "blockedConflictGroups": 0,
+    "movementSteps": 1,
+    "idleRobotSteps": 9,
+    "timestep": 1,
+    "episode": 1,
+    "reward": null,
+    "fps": null
   },
-  "safetyOverrideActive": false
+  "safetyEvents": [],
+  "safetyOverrideActive": false,
+  "isDemoMode": false,
+  "isConnectedToBackend": true
 }
 ```
+
+The backend reports `battery` and `rotation` as `null` because it does not
+measure them. Displayed routes are marked `BFS_ESTIMATE`; they are explanatory
+shortest-path estimates, not QMIX action trajectories. Training progress is
+`null` unless a training process streams it. Throughput, delivery time, and
+proposal counts are also `null` until the backend computes them; the UI labels
+these values unavailable instead of displaying invented zeros.
 
 ---
 

@@ -81,7 +81,9 @@ export class WarehouseSceneController {
   }
 
   public updateState(state: WarehouseState): void {
-    this.robotSystem.updateRobots(state.robots, 0.85);
+    const interval = state.config.updateIntervalSeconds;
+    const moveDuration = interval === undefined ? 0.4 : Math.max(0.02, interval * 0.9);
+    this.robotSystem.updateRobots(state.robots, moveDuration);
     this.pathSystem.updatePaths(state.robots);
     this.taskSystem.updateTasks(state.tasks);
     this.safetySystem.updateCollisions(state.recentCollisions);

@@ -79,5 +79,6 @@ class MARLEnvironmentAdapter:
 
     def get_num_agents(self):
         """Return the number of cooperative agents."""
-
+        # The visualization can resize the fleet while reusing this adapter.
+        self.num_agents = self.environment.num_robots
         return self.num_agents

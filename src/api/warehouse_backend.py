@@ -86,6 +86,7 @@ def _planned_path(environment: WarehouseEnvironment, robot, extra_blocked=()) ->
 def build_state_payload(
     environment: WarehouseEnvironment,
     policy_telemetry: dict[str, object] | None = None,
+    update_interval_seconds: float = 0.1,
 ) -> dict[str, Any]:
     """Build a JSON snapshot matching the existing React state contract."""
     policy = policy_telemetry or {
@@ -94,6 +95,7 @@ def build_state_payload(
         "trained": False,
         "checkpointPath": None,
     }
+    policy = {**policy, "trainingProgress": policy.get("trainingProgress")}
     is_qmix = policy.get("source") == "QMIX"
     layout = environment.get_active_layout()
     tasks = [{
@@ -115,10 +117,11 @@ def build_state_payload(
         target = _robot_goal(environment, robot)
         robots.append({
             "id": f"R{robot.robot_id + 1:02d}", "position": list(robot.position),
-            "targetPosition": list(target), "rotation": 0,
+            "targetPosition": list(target), "rotation": None,
             "status": "WARNING" if robot.action_overridden else ("MOVING" if robot.last_executed_action is not None else "IDLE"),
             "taskId": f"T{task.task_id:02d}" if task is not None else None,
-            "hasCargo": robot.carrying_item, "battery": 100, "path": [list(cell) for cell in path],
+            "hasCargo": robot.carrying_item, "battery": None, "path": [list(cell) for cell in path],
+            "pathSource": "BFS_ESTIMATE",
             "safetyAlert": robot.action_overridden,
             "lastRequestedAction": robot.last_requested_action,
             "lastExecutedAction": "NO_OP" if robot.action_overridden else robot.last_executed_action,
@@ -131,14 +134,26 @@ def build_state_payload(
         safety_zones.append({"id": "HUMAN_CORRIDOR", "name": "Human-worker corridor",
                              "bounds": {"minX": min(xs), "maxX": max(xs), "minY": min(ys), "maxY": max(ys)},
                              "activeWarning": bool(environment.get_safety_events())})
-    events = [event.to_dict() for event in environment.get_safety_events()]
+    events = [{
+        "robotId": f"R{event.robot_id + 1:02d}",
+        "currentCell": list(event.current_cell),
+        "proposedAction": event.proposed_action,
+        "targetCell": None if event.target_cell is None else list(event.target_cell),
+        "finalAction": "NO_OP" if event.final_action is None else event.final_action,
+        "overridden": event.overridden,
+        "reason": event.reason,
+        "episode": event.episode,
+        "timestep": event.timestep,
+    } for event in environment.get_safety_events()]
     step = environment.episode_manager.current_step
     return {
         "type": "state_update", "timestep": step, "episode": environment.episode,
         "algorithm": "QMIX" if is_qmix else "DEMO",
         "controllerType": "RL_BACKEND" if is_qmix else "DEMO_CONTROLLER",
         "policy": policy,
-        "config": {"gridWidth": layout.width, "gridHeight": layout.height, "cellSize": 1, "layoutId": layout.layout_id},
+        "config": {"gridWidth": layout.width, "gridHeight": layout.height, "cellSize": 1,
+                   "layoutId": layout.layout_id,
+                   "updateIntervalSeconds": max(0.01, float(update_interval_seconds))},
         "layout": layout.to_dict(), "robots": robots,
         "shelves": [{"id": f"S{i:02d}", "gridPos": list(c), "levels": 1, "aisleId": "LAYOUT"}
                     for i, c in enumerate(sorted(layout.obstacles), 1)],
@@ -146,16 +161,20 @@ def build_state_payload(
         "metrics": {"activeRobots": len(robots), "totalRobots": len(robots),
                      "activeTasks": sum(not t.completed for t in environment.tasks),
                      "completedTasks": sum(t.completed for t in environment.tasks),
-                     "throughputPerHour": 0, "averageDeliveryTimeSec": 0,
-                     "collisionAttempts": 0, "conflictingProposals": 0,
+                     "throughputPerHour": None, "averageDeliveryTimeSec": None,
+                     "collisionAttempts": None, "conflictingProposals": None,
                      "safetyOverrides": environment.safety_overrides, "physicalCollisions": 0,
                      "totalCollisions": 0, "collisionCount": 0,
-                     "blockedActionCount": sum(r.action_overridden for r in environment.robots),
+                     "blockedConflictGroups": environment.blocked_conflict_groups,
+                     "blockedActionCount": environment.safety_overrides,
                      "overrideCount": environment.safety_overrides,
-                     "movementSteps": sum(r.last_executed_action is not None for r in environment.robots),
-                     "idleRobotSteps": sum(r.last_executed_action is None for r in environment.robots),
-                     "timestep": step, "episode": environment.episode, "reward": 0, "fps": 0},
-        "safetyOverrideActive": bool(events), "isDemoMode": not is_qmix,
+                     "movementSteps": environment.movement_steps,
+                     "idleRobotSteps": environment.idle_robot_steps,
+                     "timestep": step, "episode": environment.episode,
+                     "reward": (sum(components["total"] for components in environment.last_reward_components.values())
+                                if environment.last_reward_components else None),
+                     "fps": None},
+        "safetyOverrideActive": any(event["overridden"] for event in events), "isDemoMode": not is_qmix,
         "isConnectedToBackend": True,
     }
 
@@ -194,6 +213,9 @@ def create_app(
         else None
     )
     app = FastAPI(title="Warehouse Environment Backend")
+    simulation_paused = False
+    simulation_delay = max(0.01, float(interval_seconds))
+    simulation_driver: WebSocket | None = None
 
     def current_policy() -> dict[str, object]:
         if qmix_controller is not None:
@@ -211,30 +233,39 @@ def create_app(
 
     @app.get("/state")
     async def state():
-        return build_state_payload(env, current_policy())
+        return build_state_payload(env, current_policy(), simulation_delay)
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
+        nonlocal simulation_paused, simulation_delay, simulation_driver
         await websocket.accept()
-        paused, delay = False, max(0.01, float(interval_seconds))
         try:
             while True:
                 try:
-                    command = json.loads(await asyncio.wait_for(websocket.receive_text(), timeout=delay))
+                    command = json.loads(await asyncio.wait_for(
+                        websocket.receive_text(), timeout=simulation_delay
+                    ))
                     if command.get("type") == "reset":
                         env.reset()
+                        simulation_paused = False
                     elif command.get("type") == "set_fleet_size":
                         env.set_num_robots(int(command["size"]))
                         if qmix_controller is not None:
                             qmix_controller.reset_for_fleet()
                     elif command.get("type") == "pause":
-                        paused = True
+                        simulation_paused = True
                     elif command.get("type") == "resume":
-                        paused = False
+                        simulation_paused = False
                     elif command.get("type") == "set_speed":
-                        delay = max(0.01, float(interval_seconds) / max(0.1, float(command.get("speed", 1))))
+                        simulation_delay = max(
+                            0.01,
+                            float(interval_seconds) / max(0.1, float(command.get("speed", 1))),
+                        )
+                    await websocket.send_json(build_state_payload(env, current_policy(), simulation_delay))
                 except asyncio.TimeoutError:
-                    if not paused:
+                    if simulation_driver is None:
+                        simulation_driver = websocket
+                    if not simulation_paused and simulation_driver is websocket:
                         actions = (
                             qmix_controller.select_actions()
                             if qmix_controller is not None
@@ -243,11 +274,12 @@ def create_app(
                         _, _, terminated, _ = adapter.step(actions)
                         if terminated:
                             env.reset()
-                        await websocket.send_json(
-                            build_state_payload(env, current_policy())
-                        )
+                    await websocket.send_json(build_state_payload(env, current_policy(), simulation_delay))
         except WebSocketDisconnect:
-            return
+            pass
+        finally:
+            if simulation_driver is websocket:
+                simulation_driver = None
 
     return app
 

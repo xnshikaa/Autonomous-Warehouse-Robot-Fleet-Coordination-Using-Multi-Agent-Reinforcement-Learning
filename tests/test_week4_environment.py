@@ -5,6 +5,7 @@ import pytest
 
 from src.ai.environment import WarehouseEnvironment
 from src.api.warehouse_backend import build_state_payload, create_app
+from src.safety.safety_layer import SafetyOverrideEvent
 from src.warehouse.layouts import LayoutValidationError, WarehouseLayout, get_default_layout_library
 
 
@@ -228,6 +229,13 @@ def test_layout_switch_and_frontend_payload():
     assert payload["config"]["layoutId"] == "cross_dock"
     assert payload["robots"][0]["id"] == "R01"
     assert payload["layout"]["human_corridors"]["cells"]
+    assert payload["config"]["updateIntervalSeconds"] == pytest.approx(0.1)
+
+
+def test_frontend_payload_streams_active_backend_tick_interval():
+    environment = WarehouseEnvironment(num_robots=1)
+    payload = build_state_payload(environment, update_interval_seconds=0.025)
+    assert payload["config"]["updateIntervalSeconds"] == pytest.approx(0.025)
 
 
 def test_frontend_payload_reports_backend_task_and_cargo_state():
@@ -239,15 +247,31 @@ def test_frontend_payload_reports_backend_task_and_cargo_state():
     robot.last_requested_action = 3
     robot.last_executed_action = None
     robot.action_overridden = True
+    environment._last_safety_events = [SafetyOverrideEvent(
+        robot_id=0, current_cell=robot.position, proposed_action=3,
+        target_cell=(1, 0), final_action=None, overridden=True,
+        reason="human_corridor", episode=environment.episode, timestep=1,
+    )]
 
     payload = build_state_payload(environment)
 
     assert payload["robots"][0]["position"] == list(robot.position)
+    assert payload["robots"][0]["pathSource"] == "BFS_ESTIMATE"
+    assert payload["robots"][0]["battery"] is None
+    assert payload["robots"][0]["rotation"] is None
     assert payload["robots"][0]["taskId"] == "T01"
     assert payload["robots"][0]["hasCargo"] is False
     assert payload["robots"][0]["lastRequestedAction"] == 3
     assert payload["robots"][0]["lastExecutedAction"] == "NO_OP"
     assert [task["status"] for task in payload["tasks"]] == ["ASSIGNED", "UNASSIGNED"]
+    assert payload["safetyOverrideActive"] is True
+    assert payload["policy"]["trainingProgress"] is None
+    assert payload["safetyEvents"][0] == {
+        "robotId": "R01", "currentCell": list(robot.position),
+        "proposedAction": 3, "targetCell": [1, 0], "finalAction": "NO_OP",
+        "overridden": True, "reason": "human_corridor",
+        "episode": environment.episode, "timestep": 1,
+    }
 
     robot.carrying_item = True
     robot.action_overridden = False
@@ -269,3 +293,30 @@ def test_backend_starts_with_robots_and_accepts_fleet_size_commands():
     assert len(environment.robots) == 5
     environment.set_num_robots(10)
     assert len(environment.robots) == 10
+
+
+def test_backend_metrics_mark_unknown_values_and_count_episode_steps():
+    environment = WarehouseEnvironment(num_robots=1)
+    environment.reset()
+    robot = environment.robots[0]
+    action = next(
+        action for action in environment.ACTION_DELTAS
+        if (target := environment.get_target_cell(robot, action)) is not None
+        and environment.is_walkable(target)
+        and not environment.safety_layer.check_action(robot, action).was_overridden
+    )
+    environment.step({0: action})
+
+    payload = build_state_payload(environment)
+    metrics = payload["metrics"]
+    assert metrics["movementSteps"] == 1
+    assert metrics["idleRobotSteps"] == 0
+    assert metrics["blockedConflictGroups"] == 0
+    assert metrics["throughputPerHour"] is None
+    assert metrics["averageDeliveryTimeSec"] is None
+    assert metrics["collisionAttempts"] is None
+    assert metrics["conflictingProposals"] is None
+    assert metrics["reward"] == pytest.approx(sum(
+        row["total"] for row in environment.last_reward_components.values()
+    ))
+    assert payload["policy"]["trainingProgress"] is None

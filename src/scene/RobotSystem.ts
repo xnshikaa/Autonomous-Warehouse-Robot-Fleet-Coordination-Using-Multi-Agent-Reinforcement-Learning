@@ -37,6 +37,7 @@ export class RobotSystem {
       let anim = this.animMap.get(state.id);
 
       const targetWorld = gridToWorld(state.position[0], state.position[1]);
+      const renderRotation = state.rotation ?? 0;
 
       if (!amr || !anim) {
         // Instantiate model
@@ -45,13 +46,13 @@ export class RobotSystem {
         this.group.add(amr.mesh);
 
         amr.mesh.position.copy(targetWorld);
-        amr.mesh.rotation.y = state.rotation;
+        amr.mesh.rotation.y = renderRotation;
 
         anim = {
           currentPos: targetWorld.clone(),
           targetPos: targetWorld.clone(),
-          currentRotation: state.rotation,
-          targetRotation: state.rotation
+          currentRotation: renderRotation,
+          targetRotation: renderRotation
         };
         this.animMap.set(state.id, anim);
       } else {

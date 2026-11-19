@@ -5,8 +5,11 @@ export class PythonWebSocketProvider implements StateProvider {
   private ws: WebSocket | null = null;
   private subscribers: Set<(state: WarehouseState) => void> = new Set();
   private fallbackProvider: DemoStateProvider;
+  private fallbackUnsubscribe: (() => void) | null = null;
   private activeState: WarehouseState;
   private url: string;
+  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+  private disposed = false;
 
   constructor(url: string = 'ws://127.0.0.1:8000/ws') {
     this.url = url;
@@ -14,7 +17,7 @@ export class PythonWebSocketProvider implements StateProvider {
     this.activeState = this.fallbackProvider.getState();
 
     // Subscribe to fallback provider as default
-    this.fallbackProvider.subscribe(state => {
+    this.fallbackUnsubscribe = this.fallbackProvider.subscribe(state => {
       if (!this.activeState.isConnectedToBackend) {
         this.activeState = state;
         this.notifySubscribers();
@@ -83,15 +86,30 @@ export class PythonWebSocketProvider implements StateProvider {
     this.fallbackProvider.selectTask(taskId);
   }
 
+  public dispose(): void {
+    this.disposed = true;
+    if (this.reconnectTimer !== null) {
+      clearTimeout(this.reconnectTimer);
+      this.reconnectTimer = null;
+    }
+    this.fallbackUnsubscribe?.();
+    this.fallbackUnsubscribe = null;
+    this.fallbackProvider.dispose();
+    if (this.ws) {
+      this.ws.onclose = null;
+      this.ws.close();
+      this.ws = null;
+    }
+  }
+
   private connect(): void {
+    if (this.disposed) return;
     try {
       this.ws = new WebSocket(this.url);
 
       this.ws.onopen = () => {
         console.log(`[WebSocket] Connected to Python RL Backend at ${this.url}`);
-        this.activeState.isConnectedToBackend = true;
-        this.activeState.isDemoMode = false;
-        this.notifySubscribers();
+        this.fallbackProvider.pause();
       };
 
       this.ws.onmessage = event => {
@@ -114,15 +132,21 @@ export class PythonWebSocketProvider implements StateProvider {
         console.warn('[WebSocket] Backend connection error. Using local DemoMode fallback.');
         this.activeState.isConnectedToBackend = false;
         this.activeState.isDemoMode = true;
+        this.fallbackProvider.resume();
         this.notifySubscribers();
       };
 
       this.ws.onclose = () => {
+        if (this.disposed) return;
         console.warn('[WebSocket] Backend disconnected. Reconnecting in 5s...');
         this.activeState.isConnectedToBackend = false;
         this.activeState.isDemoMode = true;
+        this.fallbackProvider.resume();
         this.notifySubscribers();
-        setTimeout(() => this.connect(), 5000);
+        this.reconnectTimer = setTimeout(() => {
+          this.reconnectTimer = null;
+          this.connect();
+        }, 5000);
       };
     } catch (e) {
       console.warn('[WebSocket] Unable to instantiate WebSocket. Using DemoMode.');

@@ -68,11 +68,20 @@ export const RobotInspector: React.FC<RobotInspectorProps> = ({ robot, onClose, 
           <span className="text-slate-400 flex items-center gap-1.5">
             <BatteryCharging className="w-3.5 h-3.5 text-emerald-400" /> Battery Telemetry:
           </span>
-          <span className="text-emerald-400 font-bold">{robot.battery}%</span>
+          <span className="text-emerald-400 font-bold">
+            {robot.battery === null ? 'UNAVAILABLE' : `${robot.battery}%`}
+          </span>
         </div>
 
         <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
-          <span className="text-slate-400">Planned Route Path:</span>
+          <span className="text-slate-400">Heading telemetry:</span>
+          <span className="text-slate-300 font-bold">
+            {robot.rotation === null ? 'UNAVAILABLE' : `${robot.rotation.toFixed(2)} rad`}
+          </span>
+        </div>
+
+        <div className="flex items-center justify-between p-2.5 rounded-xl bg-slate-900/60 border border-slate-800">
+          <span className="text-slate-400">{robot.pathSource === 'BFS_ESTIMATE' ? 'Estimated BFS route:' : 'Planned route:'}</span>
           <span className="text-slate-200 font-bold">{robot.path.length} cells</span>
         </div>
 

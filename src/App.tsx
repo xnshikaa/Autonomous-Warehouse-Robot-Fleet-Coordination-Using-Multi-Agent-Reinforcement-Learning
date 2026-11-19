@@ -40,6 +40,7 @@ export default function App() {
 
     return () => {
       unsubscribe();
+      provider.dispose();
     };
   }, []);
 

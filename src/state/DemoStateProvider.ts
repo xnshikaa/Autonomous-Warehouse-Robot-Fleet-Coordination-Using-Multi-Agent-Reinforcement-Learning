@@ -49,6 +49,14 @@ export class DemoStateProvider implements StateProvider {
     return this.environment;
   }
 
+  public dispose(): void {
+    if (this.timerId !== null) {
+      clearInterval(this.timerId);
+      this.timerId = null;
+    }
+    this.subscribers.clear();
+  }
+
   public subscribe(callback: (state: WarehouseState) => void): () => void {
     this.subscribers.add(callback);
     callback(this.getState());

@@ -72,6 +72,7 @@ export class WarehouseEnvironment {
         averageDeliveryTimeSec: 0,
         collisionAttempts: 0,
         conflictingProposals: 0,
+        blockedConflictGroups: 0,
         safetyOverrides: 0,
         physicalCollisions: 0,
         totalCollisions: 0,
@@ -104,6 +105,7 @@ export class WarehouseEnvironment {
     this.state.metrics.completedTasks = 0;
     this.state.metrics.collisionAttempts = 0;
     this.state.metrics.conflictingProposals = 0;
+    this.state.metrics.blockedConflictGroups = 0;
     this.state.metrics.safetyOverrides = 0;
     this.state.metrics.physicalCollisions = 0;
     this.state.metrics.totalCollisions = 0;
@@ -417,15 +419,16 @@ export class WarehouseEnvironment {
     this.state.recentCollisions = conflictEvents;
     this.state.lastActionTraces = traces;
 
-    this.state.metrics.collisionAttempts += stepCollisionAttempts;
-    this.state.metrics.conflictingProposals += stepConflictingProposals;
+    this.state.metrics.collisionAttempts = (this.state.metrics.collisionAttempts ?? 0) + stepCollisionAttempts;
+    this.state.metrics.conflictingProposals = (this.state.metrics.conflictingProposals ?? 0) + stepConflictingProposals;
+    this.state.metrics.blockedConflictGroups += stepConflictingProposals;
     this.state.metrics.safetyOverrides += stepSafetyOverrides;
     this.state.metrics.physicalCollisions = 0; // Safety layer prevents physical overlaps
 
     this.state.metrics.blockedActionCount += stepBlockedCount;
     this.state.metrics.overrideCount += stepBlockedCount;
-    this.state.metrics.totalCollisions = this.state.metrics.conflictingProposals;
-    this.state.metrics.collisionCount = this.state.metrics.conflictingProposals;
+    this.state.metrics.totalCollisions = this.state.metrics.conflictingProposals ?? 0;
+    this.state.metrics.collisionCount = this.state.metrics.conflictingProposals ?? 0;
     this.state.metrics.movementSteps += stepMovementCount;
     this.state.metrics.idleRobotSteps += stepIdleCount;
     this.state.metrics.activeTasks = this.state.tasks.filter(t => t.status !== 'COMPLETED').length;

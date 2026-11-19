@@ -50,6 +50,9 @@ class WarehouseEnvironment:
         self.episode_manager = EpisodeManager(max_steps=max_steps)
         self.episode = 0
         self.safety_overrides = 0
+        self.movement_steps = 0
+        self.idle_robot_steps = 0
+        self.blocked_conflict_groups = 0
         self._last_safety_events: list[SafetyOverrideEvent] = []
         self._safety_event_history: list[SafetyOverrideEvent] = []
         self._last_collision_intent_groups: list[tuple[int, ...]] = []
@@ -84,6 +87,9 @@ class WarehouseEnvironment:
         self._last_collision_intent_groups = []
         self.last_reward_components = {}
         self.safety_overrides = 0
+        self.movement_steps = 0
+        self.idle_robot_steps = 0
+        self.blocked_conflict_groups = 0
 
     def set_num_robots(self, num_robots: int) -> None:
         """Change the fleet size and start a clean episode."""
@@ -133,6 +139,9 @@ class WarehouseEnvironment:
                 self.add_task(task.task_id, task.pickup_position, task.delivery_position, assigned_robot)
         self.episode += 1
         self.safety_overrides = 0
+        self.movement_steps = 0
+        self.idle_robot_steps = 0
+        self.blocked_conflict_groups = 0
         self._last_safety_events, self._safety_event_history = [], []
         self._last_collision_intent_groups = []
         self.last_reward_components = {}
@@ -359,6 +368,7 @@ class WarehouseEnvironment:
             else:
                 merged.append(group)
         self._last_collision_intent_groups = [tuple(sorted(group)) for group in merged]
+        self.blocked_conflict_groups += len(self._last_collision_intent_groups)
         for robot_id in sorted(collision_robots):
             if safe_actions[robot_id] is not None:
                 event = self._blocked_event(self._last_safety_events[robot_id], "robot_collision")
@@ -390,6 +400,8 @@ class WarehouseEnvironment:
             robot.last_executed_action = None if blocked else safe_actions[robot.robot_id]
             robot.action_overridden = event.overridden or robot.robot_id in collision_robots
             robot.blocked_reason = event.reason if blocked else None
+        self.movement_steps += sum(robot.last_executed_action is not None for robot in self.robots)
+        self.idle_robot_steps += sum(robot.last_executed_action is None for robot in self.robots)
 
         delivered = set()
         picked_up = set()

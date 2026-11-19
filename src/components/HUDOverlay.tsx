@@ -54,17 +54,23 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
   const [showLegend, setShowLegend] = React.useState(true);
   const isLiveBackend = isConnectedToBackend && !state.isDemoMode && state.controllerType === 'RL_BACKEND';
   const policyLabel = isLiveBackend
-    ? `${state.policy?.source ?? state.algorithm} / ${state.algorithm}`
+    ? `${state.policy?.source ?? state.algorithm} / ${state.policy?.trained ? 'TRAINED CHECKPOINT' : 'INITIALIZED WEIGHTS'}`
     : 'DEMO CONTROLLER / LOCAL SIM';
+  const trainingProgress = state.policy?.trainingProgress ?? null;
+  const trainingLabel = trainingProgress
+    ? `EP ${trainingProgress.episode} · REWARD ${trainingProgress.reward ?? 'N/A'} · LOSS ${trainingProgress.loss ?? 'N/A'}`
+    : 'NOT STREAMED';
   const targetLabel = isLiveBackend
     ? `${state.controllerType} / ${state.algorithm}`
     : 'DEMO CONTROLLER / LOCAL SIM';
-  const latestSafetyEvent = [...state.recentCollisions].sort((a, b) => b.timestamp - a.timestamp)[0];
+  const latestSafetyEvent = [...(state.safetyEvents ?? [])]
+    .filter(event => event.overridden)
+    .sort((a, b) => b.timestep - a.timestep)[0];
   const activeSafetyRobotIds = state.robots
     .filter(robot => robot.safetyAlert || robot.status === 'COLLISION')
     .map(robot => robot.id);
-  const safetyRobotIds = latestSafetyEvent?.robots?.length
-    ? latestSafetyEvent.robots
+  const safetyRobotIds = latestSafetyEvent?.robotId
+    ? [latestSafetyEvent.robotId]
     : activeSafetyRobotIds;
 
   return (
@@ -98,6 +104,10 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
 
             <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700/80 text-slate-300">
               POLICY: {policyLabel}
+            </span>
+
+            <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-700/80 text-slate-400">
+              TRAINING: {trainingLabel}
             </span>
 
             <span className="px-2.5 py-1 rounded-lg bg-indigo-500/10 border border-indigo-500/30 text-indigo-300 font-bold">
@@ -198,10 +208,13 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
                 ? 'border-emerald-500/40 bg-emerald-500/10 text-emerald-400 font-bold'
                 : 'border-slate-700 bg-slate-800 text-slate-300'
             }`}
-            title="Toggle 3D Robot Route Paths (ALL / SELECTED / OFF)"
+            title={isLiveBackend
+              ? 'Toggle estimated BFS routes; these are not QMIX policy trajectories'
+              : 'Toggle 3D Robot Route Paths (ALL / SELECTED / OFF)'}
           >
             <Route className="w-4 h-4" />
             <span>PATHS: {pathMode}</span>
+            {isLiveBackend && <span className="text-[9px] opacity-70">BFS ESTIMATE</span>}
           </button>
         </div>
 
@@ -229,7 +242,7 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
       {!isPresentationMode && (
         <div className="w-full pointer-events-auto flex items-end justify-between gap-3 mt-auto flex-col lg:flex-row">
           {/* Engineering Telemetry Dashboard */}
-          <div className="glass-panel rounded-2xl p-2.5 sm:p-3.5 border border-slate-700/60 shadow-2xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-2 text-xs flex-1 min-w-0 w-full">
+          <div className="glass-panel rounded-2xl p-2.5 sm:p-3.5 border border-slate-700/60 shadow-2xl grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-8 gap-2 text-xs flex-1 min-w-0 w-full">
             <div className="px-3 py-2 rounded-xl bg-slate-900/60 border border-slate-800">
               <span className="text-slate-500 block text-[10px] uppercase">Active AMRs</span>
               <span className="text-industrial-accent font-bold text-base flex items-center gap-1">
@@ -259,9 +272,9 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
             </div>
 
             <div className="px-3 py-2 rounded-xl bg-slate-900/60 border border-slate-800">
-              <span className="text-slate-500 block text-[10px] uppercase">Conflicts</span>
+              <span className="text-slate-500 block text-[10px] uppercase">Blocked groups</span>
               <span className="text-rose-400 font-bold text-base">
-                {metrics.totalCollisions}
+                {metrics.blockedConflictGroups}
               </span>
             </div>
 
@@ -278,6 +291,13 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
                 #{metrics.timestep} <span className="text-[10px] text-slate-500">(Ep {metrics.episode})</span>
               </span>
             </div>
+
+            <div className="px-3 py-2 rounded-xl bg-slate-900/60 border border-slate-800">
+              <span className="text-slate-500 block text-[10px] uppercase">Team reward / step</span>
+              <span className="text-slate-200 font-bold text-base">
+                {metrics.reward == null ? 'N/A' : metrics.reward.toFixed(2)}
+              </span>
+            </div>
           </div>
 
           <div className={`glass-panel rounded-2xl p-3.5 border shadow-2xl w-full lg:w-auto min-w-0 lg:min-w-[250px] max-w-none lg:max-w-[320px] ${
@@ -290,11 +310,11 @@ export const HUDOverlay: React.FC<HUDOverlayProps> = ({
               Safety status
             </div>
             <div className={`mt-1 font-bold ${safetyOverrideActive ? 'text-amber-300' : 'text-slate-200'}`}>
-              {safetyOverrideActive ? 'OVERRIDE ACTIVE — WAIT' : latestSafetyEvent ? 'RECENT CONFLICT' : 'CLEAR'}
+              {safetyOverrideActive ? 'OVERRIDE ACTIVE — WAIT' : latestSafetyEvent ? 'RECENT OVERRIDE' : 'CLEAR'}
             </div>
             <div className="mt-1 text-[10px] text-slate-400 truncate">
               {latestSafetyEvent
-                ? `${latestSafetyEvent.type.replace(/_/g, ' ')} · ${safetyRobotIds.join(', ') || 'IDs unavailable'}`
+                ? `${latestSafetyEvent.reason?.replace(/_/g, ' ') ?? 'action blocked'} · ${safetyRobotIds.join(', ') || 'IDs unavailable'}`
                 : 'No recent safety events'}
             </div>
           </div>

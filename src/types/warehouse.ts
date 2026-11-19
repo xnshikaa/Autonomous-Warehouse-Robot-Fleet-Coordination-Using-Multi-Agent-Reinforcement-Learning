@@ -30,6 +30,8 @@ export interface WarehouseConfig {
   gridWidth: number;
   gridHeight: number;
   cellSize: number;
+  /** Backend simulation tick interval; absent for local-only simulation state. */
+  updateIntervalSeconds?: number;
 }
 
 export type RobotStatus = 
@@ -58,12 +60,13 @@ export interface RobotState {
   id: string; // e.g. "R01", "R02"
   position: [number, number]; // [gridX, gridY]
   targetPosition?: [number, number]; // [gridX, gridY]
-  rotation: number; // angle in radians
+  rotation: number | null; // angle in radians; null when not measured
   status: RobotStatus;
   taskId?: string;
   hasCargo: boolean;
-  battery: number; // 0-100 visual indicator
+  battery: number | null; // 0-100; null when not measured
   path: [number, number][]; // array of grid coordinates
+  pathSource?: 'BFS_ESTIMATE' | 'POLICY_TRAJECTORY' | 'UNKNOWN';
   safetyAlert: boolean;
   lastRequestedAction?: Action;
   lastExecutedAction?: ExecutedAction;
@@ -115,27 +118,40 @@ export interface ActionEventTrace {
   reason?: string;
 }
 
+export interface SafetyEvent {
+  robotId: string;
+  currentCell: [number, number];
+  proposedAction: Action;
+  targetCell: [number, number] | null;
+  finalAction: ExecutedAction;
+  overridden: boolean;
+  reason: string | null;
+  episode: number;
+  timestep: number;
+}
+
 export interface WarehouseMetrics {
   activeRobots: number;
   totalRobots: number;
   activeTasks: number;
   completedTasks: number;
-  throughputPerHour: number;
-  averageDeliveryTimeSec: number;
-  collisionAttempts: number;
-  conflictingProposals: number;
+  throughputPerHour: number | null;
+  averageDeliveryTimeSec: number | null;
+  collisionAttempts: number | null;
+  conflictingProposals: number | null;
   safetyOverrides: number;
   physicalCollisions: number;
   totalCollisions: number;
   collisionCount: number;
+  blockedConflictGroups: number;
   blockedActionCount: number;
   overrideCount: number;
   movementSteps: number;
   idleRobotSteps: number;
   timestep: number;
   episode: number;
-  reward?: number;
-  fps: number;
+  reward?: number | null;
+  fps: number | null;
 }
 
 export interface PolicyTelemetry {
@@ -143,6 +159,7 @@ export interface PolicyTelemetry {
   checkpointLoaded: boolean;
   trained: boolean;
   checkpointPath?: string | null;
+  trainingProgress: { episode: number; reward: number | null; loss: number | null } | null;
 }
 
 export interface ShelfState {
@@ -163,6 +180,7 @@ export interface WarehouseState {
   tasks: TaskState[];
   safetyZones: SafetyZoneState[];
   recentCollisions: ConflictEvent[];
+  safetyEvents?: SafetyEvent[];
   lastActionTraces?: ActionEventTrace[];
   metrics: WarehouseMetrics;
   policy?: PolicyTelemetry;
