@@ -100,7 +100,13 @@ def build_state_payload(
         "id": f"T{task.task_id:02d}", "pickupPos": list(task.pickup_position),
         "deliveryPos": list(task.delivery_position),
         "assignedRobotId": f"R{task.assigned_robot + 1:02d}" if task.assigned_robot is not None else None,
-        "status": "COMPLETED" if task.completed else "IN_PROGRESS",
+        "status": (
+            "COMPLETED" if task.completed
+            else "IN_PROGRESS" if task.assigned_robot is not None
+            and environment.robots[task.assigned_robot].carrying_item
+            else "ASSIGNED" if task.assigned_robot is not None
+            else "UNASSIGNED"
+        ),
     } for task in environment.tasks]
     robots = []
     for robot in environment.robots:
@@ -112,10 +118,10 @@ def build_state_payload(
             "targetPosition": list(target), "rotation": 0,
             "status": "WARNING" if robot.action_overridden else ("MOVING" if robot.last_executed_action is not None else "IDLE"),
             "taskId": f"T{task.task_id:02d}" if task is not None else None,
-            "hasCargo": False, "battery": 100, "path": [list(cell) for cell in path],
+            "hasCargo": robot.carrying_item, "battery": 100, "path": [list(cell) for cell in path],
             "safetyAlert": robot.action_overridden,
             "lastRequestedAction": robot.last_requested_action,
-            "lastExecutedAction": robot.last_executed_action,
+            "lastExecutedAction": "NO_OP" if robot.action_overridden else robot.last_executed_action,
             "actionOverridden": robot.action_overridden,
         })
     corridor = sorted(layout.human_corridors)

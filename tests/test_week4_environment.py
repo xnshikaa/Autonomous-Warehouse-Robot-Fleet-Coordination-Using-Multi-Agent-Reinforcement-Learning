@@ -230,6 +230,39 @@ def test_layout_switch_and_frontend_payload():
     assert payload["layout"]["human_corridors"]["cells"]
 
 
+def test_frontend_payload_reports_backend_task_and_cargo_state():
+    environment = WarehouseEnvironment(num_robots=1)
+    environment.reset()
+    environment.add_task(1, (2, 2), (3, 3), assigned_robot=0)
+    environment.add_task(2, (4, 4), (5, 5))
+    robot = environment.robots[0]
+    robot.last_requested_action = 3
+    robot.last_executed_action = None
+    robot.action_overridden = True
+
+    payload = build_state_payload(environment)
+
+    assert payload["robots"][0]["position"] == list(robot.position)
+    assert payload["robots"][0]["taskId"] == "T01"
+    assert payload["robots"][0]["hasCargo"] is False
+    assert payload["robots"][0]["lastRequestedAction"] == 3
+    assert payload["robots"][0]["lastExecutedAction"] == "NO_OP"
+    assert [task["status"] for task in payload["tasks"]] == ["ASSIGNED", "UNASSIGNED"]
+
+    robot.carrying_item = True
+    robot.action_overridden = False
+    robot.last_executed_action = 3
+    payload = build_state_payload(environment)
+    assert payload["robots"][0]["hasCargo"] is True
+    assert payload["robots"][0]["lastExecutedAction"] == 3
+    assert payload["tasks"][0]["status"] == "IN_PROGRESS"
+
+    environment.tasks[0].completed = True
+    robot.carrying_item = False
+    payload = build_state_payload(environment)
+    assert payload["tasks"][0]["status"] == "COMPLETED"
+
+
 def test_backend_starts_with_robots_and_accepts_fleet_size_commands():
     environment = WarehouseEnvironment()
     create_app(environment, interval_seconds=0.01)
