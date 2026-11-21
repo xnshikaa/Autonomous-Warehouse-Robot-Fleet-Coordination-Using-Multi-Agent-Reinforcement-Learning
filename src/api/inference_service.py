@@ -99,9 +99,9 @@ class _TorchAgent:
         self.fleet_size: int = self.metadata.get("num_agents", payload.get("num_agents", 5))
 
         # Import and build the network
-        from src.marl.qmix_network import AgentNetwork
-        self.net = AgentNetwork(
-            obs_dim=self.obs_dim,
+        from src.marl.qmix_network import AgentQNetwork
+        self.net = AgentQNetwork(
+            observation_dim=self.obs_dim,
             action_dim=self.action_dim,
             hidden_dim=self.metadata.get("agent_hidden_dim", 64),
         )
@@ -213,21 +213,21 @@ def create_inference_app(
     load_model(resolved_ckpt, resolved_onnx)
 
     @app.get("/health", tags=["ops"])
-    async def health():
+    def health():
         return {"ok": True, "service": "inference"}
 
     @app.get("/readiness", tags=["ops"])
-    async def readiness():
+    def readiness():
         if _active_agent is None:
             raise HTTPException(status_code=503, detail="No model loaded")
         return {"ok": True, "model_source": _model_info["model_source"]}
 
     @app.get("/model/info", response_model=ModelInfoResponse, tags=["model"])
-    async def model_info():
+    def model_info():
         return _model_info
 
     @app.post("/decide", response_model=DecideResponse, tags=["inference"])
-    async def decide(request: DecideRequest):
+    def decide(request: DecideRequest):
         if _active_agent is None:
             raise HTTPException(status_code=503, detail="No model loaded; configure QMIX_CHECKPOINT or QMIX_ONNX")
 

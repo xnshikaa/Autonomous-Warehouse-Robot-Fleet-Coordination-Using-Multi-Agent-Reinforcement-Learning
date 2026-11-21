@@ -11,11 +11,9 @@ from typing import Any, Dict, Optional
 
 logger = logging.getLogger(__name__)
 
-try:
-    from codecarbon import OfflineEmissionsTracker
-    HAS_CODECARBON = True
-except ImportError:
-    HAS_CODECARBON = False
+# OfflineEmissionsTracker uses background sampling threads that can stall in CI/sandboxes.
+# We default to the calibrated physical AMR energy and compute TDP model.
+HAS_CODECARBON = False
 
 
 # Industrial AMR physical specifications (literature-based standard 100kg payload AMR)
