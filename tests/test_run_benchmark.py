@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 
 import torch
 import pytest
@@ -44,7 +45,7 @@ def test_benchmark_writes_matched_traces_manifest_and_statistics(tmp_path):
     assert len(report["summary"]) == 3
     assert len(report["manifest"]["runs"]) == 3
     assert all("trace_sha256" in run for run in report["manifest"]["runs"])
-    assert report["manifest"]["runs"][0]["checkpoint"]["path"].startswith("/")
+    assert Path(report["manifest"]["runs"][0]["checkpoint"]["path"]).is_absolute()
     assert report["manifest"]["scalability_plot"]["file"] == "scalability.png"
     assert (tmp_path / "evaluation" / "scalability.png").stat().st_size > 0
     assert report["safety_gate"]["passed"] is True

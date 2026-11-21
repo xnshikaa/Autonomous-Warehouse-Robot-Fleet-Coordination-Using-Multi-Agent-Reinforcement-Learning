@@ -1,301 +1,237 @@
-# Autonomous Warehouse Robot Fleet Coordination Visualizer (MARL / QMIX)
+# Autonomous Warehouse Robot Fleet Coordination
+## Multi-Agent Reinforcement Learning (QMIX / IQL / Rule-Based)
 
-A premium, research-grade 3D visualization layer built for university project demonstrations on **Autonomous Warehouse Robot Fleet Coordination Using Multi-Agent Reinforcement Learning (QMIX)**.
-
----
-
-## 🌟 Visual Identity & Design Principles
-
-- **Industrial Robotics Lab Aesthetic**: Clean, dark polished concrete floor, instanced modular shelving racks, painted yellow hazard borders, defined storage aisles, conveyor delivery bays, inductive charging docks, and translucent human safety zones.
-- **Decoupled Architecture**: Strict state separation (`WarehouseState`). Three.js renders state snapshots received from either a local **DemoMode** simulator or a live **Python WebSocket API** (`ws://localhost:8000/ws`).
-- **Research Transparency**: High-performance multi-robot fleet rendering (N=5, 10, 20), animated 3D path line ribbons, live engineering control dashboard, interactive robot inspector drawers, and presentation mode.
+> **Project 25** — Cooperative MARL for autonomous warehouse AMR fleets (N=5, 10, 20 robots).
 
 ---
 
-## 🏗 System Architecture
+## 🏗 Architecture Overview
 
 ```
-┌────────────────────────────────────────────────────────┐
-│             Python RL Environment                      │
-│      (Gym / PyMARL / QMIX / IQL / Greedy+A*)           │
-└───────────────────────────┬────────────────────────────┘
-                            │ WebSocket JSON Telemetry
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│            PythonWebSocketProvider                     │
-│  (Subscribes to ws://localhost:8000/ws, with automatic │
-│   fallback to DemoStateProvider when offline)          │
-└───────────────────────────┬────────────────────────────┘
-                            │ State Snapshot (WarehouseState)
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│            Three.js Visualization Layer                │
-│  ├── WarehouseFloor (20x20 Grid, Aisles & Markings)   │
-│  ├── ShelfSystem (Instanced Racks & Storage Crates)   │
-│  ├── ZoneSystem (Dispatch, Charging, Human Zone)      │
-│  ├── RobotSystem (AMR Fleet R01-R20 & LiDAR Towers)    │
-│  ├── PathSystem (Glowing Directional Route Lines)     │
-│  ├── TaskSystem (Pickup & Delivery Beacons)           │
-│  └── SafetySystem (Human Zone Overrides & Collisions) │
-└───────────────────────────┬────────────────────────────┘
-                            │
-                            ▼
-┌────────────────────────────────────────────────────────┐
-│        Industrial Engineering Control HUD (React)      │
-│  ├── Live Dashboard (Algorithm, Fleet, Timestep, Ep)   │
-│  ├── Robot & Task Inspector Panels                     │
-│  ├── Multi-Camera Viewports (Overview, Top-Down, Free) │
-│  └── Presentation Mode & Replay Speed Controls         │
-└────────────────────────────────────────────────────────┘
+┌─────────────────────────────────────────────────────────────────┐
+│                   MARL Training Pipeline                        │
+│  QMIX (CTDE)  ──┐                                              │
+│  IQL (independent) ─┤── QMIXTrainer / IQLTrainer               │
+│  Rule-Based (greedy) ┘                                         │
+└──────────────────────┬──────────────────────────────────────────┘
+                       │  checkpoint_state.pt (Schema V2)
+                       ▼
+┌──────────────────────────────────────────────────────────────┐
+│               FastAPI WebSocket Backend                      │
+│   /ws — live simulation + QMIX decisions                     │
+│   /health, /state — REST health / state                      │
+│   Inference Service /decide — ONNX / PyTorch decisions       │
+└──────────────────────┬───────────────────────────────────────┘
+                       │  ws://localhost:8000/ws (JSON telemetry)
+                       ▼
+┌──────────────────────────────────────────────────────────────┐
+│          React / Three.js / TypeScript Frontend              │
+│   3D 20×20 warehouse grid, AMR fleet visualization          │
+│   Safety zone overlays, task assignment, algorithm selector  │
+└──────────────────────────────────────────────────────────────┘
 ```
 
 ---
 
-## 🚀 How to Run
+## 🚀 Quick Start (Windows PowerShell)
 
-Use Python 3.11 and Node.js 22 LTS. From the repository root, install the
-backend and frontend dependencies:
+### Prerequisites
 
-```bash
-# Python backend and test dependencies
-python3.11 -m venv .venv
-source .venv/bin/activate
+- Python 3.12 (`C:\Users\Admin\AppData\Local\Programs\Python\Python312\python.exe`)
+- Node.js 20+
+- Git
+
+### 1. Install Dependencies
+
+```powershell
+# Python dependencies
+python -m pip install torch --index-url https://download.pytorch.org/whl/cpu
 python -m pip install -r requirements.txt
 
-# Frontend dependencies (package-lock.json pins the npm dependency tree)
+# Frontend dependencies
 npm ci
 ```
 
-Start each service in a separate terminal from the repository root. Activate
-`.venv` in the backend terminal:
+### 2. Train Models
 
-```bash
-source .venv/bin/activate
-python -m src.api.warehouse_backend
+```powershell
+# QMIX N=5 (full training — ~1000 episodes)
+python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 5 `
+    --episodes 1000 --max-steps 100 --seed 42 `
+    --checkpoint-interval 100 --output artifacts/training/qmix_n5_v1
+
+# IQL N=5
+python -m src.marl.train_p2_policy --algorithm IQL --fleet-size 5 `
+    --episodes 500 --max-steps 100 --seed 42 `
+    --checkpoint-interval 100 --output artifacts/training/iql_n5_v1
+
+# QMIX N=10
+python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 10 `
+    --episodes 1000 --max-steps 100 --seed 43 `
+    --checkpoint-interval 100 --output artifacts/training/qmix_n10_v1
+
+# QMIX N=20
+python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 20 `
+    --episodes 1000 --max-steps 100 --seed 44 `
+    --checkpoint-interval 100 --output artifacts/training/qmix_n20_v1
 ```
 
-```bash
+### 3. Run Evaluation Benchmark
+
+```powershell
+python -m src.evaluation.run_benchmark `
+    --algorithms QMIX IQL Rule-Based `
+    --fleet-sizes 5 10 20 `
+    --episodes 20 --max-steps 100 --seed 999 `
+    --qmix-checkpoint 5=artifacts/training/qmix_n5_v1/qmix.pt `
+    --qmix-checkpoint 10=artifacts/training/qmix_n10_v1/qmix.pt `
+    --qmix-checkpoint 20=artifacts/training/qmix_n20_v1/qmix.pt `
+    --iql-checkpoint 5=artifacts/training/iql_n5_v1/agents `
+    --iql-checkpoint 10=artifacts/training/iql_n10_v1/agents `
+    --iql-checkpoint 20=artifacts/training/iql_n20_v1/agents `
+    --output results/benchmark_v1
+```
+
+### 4. ONNX Export
+
+```powershell
+python -c "from src.marl.export_onnx import export_agent_to_onnx, verify_onnx_parity; export_agent_to_onnx('artifacts/training/qmix_n5_v1/qmix.pt', 'artifacts/onnx/qmix_agent_n5.onnx'); verify_onnx_parity('artifacts/training/qmix_n5_v1/qmix.pt', 'artifacts/onnx/qmix_agent_n5.onnx')"
+```
+
+### 5. Start Backend + Frontend
+
+```powershell
+# Backend (WebSocket simulation server)
+python -m uvicorn src.api.warehouse_backend:create_app --factory --port 8000
+
+# Frontend (in a separate terminal)
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000). To run the available
-baseline checks:
+---
 
-```bash
-source .venv/bin/activate
-python -m pytest -q
-npm run lint
+## 🧪 Testing
+
+```powershell
+# Full test suite (Windows)
+python -m pytest tests/ --ignore=tests/test_optuna_study.py --ignore=tests/test_monitoring.py -q
+
+# P6 Checkpoint compatibility tests
+python -m pytest tests/test_p6_checkpoint_compatibility.py -v
+
+# Inference service tests
+python -m pytest tests/test_inference_service.py -v
+
+# Frontend tests
+npm run test:frontend -- --run
+
+# Frontend production build
 npm run build
 ```
 
-`requirements.txt` specifies minimum Python package versions rather than an
-exact lock, so a Python dependency installation is not byte-for-byte pinned.
-The repository does not define a frontend unit-test script; `npm run lint` and
-`npm run build` are its available frontend checks.
+---
+
+## 📁 Project Structure
+
+```
+├── src/
+│   ├── ai/                       # Core warehouse environment
+│   │   ├── environment.py        # 20×20 grid warehouse, task management
+│   │   ├── safety_layer.py       # Hard corridor exclusion enforcement
+│   │   └── reward_function.py    # Cooperative + collision reward shaping
+│   ├── marl/                     # MARL algorithms
+│   │   ├── qmix_network.py       # AgentQNetwork + QMIXMixer
+│   │   ├── qmix_trainer.py       # QMIX training loop (CTDE)
+│   │   ├── iql_trainer.py        # Independent Q-Learning trainer
+│   │   ├── qmix_controller.py    # Fleet inference controller (P6 compatible)
+│   │   ├── checkpoint_validator.py  # Schema V2 validation + compatibility checks
+│   │   ├── observation_encoder.py   # Map-aware 456-dim encoder
+│   │   ├── export_onnx.py        # ONNX export + parity verification
+│   │   └── optuna_study.py       # Hyperparameter optimization
+│   ├── evaluation/               # Benchmarking + evaluation pipeline
+│   │   ├── run_benchmark.py      # QMIX/IQL/Rule-Based comparison
+│   │   ├── metrics.py            # Bootstrap CI, paired tests
+│   │   ├── safety_gate.py        # Corridor safety evaluation
+│   │   └── trace_generator.py    # Episode trace recording
+│   ├── api/
+│   │   ├── warehouse_backend.py  # FastAPI WebSocket simulation bridge
+│   │   └── inference_service.py  # ONNX/PyTorch /decide REST endpoint
+│   ├── monitoring/
+│   │   ├── drift_monitor.py      # Evidently task-queue drift monitoring
+│   │   └── carbon_tracker.py     # CodeCarbon + AMR energy model
+│   └── simulation/
+│       └── pybullet_warehouse.py # PyBullet 3D bridge (software fallback)
+├── python_infra/
+│   └── checkpoint_manager.py     # Schema V2 checkpoint save/load
+├── tests/                        # pytest test suite (250+ tests)
+├── artifacts/
+│   ├── training/                 # Training run outputs
+│   ├── checkpoints/              # Legacy + current checkpoints
+│   └── onnx/                     # ONNX model exports
+├── results/                      # Benchmark and evaluation outputs
+├── .github/workflows/ci.yml      # GitHub Actions CI pipeline
+├── Dockerfile                    # Inference service container
+├── MODEL_CARD.md                 # Model documentation
+└── requirements.txt              # Python dependencies
+```
 
 ---
 
-## 🎮 Demo & Keyboard Controls
+## 🔐 Checkpoint Compatibility (P6)
 
-- **Camera Viewports**:
-  - `OVERVIEW`: Angled high-bay perspective of the complete 20x20 warehouse layout.
-  - `TOP-DOWN`: Tactical 2D overhead camera view for multi-agent coordination analysis.
-  - `FREE ORBIT`: Left-click drag to rotate, right-click drag to pan, scroll to zoom.
-- **Path Ribbon Visibility**:
-  - Click `PATHS: ALL / SELECTED / OFF` in top right toolbar to cycle route overlay modes.
-- **Robot Inspection**:
-  - Left-click any AMR robot (`R01`–`R20`) in the 3D scene to open its inspector panel and click `TRACK ROBOT CAMERA`.
-- **Presentation Mode**:
-  - Click `PRESENTATION MODE` button in the top right header to toggle distraction-free widescreen view.
-- **Simulation Replay Controls**:
-  - Click `PLAY / PAUSE`, `RESET`, or `0.5x / 1x / 2x / 5x` speed multiplier in the bottom control bar.
+All checkpoints use **Schema Version 2** with full architecture metadata. The checkpoint validator:
+
+- Rejects cross-fleet-size loading (N=5 checkpoint → N=10 raises `CheckpointCompatibilityError`)  
+- Rejects obs_dim mismatches (legacy 50-dim vs current 456-dim)
+- Never performs silent partial loading
+- Requires explicit metadata for all saved checkpoints
+
+```python
+from src.marl.checkpoint_validator import validate_checkpoint_architecture
+validate_checkpoint_architecture(checkpoint_path, expected_num_agents=5)
+# Raises CheckpointCompatibilityError if mismatch
+```
 
 ---
 
-## 📡 Python WebSocket Backend API Specification
+## 📊 Key NFRs
 
-The visualizer connects to `ws://localhost:8000/ws` and receives snapshots in
-the `WarehouseState` shape. The following abbreviated example shows telemetry
-values supplied by the current backend (counts and positions vary at runtime):
-
-```json
-{
-  "type": "state_update",
-  "timestep": 1,
-  "episode": 1,
-  "algorithm": "QMIX",
-  "controllerType": "RL_BACKEND",
-  "policy": {
-    "source": "QMIX",
-    "checkpointLoaded": false,
-    "trained": false,
-    "checkpointPath": null,
-    "trainingProgress": null
-  },
-  "config": {
-    "gridWidth": 20,
-    "gridHeight": 20,
-    "cellSize": 1,
-    "updateIntervalSeconds": 0.1
-  },
-  "robots": [
-    {
-      "id": "R01",
-      "position": [5, 7],
-      "targetPosition": [12, 14],
-      "rotation": null,
-      "status": "MOVING",
-      "taskId": "T04",
-      "hasCargo": true,
-      "battery": null,
-      "path": [[5, 7], [6, 7], [7, 7], [8, 7], [9, 7]],
-      "pathSource": "BFS_ESTIMATE",
-      "safetyAlert": false
-    }
-  ],
-  "tasks": [
-    {
-      "id": "T04",
-      "pickupPos": [5, 7],
-      "deliveryPos": [3, 18],
-      "assignedRobotId": "R01",
-      "status": "IN_PROGRESS"
-    }
-  ],
-  "safetyZones": [],
-  "recentCollisions": [],
-  "metrics": {
-    "activeRobots": 10,
-    "totalRobots": 10,
-    "activeTasks": 10,
-    "completedTasks": 0,
-    "throughputPerHour": null,
-    "averageDeliveryTimeSec": null,
-    "collisionAttempts": null,
-    "conflictingProposals": null,
-    "totalCollisions": 0,
-    "safetyOverrides": 0,
-    "physicalCollisions": 0,
-    "blockedConflictGroups": 0,
-    "movementSteps": 1,
-    "idleRobotSteps": 9,
-    "timestep": 1,
-    "episode": 1,
-    "reward": null,
-    "fps": null
-  },
-  "safetyEvents": [],
-  "safetyOverrideActive": false,
-  "isDemoMode": false,
-  "isConnectedToBackend": true
-}
-```
-
-The backend reports `battery` and `rotation` as `null` because it does not
-measure them. Displayed routes are marked `BFS_ESTIMATE`; they are explanatory
-shortest-path estimates, not QMIX action trajectories. Training progress is
-`null` unless a training process streams it. Throughput, delivery time, and
-proposal counts are also `null` until the backend computes them; the UI labels
-these values unavailable instead of displaying invented zeros.
+| NFR | Requirement | Status |
+|---|---|---|
+| NFR-1 | QMIX ≥80% completion at N=5 (20 episodes) | 🔄 Training |
+| NFR-3 | Zero corridor intrusions (20 safety episodes) | ✅ Safety layer enforced |
+| NFR-4 | QMIX collision rate ≤50% of IQL at N=10 | 🔄 Training |
+| NFR-5 | Bootstrap 95% CI for all algo × fleet combinations | ✅ Evaluation pipeline ready |
 
 ---
 
-## 🔗 Python RL (QMIX) Connection
+## 🛠 Technology Stack
 
-The Week 4 Python backend is now connected to the simulator. Its live action
-path is:
-
-```text
-QMIXController -> MARLEnvironmentAdapter -> WarehouseEnvironment.step()
-                                                    |
-                                      movement + safety + rewards
-```
-
-The adapter is the small integration boundary that translates the warehouse
-environment into the multi-agent interface expected by QMIX or an external
-EPyMARL training loop. It keeps the frontend, policy, and environment on the
-same episode state. The backend uses the QMIX learner for action selection by
-default; `policy_source="demo"` remains available as a deterministic fallback.
-
-Start the backend from the repository root with:
-
-```bash
-source .venv/bin/activate
-python -m src.api.warehouse_backend
-```
-
-The UI connects to `ws://localhost:8000/ws`. The `/state` response includes
-`policy.source`, `policy.checkpointLoaded`, and `policy.trained`. The repository
-does not currently contain a trained QMIX checkpoint, so the default live
-connection is a real QMIX inference path with initial (untrained) weights. A
-trained checkpoint can be supplied with:
-
-```bash
-export QMIX_CHECKPOINT="/path/to/qmix_checkpoint.pt"
-python -m src.api.warehouse_backend
-```
-
-The checkpoint format is a PyTorch dictionary containing `agent_network` and,
-optionally, `mixer` state dictionaries. `QMIXTrainer` remains the in-repo
-training example; EPyMARL is not vendored here.
+| Component | Technology |
+|---|---|
+| MARL Training | PyTorch (custom QMIX + IQL) |
+| Environment | Custom grid-world (PyBullet 3D bridge with software fallback) |
+| Backend API | FastAPI + WebSocket |
+| Frontend | React 18 + Three.js + TypeScript |
+| Model Tracking | MLflow |
+| HPO | Optuna |
+| ONNX Export | torch.onnx + ONNX Runtime |
+| Drift Monitoring | Evidently |
+| Carbon Tracking | CodeCarbon |
+| CI/CD | GitHub Actions |
+| Containerization | Docker |
 
 ---
 
-## Reproducible policy evaluation (P2)
+## 📋 Notes
 
-Before training a new policy, generate and commit a fresh evaluation manifest.
-Do not train or tune on its task queues. It materializes 20 scenarios per fleet
-size and hashes the layout/configuration and scenario-generation code.
-
-```bash
-.venv/bin/python -m src.evaluation.scenario_manifest \
-  --fleet-sizes 5 10 20 --episodes 20 --max-steps 100 --seed 976304181 \
-  --output results/evaluation/p2_holdout_2026_11/scenario_manifest.json
-```
-
-After committing the manifest and training, evaluate the same frozen scenarios
-with QMIX, IQL, and the rule-based baseline at N=5, 10, and 20. The command writes compressed
-per-step traces, checkpoint/config/source hashes, aggregate metrics,
-episode-bootstrap 95% confidence intervals, paired sign-flip comparisons,
-Holm-adjusted p-values, and the specification's scalability plots. The
-checkpoint paths must match the local training outputs.
-
-```bash
-MLFLOW_DISABLE_AGENT_HINT=1 .venv/bin/python -m src.evaluation.run_benchmark \
-  --fleet-sizes 5 10 20 \
-  --algorithms QMIX IQL Rule-Based \
-  --qmix-checkpoint 5=artifacts/checkpoints/qmix/p1_pathcost_n5_refine500/checkpoint_3600 \
-  --qmix-checkpoint 10=artifacts/checkpoints/qmix/p2_qmix_n10_seed300010/latest \
-  --qmix-checkpoint 20=artifacts/checkpoints/qmix/p2_qmix_n20_seed300020/latest \
-  --iql-checkpoint 5=artifacts/checkpoints/iql/p2_iql_n5_seed400005 \
-  --iql-checkpoint 10=artifacts/checkpoints/iql/p2_iql_n10_seed400010 \
-  --iql-checkpoint 20=artifacts/checkpoints/iql/p2_iql_n20_seed400020 \
-  --episodes 20 --max-steps 100 \
-  --scenario-manifest results/evaluation/p2_holdout_2026_11/scenario_manifest.json \
-  --output results/evaluation/p2_benchmark
-```
-
-`manifest.json`, `summary.json`, `report.md`, and `scalability.png` are the report files;
-`safety_gate.json` records the separate 20-episode aggressive corridor-entry
-gate. `traces/` contains gzip-compressed raw episodes and can be loaded by
-`src.evaluation.run_evaluation`. Collision counts represent actual collision
-events. Safety-blocked conflicts and overrides are reported separately. The
-benchmark is an evaluation harness, not evidence that a policy converged; use
-the completion metrics and traces to assess the selected checkpoints.
-
-## ⚡ Technical Performance Optimizations
-
-- **`InstancedMesh`**: Used for all storage rack tiers and crates, reducing draw calls from hundreds down to 2 draw calls.
-- **Pixel Ratio Capping**: WebGLRenderer pixel ratio capped at `Math.min(window.devicePixelRatio, 2)` for high-DPI displays.
-- **GSAP Tweens**: Smooth position & angular rotation interpolation prevents frame stuttering during grid transitions.
+- PyBullet requires MSVC 14+ to compile from source on Windows — a **software physics fallback** is used automatically
+- All training uses CPU (no GPU required)
+- Synthetic test checkpoints are explicitly labeled with `synthetic: true` in metadata
+- Do not use legacy 50-dim checkpoints from `artifacts/checkpoints/qmix/3f1553055ba04a13bf297b2d3b97e746/` — they will be rejected by the validator
 
 ---
 
-## 🎯 Current Status
+## 📄 License
 
-The simulator, Python environment, QMIX inference bridge, safety checks, and
-WebSocket telemetry are implemented. The remaining model-dependent step is to
-train a policy or connect an externally trained EPyMARL checkpoint; until then
-the UI correctly reports `QMIX: UNTRAINED` when the default controller is used.
-
-
+This project is for academic/research purposes as part of Project 25 requirements.

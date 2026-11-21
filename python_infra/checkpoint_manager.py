@@ -91,26 +91,45 @@ class CheckpointManager:
         """
         step_dir = os.path.join(self.run_dir, f"checkpoint_{step}")
         os.makedirs(step_dir, exist_ok=True)
-
         state_file = os.path.join(step_dir, "checkpoint_state.pt" if HAS_TORCH else "checkpoint_state.pkl")
-        self._save_payload(state_file, checkpoint_data)
 
-        # Build clean metadata
+        # Build clean rich metadata (Schema Version 2)
         checkpoint_config = checkpoint_data.get("config") or {}
-        observation_dim = checkpoint_config.get("observation_dim")
+        num_agents = checkpoint_config.get("num_agents") or checkpoint_data.get("metadata", {}).get("num_agents")
+        observation_dim = checkpoint_config.get("observation_dim") or checkpoint_data.get("metadata", {}).get("observation_dim")
+        action_dim = checkpoint_config.get("action_dim", 4)
+        state_dim = checkpoint_config.get("state_dim") or (11 * num_agents if num_agents else None)
+
         metadata = {
+            "schema_version": 2,
             "step": step,
             "algorithm": self.algorithm,
             "run_id": self.run_id,
             "timestamp": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+            "num_agents": num_agents,
+            "observation_dim": observation_dim,
+            "action_dim": action_dim,
+            "state_dim": state_dim,
+            "agent_network_arch": checkpoint_data.get("metadata", {}).get("agent_network_arch", "AgentQNetwork"),
+            "mixer_arch": checkpoint_data.get("metadata", {}).get("mixer_arch", "QMIXMixer"),
+            "agent_hidden_dim": checkpoint_config.get("agent_hidden_dim", 64),
+            "mixing_hidden_dim": checkpoint_config.get("mixing_hidden_dim", 32),
             "observation_vector": (
                 f"{observation_dim}-D" if observation_dim is not None else "unknown"
             ),
-            "action_space": "Discrete(4)",
+            "action_space": f"Discrete({action_dim})",
             "is_best": is_best,
             "best_metric_val": best_metric_val,
-            "keys": list(checkpoint_data.keys())
+            "keys": list(checkpoint_data.keys()),
+            "config": checkpoint_config,
         }
+
+        # Embed metadata inside the state payload for standalone verification
+        if "metadata" not in checkpoint_data:
+            checkpoint_data["metadata"] = metadata
+        checkpoint_data["schema_version"] = 2
+
+        self._save_payload(state_file, checkpoint_data)
 
         meta_file = os.path.join(step_dir, "metadata.json")
         with open(meta_file, "w") as f:

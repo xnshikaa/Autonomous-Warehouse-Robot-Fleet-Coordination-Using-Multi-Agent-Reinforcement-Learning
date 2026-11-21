@@ -95,9 +95,11 @@ def _process_command_message(
             environment.reset()
             simulation_paused = False
         elif command_type == "set_fleet_size":
-            environment.set_num_robots(command["size"])
+            new_size = command["size"]
+            checkpoint_path = command.get("checkpoint_path")
             if qmix_controller is not None:
-                qmix_controller.reset_for_fleet()
+                qmix_controller.reconfigure_fleet(new_size, checkpoint_path=checkpoint_path)
+            environment.set_num_robots(new_size)
         elif command_type == "pause":
             simulation_paused = True
         elif command_type == "resume":
@@ -105,7 +107,7 @@ def _process_command_message(
         elif command_type == "set_speed":
             speed_multiplier = float(command["speed"])
             simulation_delay = max(0.01, float(interval_seconds) / speed_multiplier)
-    except (KeyError, TypeError, ValueError) as error:
+    except (KeyError, TypeError, ValueError, FileNotFoundError) as error:
         return ({
             "type": "command_error",
             "error": {"code": "invalid_command_value", "message": str(error)},

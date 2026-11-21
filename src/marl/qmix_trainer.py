@@ -9,6 +9,13 @@ import torch
 from python_infra.checkpoint_manager import CheckpointManager
 from python_infra.config import ExperimentConfig, TrainingMetrics
 from python_infra.experiment_tracker import ExperimentTracker
+from src.marl.checkpoint_validator import (
+    build_checkpoint_metadata,
+    extract_or_infer_metadata,
+    validate_checkpoint_architecture,
+    validate_checkpoint_tensors,
+    CheckpointCompatibilityError,
+)
 from src.marl.gymnasium_env import WarehouseGymEnv
 from src.marl.qmix_learner import QMIXLearner
 from src.marl.replay_buffer import ReplayBuffer
@@ -185,7 +192,31 @@ class QMIXTrainer:
 
     def _get_checkpoint_payload(self, episode: int, epsilon: float) -> Dict[str, Any]:
         """Construct checkpoint payload compatible with QMIXController and CheckpointManager."""
+        config = {
+            "num_agents": self.num_agents,
+            "observation_dim": self.observation_dim,
+            "action_dim": self.action_dim,
+            "state_dim": self.state_dim,
+            "learning_rate": self.learning_rate,
+            "gamma": self.gamma,
+            "batch_size": self.batch_size,
+            "target_update_interval": self.target_update_interval,
+            "reward_overrides": self.reward_overrides,
+        }
+        metadata = build_checkpoint_metadata(
+            num_agents=self.num_agents,
+            observation_dim=self.observation_dim,
+            action_dim=self.action_dim,
+            state_dim=self.state_dim,
+            agent_hidden_dim=64,
+            mixing_hidden_dim=32,
+            run_id=self.run_id,
+            episode=episode,
+            config=config,
+        )
         return {
+            "schema_version": 2,
+            "metadata": metadata,
             "agent_network": self.learner.agent_network.state_dict(),
             "mixer": self.learner.mixer.state_dict(),
             "target_agent_network": self.learner.target_agent_network.state_dict(),
@@ -200,17 +231,7 @@ class QMIXTrainer:
                 "numpy": np.random.get_state(),
                 "torch": torch.get_rng_state(),
             },
-            "config": {
-                "num_agents": self.num_agents,
-                "observation_dim": self.observation_dim,
-                "action_dim": self.action_dim,
-                "state_dim": self.state_dim,
-                "learning_rate": self.learning_rate,
-                "gamma": self.gamma,
-                "batch_size": self.batch_size,
-                "target_update_interval": self.target_update_interval,
-                "reward_overrides": self.reward_overrides,
-            },
+            "config": config,
             "replay_buffer": self.replay_buffer.state_dict(),
         }
 
@@ -461,6 +482,23 @@ class QMIXTrainer:
             checkpoint = self.checkpoint_manager.load_checkpoint(checkpoint_target)
             payload = checkpoint["checkpoint_data"]
 
+        metadata = extract_or_infer_metadata(payload, file_path=checkpoint_path if checkpoint_path.is_file() else None)
+        validate_checkpoint_architecture(
+            metadata,
+            expected_num_agents=self.num_agents,
+            expected_observation_dim=self.observation_dim,
+            expected_action_dim=self.action_dim,
+            expected_state_dim=self.state_dim,
+        )
+        validate_checkpoint_tensors(
+            payload,
+            expected_num_agents=self.num_agents,
+            expected_observation_dim=self.observation_dim,
+            expected_action_dim=self.action_dim,
+            expected_state_dim=self.state_dim,
+            require_mixer=True,
+        )
+
         config = payload.get("config") or {}
         expected = {
             "num_agents": self.num_agents,
@@ -483,17 +521,21 @@ class QMIXTrainer:
             raise ValueError("QMIX resume checkpoint has no replay buffer; exact continuation is unavailable")
 
         agent_state = payload.get("agent_network") or payload.get("model_state_dict")
-        if agent_state:
-            self.learner.agent_network.load_state_dict(agent_state)
+        if agent_state is None:
+            raise ValueError("QMIX resume checkpoint missing 'agent_network'")
+        self.learner.agent_network.load_state_dict(agent_state, strict=True)
+
         mixer_state = payload.get("mixer")
-        if mixer_state:
-            self.learner.mixer.load_state_dict(mixer_state)
+        if mixer_state is None:
+            raise ValueError("QMIX resume checkpoint missing 'mixer'")
+        self.learner.mixer.load_state_dict(mixer_state, strict=True)
+
         target_agent_state = payload.get("target_agent_network")
         if target_agent_state:
-            self.learner.target_agent_network.load_state_dict(target_agent_state)
+            self.learner.target_agent_network.load_state_dict(target_agent_state, strict=True)
         target_mixer_state = payload.get("target_mixer")
         if target_mixer_state:
-            self.learner.target_mixer.load_state_dict(target_mixer_state)
+            self.learner.target_mixer.load_state_dict(target_mixer_state, strict=True)
         optimizer_state = payload.get("optimizer")
         if optimizer_state:
             self.learner.optimizer.load_state_dict(optimizer_state)

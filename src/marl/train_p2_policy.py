@@ -52,7 +52,9 @@ def train_policy(
     snapshots = output / "snapshots"
 
     def save_snapshot(trainer, metrics):
-        total_episodes = trainer.episode_offset + trainer.episodes
+        # IQLTrainer does not support resume so episode_offset is always 0
+        episode_offset = getattr(trainer, "episode_offset", 0)
+        total_episodes = episode_offset + trainer.episodes
         _save_checkpoint_snapshot(
             algorithm, trainer, metrics, snapshots, checkpoint_interval, total_episodes
         )

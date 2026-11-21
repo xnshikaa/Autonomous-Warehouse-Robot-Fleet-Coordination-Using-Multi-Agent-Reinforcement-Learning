@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "algorithm": "QMIX",
+  "fleet_size": 5,
+  "episodes": 50,
+  "episodes_completed_total": 50,
+  "max_steps": 50,
+  "seed": 42,
+  "learning_rate": 0.0001,
+  "target_update_interval": 200,
+  "checkpoint_interval": 10,
+  "checkpoint_selection": "final; select among snapshots using validation only",
+  "reward_overrides": {},
+  "config": {
+    "num_agents": 5,
+    "observation_dim": 456,
+    "action_dim": 4,
+    "state_dim": 55,
+    "learning_rate": 0.0001,
+    "gamma": 0.99,
+    "batch_size": 32,
+    "target_update_interval": 200,
+    "reward_overrides": {}
+  },
+  "checkpoint": "qmix.pt",
+  "history": "training_history.json",
+  "sha256": {
+    "qmix.pt": "3ce8f03a39efa021c9f55200f784ed379055915ed4221279aeee33fed2982f4a",
+    "snapshots\\episode_00010\\checkpoint_state.pt": "7858afa5ce1dbbe7de5ded3903a9edb6cb83ce6b0746868fe53526d3fe475459",
+    "snapshots\\episode_00010\\training_metrics.json": "6c324574293f2432ff57bc17a78242409e102e9c5966d31d373f1ad29337a013",
+    "snapshots\\episode_00020\\checkpoint_state.pt": "bee8262fb480458f94f27cde5b840eb147f61a63540ec53d0e372c9447735596",
+    "snapshots\\episode_00020\\training_metrics.json": "0874fe4ef1ec5f202be3876e0cbfe6722748386a5285b33be64eadda91fb3056",
+    "snapshots\\episode_00030\\checkpoint_state.pt": "135116649af7e5818335d5fca7ee08fd184824c886d03bf3e94f5657a53f73c2",
+    "snapshots\\episode_00030\\training_metrics.json": "bddea22a8a3315bb542d8c95de513538f4c172044d2afe17eb1b521c073accfe",
+    "snapshots\\episode_00040\\checkpoint_state.pt": "924fb11c3c0815bcab15788b56822753a2a58d296c1a1a2dfddf8aef756d520c",
+    "snapshots\\episode_00040\\training_metrics.json": "62ba93a22510525ab39290e838ce5f575dd613e798ad66e7e587cd39651caa44",
+    "snapshots\\episode_00050\\checkpoint_state.pt": "8add6ed7e27ffcaa1a844eac4761e38b91057d5780455a9fb9e1db11eef0ab97",
+    "snapshots\\episode_00050\\training_metrics.json": "4a36c4e3fb2cd9002f114efc183ece6bd47ae81ecb6fd4c90a663d0b4b5ef111"
+  }
+}
