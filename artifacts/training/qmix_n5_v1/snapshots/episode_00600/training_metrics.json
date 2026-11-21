@@ -1,0 +1,22 @@
+{
+  "episode": 600,
+  "steps": 100,
+  "epsilon": 0.4303803803803804,
+  "reward": 19.80000000000002,
+  "completed_tasks": 2,
+  "task_completion_rate": 0.4,
+  "collision_or_conflict_count": 4,
+  "safety_override_events": 4,
+  "collision_intent_groups": 3,
+  "team_reward_component_totals": {
+    "step_penalty": -1.0000000000000007,
+    "progress_reward": 24.799999999999983,
+    "delivery_reward": 4.0,
+    "collision_penalty": -8.0,
+    "danger_penalty": 0.0,
+    "blocked_action_penalty": 0.0,
+    "total": 19.80000000000002
+  },
+  "throughput": 2.0,
+  "loss": 0.43820116847753526
+}

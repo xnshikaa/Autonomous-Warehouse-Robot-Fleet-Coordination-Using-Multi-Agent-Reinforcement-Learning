@@ -1,0 +1,210 @@
+{
+  "manifest_id": "868412fb49b0f395",
+  "schema_version": 1,
+  "episodes": 20,
+  "max_steps": 100,
+  "evaluation_seed": 999,
+  "task_seed_rule": "evaluation_seed + episode_index - 1",
+  "scenario_manifest_id": null,
+  "fleet_sizes": [
+    5,
+    10
+  ],
+  "algorithms": [
+    "QMIX",
+    "IQL",
+    "Rule-Based"
+  ],
+  "environment_config_sha256": {
+    "environment.json": "a174f6027e2164183643ae0e6ea0ab0de516c67dbfb2bd53b2d710c36c085c03",
+    "reward.json": "740bcb5db6dc95cfde857fb6ab0c40fe0f62fb8b063432e2961670942ae26a0a"
+  },
+  "source_sha256": {
+    "src/evaluation/metrics.py": "604ca306cb0e3dbe85dec7fdaaf1310b20dc6c6d3fbee2bdd58a739ca9ced3a5",
+    "src/evaluation/trace_generator.py": "7754872a23f1dcf4d84934c791aee06ed1217c89cfbc0b64839437bd779a561f",
+    "src/evaluation/run_evaluation.py": "5442a00439cbd46562f747ba35acab754873982a579065ae2aa89a8e33db0e09",
+    "src/evaluation/run_benchmark.py": "14bf7bf67049361a40c4a2e453324c3fe9e7b70a26d24c06499a2b896203ea90",
+    "src/evaluation/plots.py": "933a86b561881cf2ed77463582350824e7bfd3d7e767f41bc46d45e02e29402d",
+    "src/evaluation/safety_gate.py": "9fa1205682d7be90c16b45b895f9fad0e0adaed9f9b110f634c89b3ffce86a85",
+    "src/evaluation/scenario_manifest.py": "55230c3deb46d5c429e3a9e4979a123d3bc91c716858d41104c9ca6cf0c91ee5",
+    "src/ai/environment.py": "aeef79d195a03af942802ea92c903565341ddbe77319f8d475171a45f1847f3d",
+    "src/ai/reward_function.py": "563f214ec2e040eebb6682b2829cfed564b8703d021f0017070873955d7ea1e8",
+    "src/marl/environment_adapter.py": "0783c83962981a595f1f30207023500d6c319c582eae29468957e016e55cd03f",
+    "src/marl/gymnasium_env.py": "6832b725634fdd64e5808ccff5982dfdadb451342e1c1f6f8d4eeecf5b0aea16",
+    "src/marl/qmix_trainer.py": "83dcf96c0f1722b9207c1d1c2770488449b067da6f0a80a6fa3f7da27a410888",
+    "src/marl/iql_trainer.py": "1ae59b3d4d1c80b67d0d22d90f6597bd0d9bbb27b025231c705ce543c34c1613",
+    "src/marl/observation_encoder.py": "78ec6f42215e0acec5edea3a28ac71a1cf8fc19ff99c0ddcee278ddbf9cd134b",
+    "src/marl/iql_learner.py": "784d741923fc4c33cc23ef357272713b585ee7d5c7e9a8037c018065f27b2564",
+    "src/marl/qmix_controller.py": "e924ff4edf3d95a384f95a1af6eff765f0c4e760a2fab6d113231220747d18e6",
+    "src/marl/qmix_learner.py": "7e365c6510c35369233ba4e314b40d12558fbdf3d1f8f915e743dbdecb7bf4ea"
+  },
+  "runtime": {
+    "python": "3.12.10 (tags/v3.12.10:0cc8128, Apr  8 2025, 12:21:36) [MSC v.1943 64 bit (AMD64)]",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "torch": "2.15.0+cpu",
+    "numpy": "2.5.5"
+  },
+  "runs": [
+    {
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+        },
+        "metadata": {
+          "training_episode": 600,
+          "training_seed": 42,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "trace_file": "traces\\qmix_n5.json.gz",
+      "trace_sha256": "8d2e9911834e0e9b4cdc0f0ddd60285cc90e7a923ba989ab4d9328e1f0d38041"
+    },
+    {
+      "algorithm": "IQL",
+      "fleet_size": 5,
+      "checkpoint": {
+        "path": "artifacts/training/iql_n5_v1/snapshots/episode_00200",
+        "sha256": {
+          "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_0.pt": "e291c9f0c9c1d2c46e757293387ba2bc141f34ea2006ac29204e54cd655b2c68",
+          "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_1.pt": "5d026eb0531b7032e01e8bfb43ec376fe96f4e162f74162d639a6ebae847ebf3",
+          "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_2.pt": "5c1f59a55bac27f4649de9a8dd213aad0d5fbab1aa409f959691cf9b595b82f9",
+          "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_3.pt": "ae98cd00cc9a7467937a2c94b4f8ed6c2a464d5fe037e8e91b89cb682e10ea34",
+          "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_4.pt": "856f585f3bd97145d0a4476f2c65741cd69fe9f665a1938d70f585a20685ffef",
+          "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_manifest.json": "c540f6ae1b40f0e8b8efca7c25dc4065a2fd09893dace5e34d8555a45512cd36"
+        },
+        "metadata": {
+          "schema_version": 1,
+          "algorithm": "IQL",
+          "num_robots": 5,
+          "observation_dim": 456,
+          "action_dim": 4,
+          "include_static_map": true,
+          "include_path_costs": true,
+          "seed": 42,
+          "episodes_completed": 200,
+          "max_steps": 100,
+          "learning_rate": 0.0001,
+          "gamma": 0.99,
+          "epsilon_start": 1.0,
+          "epsilon_end": 0.1,
+          "epsilon_decay": 0.995,
+          "target_update_frequency": 200,
+          "td_loss": "smooth_l1",
+          "gradient_clip_norm": 10.0,
+          "reward_overrides": {}
+        }
+      },
+      "trace_file": "traces\\iql_n5.json.gz",
+      "trace_sha256": "1d64154f71fc0303444fe89131a48314de04de27fab10b6c13d30c9fdaf9e53e"
+    },
+    {
+      "algorithm": "Rule-Based",
+      "fleet_size": 5,
+      "checkpoint": null,
+      "trace_file": "traces\\rule_based_n5.json.gz",
+      "trace_sha256": "ccf66d8223bad7e7c138bf22b7781cd5a4b6378c873e48c440110f0dded14a6b"
+    },
+    {
+      "algorithm": "QMIX",
+      "fleet_size": 10,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt": "8d1d4521d327f5e49f7d0c1c35031c2908bce63f9ef15227478f8ffd10be5296"
+        },
+        "metadata": {
+          "training_episode": 500,
+          "training_seed": 43,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "trace_file": "traces\\qmix_n10.json.gz",
+      "trace_sha256": "a54c100595f1429a8f406b5ea9d5d7dcd9e60d637b9cfeea32f4a1d6567c00f7"
+    },
+    {
+      "algorithm": "IQL",
+      "fleet_size": 10,
+      "checkpoint": {
+        "path": "artifacts/training/iql_n10_v1/snapshots/episode_00100",
+        "sha256": {
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_0.pt": "a28c6235abcd1ac901698fa7d428c4a92465d3cd11641fc6fb37b0ee9b259e74",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_1.pt": "e5170b419874a7023db1c884eaf3a5e487a6180e4aac0ea17166b13774ec8fb9",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_2.pt": "f78285713053059380e32bdb9a248de138df8c3b6551d7842a9f15c879943eb1",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_3.pt": "32dcedd6b2e8a0ce61a48ded51fc866d76057e1c2cfb17030e1a68d58767b2dc",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_4.pt": "7d5b68f20aefbbc522feba136b0c176c354114ca15de66a3326c99e4227c17af",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_5.pt": "ea5af00ad141dfd8ab835e8c69f87e8e8ed3684b21b81ea5b5432456ccbfdb0c",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_6.pt": "ae06bb8e183e000764424db59b51f1cf9e15b44631aadacae6088bae49128fdf",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_7.pt": "1adf5121346401563030b3bb67f1331b5302b8004578fd5bdc1c18e23e18788c",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_8.pt": "1f2cb5f455e828be55ae340b45c264b299b0c76ade1d0c2dced3ce08f25d3d22",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_9.pt": "7b4225406fa2991e242e1be3aac1141978ac03050fb6259ca7c3ae2f4ffd1c1e",
+          "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_manifest.json": "871defd28f1b13e40751e88abff831f19608940e6a570e7a939c7f4503b05395"
+        },
+        "metadata": {
+          "schema_version": 1,
+          "algorithm": "IQL",
+          "num_robots": 10,
+          "observation_dim": 456,
+          "action_dim": 4,
+          "include_static_map": true,
+          "include_path_costs": true,
+          "seed": 43,
+          "episodes_completed": 100,
+          "max_steps": 100,
+          "learning_rate": 0.0001,
+          "gamma": 0.99,
+          "epsilon_start": 1.0,
+          "epsilon_end": 0.1,
+          "epsilon_decay": 0.995,
+          "target_update_frequency": 200,
+          "td_loss": "smooth_l1",
+          "gradient_clip_norm": 10.0,
+          "reward_overrides": {}
+        }
+      },
+      "trace_file": "traces\\iql_n10.json.gz",
+      "trace_sha256": "ef6302d016a86e61e7121a6f9b18d15acdec4b0041904033015f98286d017aaa"
+    },
+    {
+      "algorithm": "Rule-Based",
+      "fleet_size": 10,
+      "checkpoint": null,
+      "trace_file": "traces\\rule_based_n10.json.gz",
+      "trace_sha256": "596fe946d9fd55760a94a714d043593f73c1677961c28ddb214c12e897c59211"
+    }
+  ],
+  "scalability_plot": {
+    "file": "scalability.png",
+    "sha256": "f3673e237cdd24f3e6a0c563b68b0994fb1934380dd4120a71543f0421e1fe3b"
+  },
+  "analysis_report": {
+    "file": "report.md",
+    "sha256": "bb5ea67fa35b1c0e1b93292c2b72fddbbce5fc10f59e4ee79789c279f7018133"
+  },
+  "safety_gate": {
+    "file": "safety_gate.json",
+    "sha256": "926069b8fcc6f9e1383aa1885533b975115f096c5f529f9e4fdb69d01c5753c7"
+  }
+}

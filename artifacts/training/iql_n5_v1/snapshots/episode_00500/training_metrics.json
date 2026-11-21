@@ -1,0 +1,18 @@
+{
+  "episode": 500,
+  "steps": 84,
+  "epsilon": 0.1,
+  "reward": 9.760000000000014,
+  "loss": 0.48510769677194415,
+  "safety_override_events": 18,
+  "collision_intent_groups": 11,
+  "team_reward_component_totals": {
+    "step_penalty": -0.8400000000000005,
+    "progress_reward": 36.60000000000003,
+    "delivery_reward": 10.0,
+    "collision_penalty": -36.0,
+    "danger_penalty": 0.0,
+    "blocked_action_penalty": 0.0,
+    "total": 9.760000000000014
+  }
+}
