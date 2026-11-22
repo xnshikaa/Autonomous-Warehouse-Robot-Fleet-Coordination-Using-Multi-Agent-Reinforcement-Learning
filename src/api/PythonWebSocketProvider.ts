@@ -9,7 +9,7 @@ export interface WarehouseFeed {
   pending: boolean;
 }
 type Command =
-  | { type: 'start' | 'pause' | 'resume' | 'reset' }
+  | { type: 'start' | 'pause' | 'resume' | 'reset' | 'load_reference' }
   | { type: 'set_speed'; speed: number }
   | { type: 'set_fleet_size'; size: number }
   | { type: 'set_algorithm'; algorithm: LiveAlgorithm };

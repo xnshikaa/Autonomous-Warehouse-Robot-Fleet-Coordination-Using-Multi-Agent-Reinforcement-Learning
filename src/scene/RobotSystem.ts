@@ -50,7 +50,7 @@ export class RobotSystem {
           targetPos: targetWorld.clone(),
         };
         this.animMap.set(state.id, anim);
-      } else if (!anim.targetPos.equals(targetWorld)) {
+      } else if (resync || !anim.targetPos.equals(targetWorld)) {
         const dx = targetWorld.x - anim.targetPos.x;
         const dz = targetWorld.z - anim.targetPos.z;
         anim.tweenPos?.kill();
@@ -59,23 +59,25 @@ export class RobotSystem {
           // A missed multi-agent frame cannot safely interpolate a shortcut.
           amr.mesh.position.copy(targetWorld);
           const movement = state.lastSuccessfulMove;
-          if (movement) {
-            amr.mesh.rotation.y = Math.atan2(movement.to[0] - movement.from[0], movement.to[1] - movement.from[1]);
-          }
+          amr.mesh.rotation.y = movement
+            ? Math.atan2(movement.to[0] - movement.from[0], movement.to[1] - movement.from[1])
+            : renderRotation;
         } else {
-          // Tween directly from current mesh position to targetWorld to prevent backward snapping jitter
+          // A tick is one cardinal move. Finish any late frame at its
+          // committed cell before starting the next segment.
+          amr.mesh.position.copy(anim.targetPos);
           const heading = Math.atan2(dx, dz);
           const delta = heading - amr.mesh.rotation.y;
           const shortestTurn = Math.atan2(Math.sin(delta), Math.cos(delta));
           anim.tweenRot = gsap.to(amr.mesh.rotation, {
             y: amr.mesh.rotation.y + shortestTurn,
-            duration: Math.max(0.12, moveDurationSec * 0.35),
+            duration: moveDurationSec * 0.35,
             ease: 'power2.inOut',
           });
           anim.tweenPos = gsap.to(amr.mesh.position, {
             x: targetWorld.x,
             z: targetWorld.z,
-            duration: Math.max(0.2, moveDurationSec),
+            duration: moveDurationSec,
             ease: 'power1.inOut',
           });
         }

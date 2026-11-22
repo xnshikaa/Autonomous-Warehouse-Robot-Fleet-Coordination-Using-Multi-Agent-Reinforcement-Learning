@@ -40,6 +40,8 @@ export class WarehouseSceneController {
   private mouse: THREE.Vector2 = new THREE.Vector2();
 
   public onRobotSelected?: (robotId: string | null) => void;
+  public onFollowChanged?: (robotId: string | null) => void;
+  private followedRobotId: string | null = null;
   public onTaskSelected?: (taskId: string | null) => void;
 
   constructor(container: HTMLElement) {
@@ -95,8 +97,9 @@ export class WarehouseSceneController {
       this.shelfSystem.updateLayout(state.shelves);
       this.zoneSystem.updateCorridor(cells);
     }
-    if (this.episode !== state.episode || this.streamId !== state.streamId) {
-      this.cameraManager.stopFollowing();
+    const newEpisode = this.episode !== state.episode || this.streamId !== state.streamId;
+    if (newEpisode) {
+      if (this.followedRobotId) this.cameraManager.rebaseFollowView();
       this.episode = state.episode;
       this.streamId = state.streamId;
       this.timestep = state.timestep;
@@ -106,7 +109,10 @@ export class WarehouseSceneController {
     const moveDuration = interval === undefined ? 0.4 : Math.max(0.02, interval * 0.9);
     const missedTick = state.timestep > this.timestep + 1;
     this.timestep = state.timestep;
-    this.robotSystem.updateRobots(state.robots, moveDuration, missedTick);
+    this.robotSystem.updateRobots(state.robots, moveDuration, newEpisode || missedTick);
+    if (this.followedRobotId && !this.robotSystem.getRobotMesh(this.followedRobotId)) {
+      this.stopFollowing();
+    }
     this.pathSystem.updatePaths(state.robots);
     this.taskSystem.updateTasks(state.tasks);
     this.safetySystem.updateCollisions(state.recentCollisions);
@@ -122,15 +128,24 @@ export class WarehouseSceneController {
     if (mesh) {
       this.cameraManager.trackObject(mesh);
       this.pathSystem.setSelectedRobot(robotId);
+      this.followedRobotId = robotId;
+      this.onFollowChanged?.(robotId);
     }
   }
 
   public stopFollowing(): void {
     this.cameraManager.stopFollowing();
+    this.followedRobotId = null;
+    this.onFollowChanged?.(null);
   }
 
   public resetCamera(): void {
-    this.cameraManager.setCameraMode('OVERVIEW');
+    this.cameraManager.resetView();
+  }
+
+  public showOverhead(): void {
+    this.stopFollowing();
+    this.cameraManager.setCameraMode('TOP_DOWN');
   }
 
   private onPointerDown = (event: MouseEvent): void => {

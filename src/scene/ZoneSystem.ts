@@ -57,7 +57,7 @@ export class ZoneSystem {
         roughness: 0.2
       });
       const conveyorMesh = new THREE.Mesh(conveyorGeo, conveyorMat);
-      conveyorMesh.position.set(worldPos.x, 0.2, worldPos.z + 1.2);
+      conveyorMesh.position.set(worldPos.x, 0.2, gridToWorld(col, GRID_SIZE).z);
       conveyorMesh.castShadow = true;
       dispatchGroup.add(conveyorMesh);
     });
@@ -107,7 +107,7 @@ export class ZoneSystem {
       });
 
       const dockMesh = new THREE.Mesh(dockGeo, dockMat);
-      dockMesh.position.set(worldPos.x, 0.6, worldPos.z - 0.8);
+      dockMesh.position.set(worldPos.x, 0.6, gridToWorld(col, -1).z);
       dockMesh.castShadow = true;
       chargingGroup.add(dockMesh);
 

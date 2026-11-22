@@ -8,6 +8,7 @@ import logging
 import math
 import os
 from collections import deque
+from contextlib import asynccontextmanager, suppress
 from pathlib import Path
 from random import Random
 from typing import Any, Callable
@@ -34,6 +35,7 @@ except ImportError:  # pragma: no cover - optional backend dependency
 logger = logging.getLogger(__name__)
 ALGORITHMS = ("QMIX", "IQL", "Rule-Based")
 FLEET_SIZES = (5, 10, 20)
+REFERENCE_SEEDS = {"QMIX": 310011, "IQL": 310001, "Rule-Based": 310011}
 
 
 class CommandValidationError(ValueError):
@@ -57,7 +59,7 @@ def _parse_command(message: str) -> dict[str, Any]:
     if not isinstance(command_type, str) or not command_type:
         raise CommandValidationError("missing_type", "Command requires a non-empty string 'type'.")
 
-    if command_type not in {"reset", "pause", "resume", "start", "set_speed", "set_fleet_size", "set_algorithm"}:
+    if command_type not in {"reset", "load_reference", "pause", "resume", "start", "set_speed", "set_fleet_size", "set_algorithm"}:
         raise CommandValidationError("unsupported_command", f"Unsupported command type: {command_type}.")
 
     if command_type == "set_speed":
@@ -97,6 +99,7 @@ def _process_command_message(
     simulation_paused: bool,
     *,
     configure: Callable[[int, str], None] | None = None,
+    load_reference: Callable[[], None] | None = None,
 ) -> tuple[dict[str, Any], float, float, bool]:
     """Apply one client message and return a response plus updated loop state."""
     try:
@@ -112,6 +115,11 @@ def _process_command_message(
         if command_type == "reset":
             environment.reset()
             simulation_paused = configure is not None
+        elif command_type == "load_reference":
+            if load_reference is None:
+                raise ValueError("Reference missions are unavailable.")
+            load_reference()
+            simulation_paused = True
         elif command_type == "set_fleet_size":
             new_size = command["size"]
             if configure is not None:
@@ -345,7 +353,17 @@ def create_app(
     env.conservative_motion = True
     env.reset()
     adapter = MARLEnvironmentAdapter(environment=env)
-    app = FastAPI(title="Warehouse Environment Backend")
+    @asynccontextmanager
+    async def lifespan(_app):
+        clock = asyncio.create_task(run_clock())
+        try:
+            yield
+        finally:
+            clock.cancel()
+            with suppress(asyncio.CancelledError):
+                await clock
+
+    app = FastAPI(title="Warehouse Environment Backend", lifespan=lifespan)
     stream_id = uuid4().hex
     initial_size = env.num_robots
     initial_qmix = checkpoint_path or os.environ.get("QMIX_CHECKPOINT")
@@ -362,6 +380,8 @@ def create_app(
     pickup_steps = {}
     successful_moves = {}
     mission_seed = MISSION_SEED - 1
+    reference_seed: int | None = None
+    reference_episode: int | None = None
 
     def configure(size: int, algorithm: str) -> None:
         nonlocal active_policy, action_provider, navigator
@@ -421,10 +441,17 @@ def create_app(
     simulation_paused = True
     simulation_delay = max(0.01, float(interval_seconds))
     speed_multiplier = 1.0
-    simulation_driver: WebSocket | None = None
 
     def current_policy() -> dict[str, object]:
         return active_policy
+
+    def load_reference_mission() -> None:
+        nonlocal reference_seed, reference_episode
+        if env.num_robots != 5 or environment is not None or env.get_active_layout().layout_id != "standard":
+            raise ValueError("Reference missions require the standard five-robot fleet.")
+        env.reset()
+        reference_seed = REFERENCE_SEEDS[str(active_policy["source"])]
+        reference_episode = env.episode
 
     def refresh_episode() -> None:
         nonlocal episode, travelled, delivery_steps, conflict_events, physical_contacts, recent_collisions, finished
@@ -435,7 +462,8 @@ def create_app(
                 mission_seed += 1
                 queue_mission(env, mission_seed)
             elif environment is None:
-                tasks = generate_task_assignments(env, Random(300_000 + env.episode))
+                seed = reference_seed if reference_episode == env.episode else 300_000 + env.episode
+                tasks = generate_task_assignments(env, Random(seed))
                 for task in tasks:
                     env.add_task(task.task_id, task.pickup_position, task.delivery_position, task.assigned_robot)
             travelled = {robot.robot_id: deque([robot.position], maxlen=32) for robot in env.robots}
@@ -486,6 +514,8 @@ def create_app(
         payload["recentCollisions"] = recent_collisions
         if env.num_robots == 1:
             payload["missionSeed"] = mission_seed
+        if reference_episode == env.episode:
+            payload["referenceSeed"] = reference_seed
         for task, record in zip(env.tasks, payload["tasks"], strict=True):
             record["pickupTimestep"] = pickup_steps.get(task.task_id)
             record["completedTimestep"] = delivery_steps.get(task.task_id)
@@ -517,6 +547,15 @@ def create_app(
         })
         return payload
 
+    async def run_clock() -> None:
+        nonlocal simulation_paused
+        while True:
+            await asyncio.sleep(simulation_delay)
+            if not simulation_paused:
+                tick()
+                if finished:
+                    simulation_paused = True
+
     @app.get("/health")
     async def health():
         return {"ok": True, "layout": env.get_active_layout().layout_id}
@@ -531,7 +570,7 @@ def create_app(
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
-        nonlocal simulation_paused, simulation_delay, simulation_driver, speed_multiplier
+        nonlocal simulation_paused, simulation_delay, speed_multiplier
         await websocket.accept()
         try:
             while True:
@@ -549,6 +588,7 @@ def create_app(
                         speed_multiplier,
                         simulation_paused,
                         configure=configure,
+                        load_reference=load_reference_mission,
                     )
                     if response["type"] == "state_update":
                         refresh_episode()
@@ -557,18 +597,9 @@ def create_app(
                         response = snapshot()
                     await websocket.send_json(response)
                 except asyncio.TimeoutError:
-                    if simulation_driver is None:
-                        simulation_driver = websocket
-                    if not simulation_paused and simulation_driver is websocket:
-                        tick()
-                        if finished:
-                            simulation_paused = True
                     await websocket.send_json(snapshot())
         except WebSocketDisconnect:
             pass
-        finally:
-            if simulation_driver is websocket:
-                simulation_driver = None
 
     return app
 

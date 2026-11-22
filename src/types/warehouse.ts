@@ -90,6 +90,7 @@ export interface TaskState {
   status: TaskStatus;
   createdTimestep?: number;
   completedTimestep?: number;
+  pickupTimestep?: number | null;
 }
 
 export interface SafetyZoneState {
@@ -188,6 +189,7 @@ export interface WarehouseState {
   episode: number;
   streamId?: string;
   missionSeed?: number;
+  referenceSeed?: number;
   /** Present for backend state; local providers may omit it. */
   simulationPaused?: boolean;
   simulationFinished?: boolean;

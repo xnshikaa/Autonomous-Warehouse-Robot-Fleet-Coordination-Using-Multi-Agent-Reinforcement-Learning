@@ -48,11 +48,6 @@ export class CameraManager {
     this.controls.minDistance = 8;
     this.controls.maxDistance = 75;
 
-    // Disengage follow mode if user manually interacts with controls
-    this.controls.addEventListener('start', () => {
-      this.stopFollowing();
-    });
-
     // Apply default overview preset
     this.setCameraMode('OVERVIEW', false);
   }
@@ -121,6 +116,22 @@ export class CameraManager {
     if (this.currentMode === 'ROBOT_FOLLOW') {
       this.targetObject = null;
       this.currentMode = 'FREE_ORBIT';
+      this.rebaseFollowView();
+    }
+  }
+
+  public rebaseFollowView(): void {
+    gsap.killTweensOf(this.camera.position);
+    gsap.killTweensOf(this.controls.target);
+    this.isTransitioning = false;
+    this.controls.enabled = true;
+  }
+
+  public resetView(): void {
+    if (this.currentMode === 'ROBOT_FOLLOW' && this.targetObject?.parent) {
+      this.trackObject(this.targetObject);
+    } else {
+      this.setCameraMode('OVERVIEW');
     }
   }
 

@@ -25,7 +25,7 @@ Branch `integration/final-demo` was three commits ahead of its upstream at takeo
   - Gymnasium environment contract tests (`test_gymnasium_env.py`).
   - Safety layer and human corridor enforcement tests (`test_safety_layer.py`, `test_corridor.py`).
 - Frontend validation: TypeScript check (`npx tsc --noEmit`) completed with 0 errors, and the production build (`npm run build`) succeeded with Vite packaging in 19.54s.
-- Camera stability, visual clearance, and tween interpolation: elevated camera tracking above shelves, automatic disengagement on manual orbit, AMR and shelf rack visual clearance buffers, and smooth continuous GSAP tweening without backward snapping.
+- Camera follow persists across episode reset, camera reset, and the next mission while the robot remains in the fleet. Orbit and zoom do not clear it. The live backend clock is independent of WebSocket viewers, and visual movement follows committed cardinal segments.
 - The earlier compiled frontend provider exercised trained QMIX across all three fleet sizes over a live WebSocket. The later Chrome verification is described below.
 - The bundled ONNX export matched the QMIX N=5 episode-600 snapshot with a maximum absolute difference of 2.39e-7. The inference endpoint returned the same actions with both model formats for a five-robot request.
 - Short QMIX and IQL CLI smoke runs each performed optimizer updates and recorded a finished MLflow run with duration and episode metrics.

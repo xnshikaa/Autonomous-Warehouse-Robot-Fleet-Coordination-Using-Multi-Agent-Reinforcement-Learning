@@ -131,3 +131,62 @@ try {
     docker rm project25-inference-check
 }
 ```
+
+## Mission walkthrough and camera reset
+
+The 27.65-second supplied recording shows **Rule-Based, five robots**.
+By about 7 seconds, its telemetry shows 5/5 deliveries. The camera zoomed
+and reframed during inspection. The recording lacks per-tick pose and
+contact data, so apparent proximity alone cannot establish a physical collision.
+
+Both **Reset** and **Reset camera** now retain the followed robot when it
+remains in the fleet. **Next mission** also retains it. Select a robot for
+inspection without changing the camera. Use **Follow selected robot** to
+track it, **Stop following** to disengage, and **Reset camera** to return to
+the overview when follow is off. A missing robot or an explicit overhead
+view ends follow. Movement remains backend-authoritative. The renderer uses
+the committed cell segment and tick duration, resynchronizes after a reset
+or missed update, and keeps decorative docks and conveyors outside the grid.
+The server owns a single simulation clock for the application lifetime.
+WebSocket connections relay commands and snapshots, so another viewer or a
+refresh cannot inherit responsibility for advancing the simulation.
+
+### Which run to show
+
+1. For a reliable end-to-end walkthrough, select **1 robot**, leave **Rule-Based**
+   active, select **R01**, optionally select **Follow selected robot**, and
+   press **Start**. The inspector shows the task, pickup and delivery coordinates,
+   pickup step, carrying state, and delivery step. At delivery it records the task
+   as completed, clears cargo, and returns to idle. **Next mission** queues a new task.
+2. To show a genuine trained policy, select **5 robots**, then **QMIX** (episode
+   600) or **IQL** (episode 300), and press **Start**. The dashboard runs the
+   generated task queue for the current episode.
+3. Describe these as selected examples. On 12 distinct five-robot diagnostic
+   scenarios under live movement rules, QMIX delivered 42/60 tasks, IQL 43/60,
+   and Rule-Based 60/60. The archived holdout results use their original
+   conditions and remain unchanged.
+
+The 100-trial single-robot validation recorded 100 deliveries and 100
+returns to idle for Rule-Based, with zero physical collisions, shelf or
+wall contacts, corridor entries, blocked moves, or repeated two-cell
+cycles. Mean delivery time was 31.52 steps. The N=5 QMIX checkpoint
+with four robots held stationary delivered 80/100 in the separate
+single-active-robot probe. That probe does not change NFR-1.
+
+Live WebSocket verification checked 20 ticks for each of the nine
+controller/fleet combinations. It checked distinct occupancy, legal cells,
+cardinal moves, reserved starting cells, and zero physical contacts. The
+three reference scenarios then finished 5/5 with recorded pickup-before-
+delivery steps and zero physical contacts. QMIX ended at step 59, IQL at
+step 43, and Rule-Based at step 58. Chrome separately verified all three
+reset controls while following R01 and captured a mission with pickup at
+step 14 and delivery at step 22. Chrome also completed all three reference
+runs through the dashboard, with no console or uncaught errors. The full
+Python suite passed 291 tests.
+
+[Seeded trial evidence](results/project25_mission/seeded_trials.json) ·
+[Carrying cargo](results/project25_mission/follow-check/02-carrying-cargo.png) ·
+[Delivered and idle](results/project25_mission/follow-check/03-delivered-and-idle.png) ·
+[QMIX completed](results/project25_mission/references/verified-qmix-5-of-5.png) ·
+[IQL completed](results/project25_mission/references/verified-iql-5-of-5.png) ·
+[Rule-Based completed](results/project25_mission/references/verified-rule-based-5-of-5.png)

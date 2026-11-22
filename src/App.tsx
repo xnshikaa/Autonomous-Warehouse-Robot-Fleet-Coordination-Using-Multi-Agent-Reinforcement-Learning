@@ -16,6 +16,7 @@ export default function App() {
   const scene = useRef<WarehouseSceneController | null>(null);
   const [feed, setFeed] = useState<WarehouseFeed>({ state: null, connection: 'connecting', error: null, pending: false });
   const [selected, setSelected] = useState<string | null>(null);
+  const [following, setFollowing] = useState<string | null>(null);
   const [pathMode, setPathMode] = useState<PathVisibilityMode>('ALL');
 
   useEffect(() => {
@@ -32,6 +33,8 @@ export default function App() {
 
   const state = feed.state;
   const selectedRobot = state?.robots.find(robot => robot.id === selected);
+  const selectedTask = state?.tasks.find(task => task.id === selectedRobot?.taskId)
+    ?? state?.tasks.find(task => selectedRobot && task.assignedRobotId === selectedRobot.id);
   const live = feed.connection === 'live';
   const interactive = live && !feed.pending;
   const status = !state ? 'Awaiting telemetry' : state.simulationFinished ? 'Episode complete'
@@ -68,10 +71,10 @@ export default function App() {
           <header className="panel-heading">
             <h2>Warehouse</h2>
             <div className="button-row">
-              <button type="button" onClick={() => scene.current?.cameraManager.setCameraMode('OVERVIEW')}>
+              <button type="button" onClick={() => scene.current?.resetCamera()}>
                 <Camera size={16} /> Reset camera
               </button>
-              <button type="button" onClick={() => scene.current?.cameraManager.setCameraMode('TOP_DOWN')}>Overhead</button>
+              <button type="button" onClick={() => scene.current?.showOverhead()}>Overhead</button>
               <select aria-label="Executed route visibility" value={pathMode} onChange={e => setPathMode(e.target.value as PathVisibilityMode)}>
                 <option value="ALL">All routes</option><option value="SELECTED_ONLY">Selected route</option><option value="OFF">Routes off</option>
               </select>
@@ -79,7 +82,10 @@ export default function App() {
           </header>
           <div className="warehouse-viewport">
             {state && <WarehouseCanvas state={state} pathMode={pathMode} selectedRobot={selectedRobot?.id ?? null}
-              onRobotSelect={setSelected} onControllerReady={controller => { scene.current = controller; }} />}
+              onRobotSelect={setSelected} onControllerReady={controller => {
+                scene.current = controller;
+                if (controller) controller.onFollowChanged = setFollowing;
+              }} />}
             {!live && <div className="stale-overlay" role="status">{state ? 'Connection lost · showing last received frame' : connection + ' · waiting for warehouse state'}</div>}
           </div>
           <div className="warehouse-legend">
@@ -107,10 +113,10 @@ export default function App() {
               </select></label>
             </div>
             <div className="button-row transport">
-              <button disabled={!interactive || state?.simulationFinished} onClick={() => provider.current?.send({ type: state?.simulationPaused ? (state.timestep ? 'resume' : 'start') : 'pause' })}>
+              {!state?.simulationFinished && <button disabled={!interactive} onClick={() => provider.current?.send({ type: state?.simulationPaused ? (state.timestep ? 'resume' : 'start') : 'pause' })}>
                 {state?.simulationPaused ? <Play size={16} /> : <Pause size={16} />}
                 {state?.simulationPaused ? (state.timestep ? 'Resume' : 'Start') : 'Pause'}
-              </button>
+              </button>}
               <button disabled={!interactive} onClick={() => provider.current?.send({ type: 'reset' })}><RotateCcw size={16} /> {state?.missionSeed && state.simulationFinished ? 'Next mission' : 'Reset'}</button>
             </div>
             {state && <div className="model-status" title={checkpoint ?? undefined}>
@@ -124,11 +130,13 @@ export default function App() {
             <h2>Episode telemetry</h2>
             {state && <p className="episode-line">Episode {state.episode} · Step {state.timestep}{!live && ' · Last received'}</p>}
             {state?.missionSeed && <p className="episode-line">Single-robot mission · Seed {state.missionSeed}</p>}
+            {state?.referenceSeed && <p className="episode-line">Reference scenario · Seed {state.referenceSeed}</p>}
             <dl className="kpi-grid">{kpis.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
           </section>
 
           <section className="side-panel">
             <h2>Robot inspection</h2>
+            {following && <p className="episode-line" role="status">Following {following}</p>}
             <select aria-label="Select robot" value={selectedRobot?.id ?? ''} onChange={e => setSelected(e.target.value || null)}>
               <option value="">Select a robot</option>
               {state?.robots.map(robot => <option key={robot.id}>{robot.id}</option>)}
@@ -136,7 +144,11 @@ export default function App() {
             {selectedRobot && <dl className="robot-details">
               <div><dt>Position</dt><dd>{selectedRobot.position.join(', ')}</dd></div>
               <div><dt>State</dt><dd>{selectedRobot.status}</dd></div>
-              <div><dt>Task</dt><dd>{selectedRobot.taskId ?? 'Unassigned'}</dd></div>
+              <div><dt>Task</dt><dd>{selectedTask ? `${selectedTask.id} · ${selectedTask.status.replace(/_/g, ' ').toLowerCase()}` : 'Unassigned'}</dd></div>
+              {selectedTask && <>
+                <div><dt>Pickup cell</dt><dd>{selectedTask.pickupPos.join(', ')}{selectedTask.pickupTimestep != null ? ` · step ${selectedTask.pickupTimestep}` : ''}</dd></div>
+                <div><dt>Delivery cell</dt><dd>{selectedTask.deliveryPos.join(', ')}{selectedTask.completedTimestep != null ? ` · step ${selectedTask.completedTimestep}` : ''}</dd></div>
+              </>}
               <div><dt>Cargo</dt><dd>{selectedRobot.hasCargo ? 'Carrying' : 'Empty'}</dd></div>
               <div><dt>Target</dt><dd>{selectedRobot.targetPosition?.join(', ') ?? '—'}</dd></div>
               <div><dt>Last successful move</dt><dd>{selectedRobot.lastSuccessfulMove ? `${selectedRobot.lastSuccessfulMove.from.join(', ')} → ${selectedRobot.lastSuccessfulMove.to.join(', ')}` : '—'}</dd></div>
