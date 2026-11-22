@@ -1,10 +1,12 @@
 import * as THREE from 'three';
+import { disposeSceneObjects } from './disposeSceneObjects';
 import { TaskState } from '../types/warehouse';
 import { gridToWorld } from './gridConfig';
 
 interface TaskBeaconGroup {
   group: THREE.Group;
   pickupRing: THREE.Mesh;
+  pickupLabel: THREE.Mesh;
   deliveryRing: THREE.Mesh;
   pickupMat: THREE.MeshBasicMaterial;
   deliveryMat: THREE.MeshBasicMaterial;
@@ -40,6 +42,9 @@ export class TaskSystem {
         this.group.add(beaconGroup.group);
       }
 
+      beaconGroup.pickupRing.visible = task.status !== 'IN_PROGRESS';
+      beaconGroup.pickupLabel.visible = task.status !== 'IN_PROGRESS';
+
       // Update positions
       const pPos = gridToWorld(task.pickupPos[0], task.pickupPos[1]);
       const dPos = gridToWorld(task.deliveryPos[0], task.deliveryPos[1]);
@@ -52,6 +57,7 @@ export class TaskSystem {
     this.taskBeaconMap.forEach((bg, id) => {
       if (!activeIds.has(id)) {
         this.group.remove(bg.group);
+        disposeSceneObjects(bg.group);
         this.taskBeaconMap.delete(id);
       }
     });
@@ -117,6 +123,7 @@ export class TaskSystem {
     return {
       group: mainGroup,
       pickupRing,
+      pickupLabel,
       deliveryRing,
       pickupMat,
       deliveryMat

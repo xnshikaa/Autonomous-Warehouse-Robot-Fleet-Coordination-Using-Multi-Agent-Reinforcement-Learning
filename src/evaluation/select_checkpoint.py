@@ -23,7 +23,7 @@ def _checkpoint_hashes(algorithm: str, candidate: Path) -> dict[str, str]:
     if not files:
         raise FileNotFoundError(f"No {algorithm} checkpoint files found at {candidate}")
     return {
-        str(path): hashlib.sha256(path.read_bytes()).hexdigest()
+        path.as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in files
     }
 
@@ -87,7 +87,7 @@ def select_checkpoint(
             if per_record["average_completion_time_steps"] is not None:
                 delivery_times.append(per_record["average_completion_time_steps"])
         results.append({
-            "candidate": str(candidate),
+            "candidate": candidate.as_posix(),
             "checkpoint_sha256": _checkpoint_hashes(algorithm, candidate),
             "completion_rate": row["completion_rate"],
             "completion_rate_95ci": bootstrap_confidence_interval(completion, seed=seed),

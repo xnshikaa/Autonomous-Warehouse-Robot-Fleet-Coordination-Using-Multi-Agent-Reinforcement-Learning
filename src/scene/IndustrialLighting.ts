@@ -12,11 +12,11 @@ export class IndustrialLighting {
     this.lightGroup.name = 'IndustrialLighting';
 
     // 1. Soft Ambient fill (Dark slate base)
-    this.ambientLight = new THREE.AmbientLight(0x1e293b, 1.2);
+    this.ambientLight = new THREE.AmbientLight(0xd6e5f0, 1.0);
     this.lightGroup.add(this.ambientLight);
 
     // 2. Hemispheric light (Industrial cyan sky fill, ground bounce dark grey)
-    this.hemiLight = new THREE.HemisphereLight(0x38bdf8, 0x0f172a, 0.8);
+    this.hemiLight = new THREE.HemisphereLight(0xe0f2fe, 0x839093, 0.9);
     this.hemiLight.position.set(0, 40, 0);
     this.lightGroup.add(this.hemiLight);
 
@@ -24,8 +24,8 @@ export class IndustrialLighting {
     this.mainSunLight = new THREE.DirectionalLight(0xfffbeb, 1.8);
     this.mainSunLight.position.set(WAREHOUSE_WIDTH * 0.6, 35, WAREHOUSE_WIDTH * 0.6);
     this.mainSunLight.castShadow = true;
-    this.mainSunLight.shadow.mapSize.width = 2048;
-    this.mainSunLight.shadow.mapSize.height = 2048;
+    this.mainSunLight.shadow.mapSize.width = 1024;
+    this.mainSunLight.shadow.mapSize.height = 1024;
     this.mainSunLight.shadow.camera.near = 5;
     this.mainSunLight.shadow.camera.far = 80;
     
@@ -59,19 +59,6 @@ export class IndustrialLighting {
       bayLight.position.set(x, y, z);
       this.lightGroup.add(bayLight);
 
-      // Visual light fixture housing mesh
-      const fixtureMesh = new THREE.Mesh(
-        new THREE.CylinderGeometry(0.6, 0.9, 0.4, 16),
-        new THREE.MeshStandardMaterial({
-          color: 0x334155,
-          metalness: 0.8,
-          roughness: 0.2,
-          emissive: 0x38bdf8,
-          emissiveIntensity: 0.3
-        })
-      );
-      fixtureMesh.position.set(x, y, z);
-      this.lightGroup.add(fixtureMesh);
     });
   }
 }

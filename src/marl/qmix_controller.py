@@ -273,10 +273,15 @@ class QMIXController:
         }
 
     @property
+    def num_agents(self) -> int:
+        return self.learner.num_agents
+
+    @property
     def telemetry(self) -> dict[str, object]:
         return {
             "source": "QMIX",
             "activeFleetSize": self.learner.num_agents,
+            "fleetSize": self.learner.num_agents,
             "checkpointLoaded": self.checkpoint_loaded,
             "trained": self.checkpoint_loaded,
             "checkpointPath": self.checkpoint_path,

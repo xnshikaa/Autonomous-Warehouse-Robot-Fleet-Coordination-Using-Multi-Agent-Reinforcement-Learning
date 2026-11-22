@@ -1,0 +1,94 @@
+[
+  {
+    "algorithm": "QMIX",
+    "fleet_size": 20,
+    "checkpoint": "artifacts/training/qmix_n20_remediation_control/qmix.pt",
+    "observation_dim": 456,
+    "state_dim": 220,
+    "action_dim": 4,
+    "checkpoint_schema": 2,
+    "training_seed": 252020,
+    "episodes": 40,
+    "environment_steps": 4000,
+    "optimizer_updates": [
+      3969
+    ],
+    "inference_verified": true,
+    "training_duration_seconds": 193.03392439999152,
+    "mlflow_run_id": "6fd0614e4c37432eae027b1db73e368d",
+    "history": "artifacts/training/qmix_n20_remediation_control/training_history.json",
+    "history_sha256": "6ab321664a110695068d745faa2d6910d020c4c22c6ba543245b1099e1599d36",
+    "sha256": {
+      "artifacts/training/qmix_n20_remediation_control/qmix.pt": "0c0e3ea22bb1c602b87dd02c52a457b49223376579631648c0112f4de974379f"
+    }
+  },
+  {
+    "algorithm": "QMIX",
+    "fleet_size": 20,
+    "checkpoint": "artifacts/training/qmix_n20_remediation_lower_collision/qmix.pt",
+    "observation_dim": 456,
+    "state_dim": 220,
+    "action_dim": 4,
+    "checkpoint_schema": 2,
+    "training_seed": 252020,
+    "episodes": 40,
+    "environment_steps": 4000,
+    "optimizer_updates": [
+      3969
+    ],
+    "inference_verified": true,
+    "training_duration_seconds": 193.6284279000247,
+    "mlflow_run_id": "9b1e427a155145ba88afb727b7009fb5",
+    "history": "artifacts/training/qmix_n20_remediation_lower_collision/training_history.json",
+    "history_sha256": "543e399682dbf5c9184203f3528584008911bb3c771b676be23c6ec9197c36c8",
+    "sha256": {
+      "artifacts/training/qmix_n20_remediation_lower_collision/qmix.pt": "96d1f35edf55daa6fe9e2a540586f8dc57f35d0e10e85e90a953e3c3a969206b"
+    }
+  },
+  {
+    "algorithm": "QMIX",
+    "fleet_size": 5,
+    "checkpoint": "artifacts/training/qmix_n5_remediation_low_lr/qmix.pt",
+    "observation_dim": 456,
+    "state_dim": 55,
+    "action_dim": 4,
+    "checkpoint_schema": 2,
+    "training_seed": 253505,
+    "episodes": 40,
+    "environment_steps": 3341,
+    "optimizer_updates": [
+      3310
+    ],
+    "inference_verified": true,
+    "training_duration_seconds": 85.28102719999151,
+    "mlflow_run_id": "3c34dbe51255429ca17adbd3ae94e7b2",
+    "history": "artifacts/training/qmix_n5_remediation_low_lr/training_history.json",
+    "history_sha256": "97c9c8a90bcd76c46bd29b36b66e7683f70d4872327c0b6968554fccfd48e133",
+    "sha256": {
+      "artifacts/training/qmix_n5_remediation_low_lr/qmix.pt": "3ed1e6ef0bca59b99519200c90cf2b470d6cecf6b1fe25076f4d7f5b987a07ad"
+    }
+  },
+  {
+    "algorithm": "QMIX",
+    "fleet_size": 5,
+    "checkpoint": "artifacts/training/qmix_n5_remediation_warm/qmix.pt",
+    "observation_dim": 456,
+    "state_dim": 55,
+    "action_dim": 4,
+    "checkpoint_schema": 2,
+    "training_seed": 251605,
+    "episodes": 100,
+    "environment_steps": 7836,
+    "optimizer_updates": [
+      7805
+    ],
+    "inference_verified": true,
+    "training_duration_seconds": 153.85422680003103,
+    "mlflow_run_id": "85b173b15fc94640a5cc6900cd11ae8c",
+    "history": "artifacts/training/qmix_n5_remediation_warm/training_history.json",
+    "history_sha256": "fed219bcc9fb6e74599aa2c01d4541ef1cd2d540c921ffcb7f9f10235adaffb4",
+    "sha256": {
+      "artifacts/training/qmix_n5_remediation_warm/qmix.pt": "c7621e07695216f077717d9de6b2c8c9d40770c241901f4fa98a2159c50de75d"
+    }
+  }
+]

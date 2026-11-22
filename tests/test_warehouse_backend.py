@@ -118,7 +118,7 @@ def test_pause_resume_reset_and_fleet_size_commands_return_current_state():
 
 def test_default_backend_uses_moving_demo_controller_without_checkpoint():
     app = create_app()
-    assert app.state.policy_source == "DEMO"
+    assert app.state.policy_source == "Rule-Based"
 
     environment = WarehouseEnvironment(load_layout_tasks=True)
     environment.reset()
@@ -168,21 +168,21 @@ def test_default_state_snapshot_is_serializable_and_keeps_unavailable_values_nul
 
 
 def test_explicit_qmix_requires_checkpoint():
-    with pytest.raises(ValueError, match="requires a compatible QMIX_CHECKPOINT"):
+    with pytest.raises(ValueError, match="No QMIX checkpoint configured"):
         create_app(policy_source="qmix")
 
 
 def test_auto_policy_uses_demo_when_checkpoint_is_missing():
     app = create_app(policy_source="auto", checkpoint_path="missing-qmix-checkpoint.pt")
 
-    assert app.state.policy_source == "DEMO"
+    assert app.state.policy_source == "Rule-Based"
 
 
 def test_auto_policy_uses_demo_when_checkpoint_is_incompatible():
     with patch("src.api.warehouse_backend.QMIXController", side_effect=ValueError("incompatible input shape")):
         app = create_app(policy_source="auto", checkpoint_path="incompatible.pt")
 
-    assert app.state.policy_source == "DEMO"
+    assert app.state.policy_source == "Rule-Based"
 
 
 def test_parse_command_returns_validated_data():

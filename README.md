@@ -3,6 +3,10 @@
 
 > **Project 25** — Cooperative MARL for autonomous warehouse AMR fleets (N=5, 10, 20 robots).
 
+[Project verification](PROJECT_COMPLETION_REPORT.md) ·
+[Checkpoint inventory](CHECKPOINT_INVENTORY.md) ·
+[Training and reproduction](TRAINING_AND_REPRODUCTION_GUIDE.md)
+
 ---
 
 ## 🏗 Architecture Overview
@@ -54,29 +58,36 @@ npm ci
 
 ### 2. Train Models
 
+To reproduce training, use fresh output directories. All six recovered runs are
+already available in `artifacts/training`. See the training guide for both
+algorithms at all fleet sizes and the validation-based evaluation workflow.
+
 ```powershell
 # QMIX N=5 (full training — ~1000 episodes)
 python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 5 `
     --episodes 1000 --max-steps 100 --seed 42 `
-    --checkpoint-interval 100 --output artifacts/training/qmix_n5_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_qmix_n5
 
 # IQL N=5
 python -m src.marl.train_p2_policy --algorithm IQL --fleet-size 5 `
     --episodes 500 --max-steps 100 --seed 42 `
-    --checkpoint-interval 100 --output artifacts/training/iql_n5_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_iql_n5
 
 # QMIX N=10
 python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 10 `
     --episodes 1000 --max-steps 100 --seed 43 `
-    --checkpoint-interval 100 --output artifacts/training/qmix_n10_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_qmix_n10
 
 # QMIX N=20
 python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 20 `
     --episodes 1000 --max-steps 100 --seed 44 `
-    --checkpoint-interval 100 --output artifacts/training/qmix_n20_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_qmix_n20
 ```
 
 ### 3. Run Evaluation Benchmark
+
+The command below is a fixed-seed check of final training weights. See the
+training guide for reproducing the evaluation of validation-selected snapshots.
 
 ```powershell
 python -m src.evaluation.run_benchmark `
@@ -95,26 +106,29 @@ python -m src.evaluation.run_benchmark `
 ### 4. ONNX Export
 
 ```powershell
-python -c "from src.marl.export_onnx import export_agent_to_onnx, verify_onnx_parity; export_agent_to_onnx('artifacts/training/qmix_n5_v1/qmix.pt', 'artifacts/onnx/qmix_agent_n5.onnx'); verify_onnx_parity('artifacts/training/qmix_n5_v1/qmix.pt', 'artifacts/onnx/qmix_agent_n5.onnx')"
+python -c "from src.marl.export_onnx import verify_onnx_parity; print(verify_onnx_parity('artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt', 'artifacts/onnx/qmix_agent_n5.onnx'))"
 ```
 
 ### 5. Start Backend + Frontend
 
 ```powershell
-# Backend (WebSocket simulation server)
-python -m uvicorn src.api.warehouse_backend:create_app --factory --port 8000
-
-# Frontend (in a separate terminal)
-npm run dev
+./Start-Warehouse.ps1
 ```
+
+Open [the warehouse control room](http://127.0.0.1:5174/). The startup script
+validates the selected checkpoint hashes, starts both services, and prints
+the process IDs to stop. Choose QMIX, IQL, or Rule-Based and a fleet of 5,
+10, or 20 robots, then press **Start**. See the
+[application integration report](FRONTEND_BACKEND_INTEGRATION_REPORT.md)
+for deployment and verification details.
 
 ---
 
 ## 🧪 Testing
 
 ```powershell
-# Full test suite (Windows)
-python -m pytest tests/ --ignore=tests/test_optuna_study.py --ignore=tests/test_monitoring.py -q
+# Full Python test suite
+python -m pytest tests/ -q
 
 # P6 Checkpoint compatibility tests
 python -m pytest tests/test_p6_checkpoint_compatibility.py -v
@@ -123,7 +137,7 @@ python -m pytest tests/test_p6_checkpoint_compatibility.py -v
 python -m pytest tests/test_inference_service.py -v
 
 # Frontend tests
-npm run test:frontend -- --run
+npm run test:frontend
 
 # Frontend production build
 npm run build
@@ -198,10 +212,12 @@ validate_checkpoint_architecture(checkpoint_path, expected_num_agents=5)
 
 | NFR | Requirement | Status |
 |---|---|---|
-| NFR-1 | QMIX ≥80% completion at N=5 (20 episodes) | 🔄 Training |
-| NFR-3 | Zero corridor intrusions (20 safety episodes) | ✅ Safety layer enforced |
-| NFR-4 | QMIX collision rate ≤50% of IQL at N=10 | 🔄 Training |
-| NFR-5 | Bootstrap 95% CI for all algo × fleet combinations | ✅ Evaluation pipeline ready |
+| NFR-1 | QMIX ≥80% completion at N=5 (20 episodes) | 78%, target missed |
+| NFR-3 | Zero corridor intrusions (20 safety episodes) | 0 intrusions, passed in simulation |
+| NFR-4 | QMIX collision rate ≤50% of IQL at N=10 | Inconclusive, zero contacts for both |
+| NFR-5 | Bootstrap 95% CI for all algorithm × fleet combinations | Passed in all nine configurations |
+
+See the [final evaluation report](FINAL_EVALUATION_REPORT.md) for the full results.
 
 ---
 

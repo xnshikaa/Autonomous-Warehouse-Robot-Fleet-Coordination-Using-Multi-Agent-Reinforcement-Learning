@@ -1,0 +1,43 @@
+{
+  "schema_version": 1,
+  "algorithm": "QMIX",
+  "fleet_size": 5,
+  "episodes": 40,
+  "episodes_completed_total": 40,
+  "training_duration_seconds": 85.28102719999151,
+  "max_steps": 100,
+  "seed": 253505,
+  "learning_rate": 2e-05,
+  "target_update_interval": 200,
+  "checkpoint_interval": 10,
+  "checkpoint_selection": "final; select among snapshots using validation only",
+  "reward_overrides": {},
+  "config": {
+    "num_agents": 5,
+    "observation_dim": 456,
+    "action_dim": 4,
+    "state_dim": 55,
+    "learning_rate": 2e-05,
+    "gamma": 0.99,
+    "batch_size": 32,
+    "target_update_interval": 200,
+    "reward_overrides": {}
+  },
+  "checkpoint": "qmix.pt",
+  "history": "training_history.json",
+  "warm_started_from": "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+  "warm_started_from_sha256": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8",
+  "epsilon_start": 0.12,
+  "mlflow_run_id": "3c34dbe51255429ca17adbd3ae94e7b2",
+  "sha256": {
+    "qmix.pt": "3ed1e6ef0bca59b99519200c90cf2b470d6cecf6b1fe25076f4d7f5b987a07ad",
+    "snapshots/episode_00010/checkpoint_state.pt": "3fe45ff35c4b3b12554fac1f38eeeacfdffca9fb7ae3ace9dba70faf7a003c96",
+    "snapshots/episode_00010/training_metrics.json": "c29882a7f4e83f0d0575c82ebff1b2c7e902897f72d0c4a9e0864c755bf152b2",
+    "snapshots/episode_00020/checkpoint_state.pt": "c9169f77c163d23622642a8ff0eca81a8baadd16a9609f5d246bed3c91ad5e6e",
+    "snapshots/episode_00020/training_metrics.json": "572fad2eb963a83c4d5c906a5358ae33cc8b3eace9038de4108f834c6bc94ff1",
+    "snapshots/episode_00030/checkpoint_state.pt": "86215a5578489fe949876f274631e6a6ae8fa80989169f98fe1ee719dd78eeac",
+    "snapshots/episode_00030/training_metrics.json": "f5797c5b43bafa2e767f27b6b1c3f29225745a6e09bd13e869170c41677f0324",
+    "snapshots/episode_00040/checkpoint_state.pt": "c399591501e3c74d8ab46f48bed91a3e33e562bad11ccd704eb224166d3c3a92",
+    "snapshots/episode_00040/training_metrics.json": "c90f331e58b29250bea52260f229ab2fe4b11660de6bec7f31ba89b52544eef9"
+  }
+}

@@ -13,7 +13,7 @@
 
 ## Reproducing Training Runs
 
-All training uses deterministic seeds. Each run is fully reproducible by re-running the same command.
+The commands reproduce the run settings with fixed seeds and fresh output directories. Use the same runtime and CPU setup when comparing results. The CLI records episode metrics, duration, run configuration and artifact manifests in MLflow.
 
 ### QMIX Training
 
@@ -21,17 +21,17 @@ All training uses deterministic seeds. Each run is fully reproducible by re-runn
 # N=5 (seed 42)
 python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 5 `
     --episodes 1000 --max-steps 100 --seed 42 `
-    --checkpoint-interval 100 --output artifacts/training/qmix_n5_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_qmix_n5
 
 # N=10 (seed 43)
 python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 10 `
     --episodes 1000 --max-steps 100 --seed 43 `
-    --checkpoint-interval 100 --output artifacts/training/qmix_n10_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_qmix_n10
 
 # N=20 (seed 44)
 python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 20 `
     --episodes 1000 --max-steps 100 --seed 44 `
-    --checkpoint-interval 100 --output artifacts/training/qmix_n20_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_qmix_n20
 ```
 
 ### IQL Training
@@ -40,17 +40,17 @@ python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 20 `
 # N=5 (seed 42)
 python -m src.marl.train_p2_policy --algorithm IQL --fleet-size 5 `
     --episodes 500 --max-steps 100 --seed 42 `
-    --checkpoint-interval 100 --output artifacts/training/iql_n5_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_iql_n5
 
 # N=10 (seed 43)
 python -m src.marl.train_p2_policy --algorithm IQL --fleet-size 10 `
     --episodes 500 --max-steps 100 --seed 43 `
-    --checkpoint-interval 100 --output artifacts/training/iql_n10_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_iql_n10
 
 # N=20 (seed 44)
 python -m src.marl.train_p2_policy --algorithm IQL --fleet-size 20 `
     --episodes 500 --max-steps 100 --seed 44 `
-    --checkpoint-interval 100 --output artifacts/training/iql_n20_v1
+    --checkpoint-interval 100 --output artifacts/training/repro_iql_n20
 ```
 
 ---
@@ -93,12 +93,12 @@ The map-aware observation encoder produces a **456-dimensional** observation vec
 
 | Component | Dims | Description |
 |---|---|---|
-| Local occupancy grid (5×9) | 45 | Obstacle/robot presence in local patch |
-| BFS path costs (9 directions) | 9 | Normalized path costs to goals |
-| Robot own state | 6 | Position, cargo, battery, task ID |
-| Task features | 8 | Pickup/delivery positions, assigned status |
-| Team features | 20 | Relative positions of other robots |
-| Layout features | 368 | Grid-level layout encoding |
+| Local occupancy grid | 45 | 3×3 neighborhood with five occupancy categories |
+| Task geometry | 3 | Normalized row and column offsets and distance |
+| Task and cargo flags | 2 | Task assigned and carrying item |
+| Robot position | 2 | Normalized absolute row and column |
+| Layout features | 400 | Static 20×20 grid |
+| BFS path costs | 4 | Remaining path distance after each movement action |
 
 **Total: 456 dimensions**
 
@@ -124,20 +124,46 @@ print(result["best_params"])
 
 ## Evaluation Pipeline
 
-### Full benchmark (requires trained checkpoints)
+### Verify recovered checkpoints and rerun validation
 
 ```powershell
-python -m src.evaluation.run_benchmark `
-    --algorithms QMIX IQL Rule-Based `
-    --fleet-sizes 5 10 20 `
-    --episodes 20 --max-steps 100 --seed 999 `
-    --qmix-checkpoint 5=artifacts/training/qmix_n5_v1/qmix.pt `
-    --qmix-checkpoint 10=artifacts/training/qmix_n10_v1/qmix.pt `
-    --qmix-checkpoint 20=artifacts/training/qmix_n20_v1/qmix.pt `
-    --iql-checkpoint 5=artifacts/training/iql_n5_v1/agents `
-    --iql-checkpoint 10=artifacts/training/iql_n10_v1/agents `
-    --iql-checkpoint 20=artifacts/training/iql_n20_v1/agents `
-    --output results/benchmark_v1
+$env:OMP_NUM_THREADS = '1'
+$env:MKL_NUM_THREADS = '1'
+python -m python_infra.generate_checkpoint_inventory
+foreach ($n in 5,10,20) {
+    foreach ($algo in 'QMIX','IQL') {
+        $name = $algo.ToLower() + "_n${n}"
+        python -m src.evaluation.select_checkpoint --algorithm $algo --fleet-size $n `
+            --candidate "artifacts/training/${name}_v1/snapshots" `
+            --episodes 20 --max-steps 100 --seed 20261120 `
+            --output "results/reproduced_validation/$name.json"
+        if ($LASTEXITCODE -ne 0) { throw "Validation failed for $name" }
+    }
+}
+```
+
+### Replay the frozen evaluation
+
+The supplied scenario manifest was generated after training and before this evaluation.
+Its seed and task queues were excluded from training and checkpoint ranking. Use the
+same file to preserve the exact evaluation tasks and its manifest ID.
+
+```powershell
+$flags = @()
+foreach ($n in 5,10,20) {
+    foreach ($algo in 'qmix','iql') {
+        $selection = Get-Content -Raw "results/project25_validation/${algo}_n${n}.json" | ConvertFrom-Json
+        foreach ($entry in $selection.results[0].checkpoint_sha256.PSObject.Properties) {
+            if ((Get-FileHash -Algorithm SHA256 -LiteralPath $entry.Name).Hash -ne $entry.Value) {
+                throw "Checkpoint hash mismatch: $($entry.Name)"
+            }
+        }
+        $flags += "--${algo}-checkpoint", "$n=$($selection.selected_checkpoint)"
+    }
+}
+python -m src.evaluation.run_benchmark @flags `
+    --scenario-manifest results/project25_holdout/scenario_manifest.json `
+    --output results/reproduced_holdout
 ```
 
 ### Safety gate (rule-based, 20 episodes)
@@ -168,12 +194,12 @@ mlflow ui --backend-store-uri sqlite:///mlflow.db
 from src.marl.export_onnx import export_agent_to_onnx, verify_onnx_parity
 
 export_agent_to_onnx(
-    "artifacts/training/qmix_n5_v1/qmix.pt",
-    "artifacts/onnx/qmix_agent_n5.onnx"
+    "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+    "artifacts/onnx/reproduced_qmix_agent_n5.onnx"
 )
 verify_onnx_parity(
-    "artifacts/training/qmix_n5_v1/qmix.pt",
-    "artifacts/onnx/qmix_agent_n5.onnx"
+    "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+    "artifacts/onnx/reproduced_qmix_agent_n5.onnx"
 )
 ```
 
@@ -213,3 +239,74 @@ report = tracker.stop_tracking(total_steps=50000, completed_deliveries=400, idle
 2. **PyBullet** — unavailable without MSVC 14+; software physics fallback used throughout
 3. **Training time** — 1000 episodes on CPU takes ~30-60 minutes per fleet size
 4. **Legacy checkpoints** — `artifacts/checkpoints/qmix/3f1553055ba04a13bf297b2d3b97e746/` uses 50-dim obs and is permanently incompatible with the current 456-dim architecture
+
+## Remediation experiments
+
+Use fresh artifact and result directories. The commands below use the captured
+evidence directories as inputs and write reproduction output elsewhere.
+
+```powershell
+$env:OMP_NUM_THREADS = '1'
+$env:MKL_NUM_THREADS = '1'
+$base5 = 'artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt'
+$base20 = 'artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt'
+
+python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 5 --seed 251605 `
+    --episodes 100 --max-steps 100 --learning-rate 0.0001 --epsilon-start 0.2 `
+    --checkpoint-interval 25 --warm-start-from $base5 `
+    --output artifacts/training/reproduced_n5_remediation
+
+foreach ($arm in @(@{name='control'; penalty=-10}, @{name='lower_collision'; penalty=-1})) {
+    python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 20 --seed 252020 `
+        --episodes 40 --max-steps 100 --learning-rate 0.0001 --epsilon-start 0.3 `
+        --collision-penalty $arm.penalty --checkpoint-interval 20 --warm-start-from $base20 `
+        --output "artifacts/training/reproduced_n20_$($arm.name)"
+}
+
+foreach ($run in @(
+    @{label='recovered'; dir='qmix_n5_v1'},
+    @{label='smoke'; dir='qmix_n5_smoke'},
+    @{label='warm'; dir='qmix_n5_remediation_warm'}
+)) {
+    python -m src.evaluation.select_checkpoint --algorithm QMIX --fleet-size 5 `
+        --candidate "artifacts/training/$($run.dir)/snapshots" --episodes 20 --max-steps 100 `
+        --seed 251705 --output "results/reproduced_remediation/n5_$($run.label)_validation.json"
+}
+
+python -m src.evaluation.cycle_escape_validation `
+    --output results/reproduced_remediation/n20_cycle_escape_validation.json
+
+python -m src.evaluation.select_checkpoint --algorithm QMIX --fleet-size 20 `
+    --candidate $base20 `
+    --candidate artifacts/training/qmix_n20_remediation_control/snapshots `
+    --candidate artifacts/training/qmix_n20_remediation_lower_collision/snapshots `
+    --episodes 20 --max-steps 100 --seed 252120 `
+    --output results/reproduced_remediation/n20_reward_validation.json
+```
+
+Warm start imports only online network weights, synchronizes target networks,
+and starts with a fresh optimizer, replay buffer, exploration schedule and RNG.
+Exact resume requires the full replay-buffer checkpoint. The initial N=5
+resume attempt stopped before training because the episode-600 snapshot
+omits replay. Its failed MLflow entry records that attempt. The completed
+N=5 run uses the explicit warm-start command above.
+The [deployment and browser procedures](FRONTEND_BACKEND_INTEGRATION_REPORT.md)
+cover verification on a machine with Docker and a visual desktop.
+
+### Application release validation
+
+```powershell
+$env:OMP_NUM_THREADS = '1'
+$env:MKL_NUM_THREADS = '1'
+$base = 'artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt'
+$run = 'artifacts/training/reproduced_n5_low_lr'
+python -m src.marl.train_p2_policy --algorithm QMIX --fleet-size 5 --seed 253505 `
+    --episodes 40 --max-steps 100 --learning-rate 0.00002 --epsilon-start 0.12 `
+    --checkpoint-interval 10 --warm-start-from $base --output $run
+python -m src.evaluation.select_checkpoint --algorithm QMIX --fleet-size 5 `
+    --candidate $base --candidate "$run/snapshots" --episodes 20 --max-steps 100 `
+    --seed 253605 --output results/reproduced_remediation/n5_low_lr_validation.json
+python -m src.evaluation.cycle_escape_validation --seed 253620 --compare-contention `
+    --output results/reproduced_remediation/n20_contention_validation.json
+./Start-Warehouse.ps1
+```

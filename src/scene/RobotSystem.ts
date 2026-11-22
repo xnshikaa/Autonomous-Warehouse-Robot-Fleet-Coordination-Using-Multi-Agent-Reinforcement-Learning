@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { disposeSceneObjects } from './disposeSceneObjects';
 import gsap from 'gsap';
 import { AMRModel } from './AMRModel';
 import { RobotState } from '../types/warehouse';
@@ -115,6 +116,7 @@ export class RobotSystem {
         if (anim?.tweenRot) anim.tweenRot.kill();
         
         this.group.remove(amr.mesh);
+        disposeSceneObjects(amr.mesh);
         this.robotMap.delete(id);
         this.animMap.delete(id);
       }

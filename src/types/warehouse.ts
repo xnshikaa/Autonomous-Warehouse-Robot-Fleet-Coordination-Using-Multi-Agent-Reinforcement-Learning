@@ -11,9 +11,9 @@
  * NOT a 5th neural-network policy action.
  */
 
-export type AlgorithmType = 'QMIX' | 'IQL' | 'GREEDY_ASTAR' | 'DEMO';
+export type AlgorithmType = 'QMIX' | 'IQL' | 'Rule-Based' | 'GREEDY_ASTAR' | 'DEMO';
 
-export type ControllerType = 'TEST_CONTROLLER' | 'DEMO_CONTROLLER' | 'RL_BACKEND';
+export type ControllerType = 'TEST_CONTROLLER' | 'DEMO_CONTROLLER' | 'RL_BACKEND' | 'RULE_BASED';
 
 export enum Action {
   UP = 0,
@@ -61,7 +61,7 @@ export type CameraMode =
 export interface RobotState {
   id: string; // e.g. "R01", "R02"
   position: [number, number]; // [gridX, gridY]
-  targetPosition?: [number, number]; // [gridX, gridY]
+  targetPosition?: [number, number] | null; // [gridX, gridY]
   rotation: number | null; // angle in radians; null when not measured
   status: RobotStatus;
   taskId?: string;
@@ -154,10 +154,15 @@ export interface WarehouseMetrics {
   episode: number;
   reward?: number | null;
   fps: number | null;
+  completionRate?: number | null;
+  averageDeliveryTimeSteps?: number | null;
+  throughputPer100Steps?: number | null;
+  safetyConflictEvents?: number;
+  idleRobots?: number;
 }
 
 export interface PolicyTelemetry {
-  source: 'QMIX' | 'DEMO';
+  source: 'QMIX' | 'IQL' | 'Rule-Based' | 'DEMO';
   checkpointLoaded: boolean;
   trained: boolean;
   checkpointPath?: string | null;
@@ -176,9 +181,12 @@ export interface WarehouseState {
   episode: number;
   /** Present for backend state; local providers may omit it. */
   simulationPaused?: boolean;
+  simulationFinished?: boolean;
+  startupWarning?: string | null;
   algorithm: AlgorithmType;
   controllerType: ControllerType;
   config: WarehouseConfig;
+  layout?: { human_corridors: { cells: [number, number][] } };
   robots: RobotState[];
   shelves: ShelfState[];
   tasks: TaskState[];

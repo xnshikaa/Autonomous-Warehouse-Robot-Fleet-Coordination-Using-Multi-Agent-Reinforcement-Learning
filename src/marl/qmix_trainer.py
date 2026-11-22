@@ -464,7 +464,7 @@ class QMIXTrainer:
 
         return history
 
-    def load_checkpoint(self, checkpoint_target: str | int) -> Dict[str, Any]:
+    def load_checkpoint(self, checkpoint_target: str | int, *, warm_start: bool = False) -> Dict[str, Any]:
         """
         Load training checkpoint state and restore QMIX learner components.
         """
@@ -498,6 +498,12 @@ class QMIXTrainer:
             expected_state_dim=self.state_dim,
             require_mixer=True,
         )
+
+        if warm_start:
+            self.learner.agent_network.load_state_dict(payload["agent_network"], strict=True)
+            self.learner.mixer.load_state_dict(payload["mixer"], strict=True)
+            self.learner.update_target_networks()
+            return checkpoint
 
         config = payload.get("config") or {}
         expected = {

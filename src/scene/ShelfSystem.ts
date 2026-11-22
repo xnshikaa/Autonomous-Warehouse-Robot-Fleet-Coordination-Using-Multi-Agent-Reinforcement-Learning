@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { disposeSceneObjects } from './disposeSceneObjects';
 import { GRID_SIZE, CELL_SIZE, gridToWorld } from './gridConfig';
 import { ShelfState } from '../types/warehouse';
 
@@ -14,9 +15,6 @@ export class ShelfSystem {
     this.group = new THREE.Group();
     this.group.name = 'ShelfSystem';
 
-    this.generateLayoutData();
-    this.buildInstancedRacks();
-    this.createShelfSignage();
 
     scene.add(this.group);
   }
@@ -25,29 +23,15 @@ export class ShelfSystem {
    * Defines logical shelf layout across 20x20 grid.
    * Shelves are grouped in double-row blocks creating 4 primary aisles & 1 cross-aisle.
    */
-  private generateLayoutData(): void {
-    // Columns where shelf racks are placed (leaving columns 0, 4, 9, 14, 19 for aisles/corridors)
-    const rackColumns = [1, 2, 5, 6, 11, 12, 16, 17];
-    // Rows where shelf racks are placed (split into Top & Bottom blocks by Cross-Aisle at rows 9-10)
-    const rackRows = [2, 3, 4, 5, 6, 7, 12, 13, 14, 15, 16, 17];
-
-    let shelfCount = 1;
-    rackColumns.forEach(col => {
-      rackRows.forEach(row => {
-        const shelfId = `S${shelfCount < 10 ? '0' : ''}${shelfCount}`;
-        const aisleId = `AISLE 0${Math.floor(col / 4) + 1}`;
-
-        this.shelves.push({
-          id: shelfId,
-          gridPos: [col, row],
-          levels: 3,
-          aisleId
-        });
-        shelfCount++;
-      });
-    });
-
-    this.totalRacks = this.shelves.length;
+  public updateLayout(shelves: ShelfState[]): void {
+    disposeSceneObjects(this.group);
+    this.group.clear();
+    this.shelves = shelves;
+    this.totalRacks = shelves.length;
+    if (this.totalRacks) {
+      this.buildInstancedRacks();
+      this.createShelfSignage();
+    }
   }
 
   private buildInstancedRacks(): void {
@@ -134,6 +118,7 @@ export class ShelfSystem {
 
     tierInstancedMesh.instanceMatrix.needsUpdate = true;
     if (this.crateInstancedMesh.instanceColor) this.crateInstancedMesh.instanceColor.needsUpdate = true;
+    this.crateInstancedMesh.count = crateIdx;
     this.crateInstancedMesh.instanceMatrix.needsUpdate = true;
 
     this.group.add(tierInstancedMesh);

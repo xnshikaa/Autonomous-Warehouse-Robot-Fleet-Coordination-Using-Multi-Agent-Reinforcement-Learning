@@ -1,0 +1,174 @@
+{
+  "episodes": 20,
+  "fleet_size": 5,
+  "max_steps": 200,
+  "policy": "selected robot commands direct corridor entry; peers use legal actions",
+  "layout_id": "standard",
+  "attempted_corridor_entries": 20,
+  "robots_with_blocked_entries": 20,
+  "intrusions": 0,
+  "safety_overrides": 68,
+  "episode_results": [
+    {
+      "episode": 1,
+      "steps": 1,
+      "attacker_robot_id": 0,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 1,
+      "intrusions": 0
+    },
+    {
+      "episode": 2,
+      "steps": 1,
+      "attacker_robot_id": 1,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 3,
+      "steps": 1,
+      "attacker_robot_id": 2,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 3,
+      "intrusions": 0
+    },
+    {
+      "episode": 4,
+      "steps": 1,
+      "attacker_robot_id": 3,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 5,
+      "steps": 1,
+      "attacker_robot_id": 4,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 5,
+      "intrusions": 0
+    },
+    {
+      "episode": 6,
+      "steps": 1,
+      "attacker_robot_id": 0,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 1,
+      "intrusions": 0
+    },
+    {
+      "episode": 7,
+      "steps": 1,
+      "attacker_robot_id": 1,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 8,
+      "steps": 1,
+      "attacker_robot_id": 2,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 3,
+      "intrusions": 0
+    },
+    {
+      "episode": 9,
+      "steps": 1,
+      "attacker_robot_id": 3,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 10,
+      "steps": 1,
+      "attacker_robot_id": 4,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 5,
+      "intrusions": 0
+    },
+    {
+      "episode": 11,
+      "steps": 1,
+      "attacker_robot_id": 0,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 1,
+      "intrusions": 0
+    },
+    {
+      "episode": 12,
+      "steps": 1,
+      "attacker_robot_id": 1,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 13,
+      "steps": 1,
+      "attacker_robot_id": 2,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 3,
+      "intrusions": 0
+    },
+    {
+      "episode": 14,
+      "steps": 1,
+      "attacker_robot_id": 3,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 15,
+      "steps": 1,
+      "attacker_robot_id": 4,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 5,
+      "intrusions": 0
+    },
+    {
+      "episode": 16,
+      "steps": 1,
+      "attacker_robot_id": 0,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 1,
+      "intrusions": 0
+    },
+    {
+      "episode": 17,
+      "steps": 1,
+      "attacker_robot_id": 1,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 18,
+      "steps": 1,
+      "attacker_robot_id": 2,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 3,
+      "intrusions": 0
+    },
+    {
+      "episode": 19,
+      "steps": 1,
+      "attacker_robot_id": 3,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 4,
+      "intrusions": 0
+    },
+    {
+      "episode": 20,
+      "steps": 1,
+      "attacker_robot_id": 4,
+      "robots_with_blocked_entries": 1,
+      "safety_overrides": 5,
+      "intrusions": 0
+    }
+  ],
+  "passed": true
+}

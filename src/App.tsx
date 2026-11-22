@@ -1,202 +1,146 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { Camera, Pause, Play, RotateCcw } from 'lucide-react';
 import { WarehouseCanvas } from './components/WarehouseCanvas';
-import { HUDOverlay } from './components/HUDOverlay';
-import { RobotInspector } from './components/RobotInspector';
-import { TaskInspector } from './components/TaskInspector';
-import { TestRunnerPanel } from './components/TestRunnerPanel';
-import { CinematicIntro } from './components/CinematicIntro';
-import { PythonWebSocketProvider } from './api/PythonWebSocketProvider';
+import { LiveAlgorithm, PythonWebSocketProvider, WarehouseFeed } from './api/PythonWebSocketProvider';
 import { WarehouseSceneController } from './scene/WarehouseSceneController';
-import { WarehouseState } from './types/warehouse';
 import { PathVisibilityMode } from './scene/PathSystem';
+import './warehouse-dashboard.css';
+
+const algorithms: LiveAlgorithm[] = ['QMIX', 'IQL', 'Rule-Based'];
+function format(value: number | null | undefined, decimals = 0) {
+  return value == null ? '—' : value.toFixed(decimals);
+}
 
 export default function App() {
-  const providerRef = useRef<PythonWebSocketProvider | null>(null);
-  const controllerRef = useRef<WarehouseSceneController | null>(null);
-
-  const [state, setState] = useState<WarehouseState | null>(null);
-  const [selectedRobotId, setSelectedRobotId] = useState<string | null>(null);
-  const [selectedTaskId, setSelectedTaskId] = useState<string | null>(null);
-  
-  const [isPaused, setIsPaused] = useState<boolean>(false);
-  const [speedMultiplier, setSpeedMultiplier] = useState<number>(1.0);
-  const [isPresentationMode, setIsPresentationMode] = useState<boolean>(false);
-  const [isWarehouseFullscreen, setIsWarehouseFullscreen] = useState<boolean>(false);
+  const provider = useRef<PythonWebSocketProvider | null>(null);
+  const scene = useRef<WarehouseSceneController | null>(null);
+  const [feed, setFeed] = useState<WarehouseFeed>({ state: null, connection: 'connecting', error: null, pending: false });
+  const [selected, setSelected] = useState<string | null>(null);
   const [pathMode, setPathMode] = useState<PathVisibilityMode>('ALL');
-  const [showIntro, setShowIntro] = useState<boolean>(true);
-  const warehouseRootRef = useRef<HTMLDivElement>(null);
-
-  // Developer validation flag via ?dev=true URL parameter
-  const isDevMode = new URLSearchParams(window.location.search).get('dev') === 'true';
-  const [isTestRunnerOpen, setIsTestRunnerOpen] = useState<boolean>(isDevMode);
 
   useEffect(() => {
-    const provider = new PythonWebSocketProvider();
-    providerRef.current = provider;
-
-    const unsubscribe = provider.subscribe(newState => {
-      setState({ ...newState });
+    let mounted = true;
+    queueMicrotask(() => {
+      if (mounted) provider.current = new PythonWebSocketProvider(setFeed);
     });
-
     return () => {
-      unsubscribe();
-      provider.dispose();
+      mounted = false;
+      provider.current?.dispose();
+      provider.current = null;
     };
   }, []);
 
-  useEffect(() => {
-    if (typeof state?.config.speedMultiplier === 'number') {
-      setSpeedMultiplier(state.config.speedMultiplier);
-    }
-    if (typeof state?.simulationPaused === 'boolean') {
-      setIsPaused(state.simulationPaused);
-    }
-  }, [state?.config.speedMultiplier, state?.simulationPaused]);
-
-  useEffect(() => {
-    const handleFullscreenChange = () => {
-      setIsWarehouseFullscreen(document.fullscreenElement === warehouseRootRef.current);
-    };
-
-    document.addEventListener('fullscreenchange', handleFullscreenChange);
-    return () => document.removeEventListener('fullscreenchange', handleFullscreenChange);
-  }, []);
-
-  const getFallbackProvider = () => {
-    return providerRef.current ? (providerRef.current as any).fallbackProvider : null;
-  };
-
-  const handleFleetSizeChange = (size: number) => {
-    providerRef.current?.setFleetSize(size);
-  };
-
-  const handlePauseToggle = () => {
-    if (!providerRef.current) return;
-    const connected = state?.isConnectedToBackend ?? false;
-    const paused = connected ? (state?.simulationPaused ?? isPaused) : isPaused;
-    if (paused) {
-      providerRef.current.resume();
-      if (!connected) setIsPaused(false);
-    } else {
-      providerRef.current.pause();
-      if (!connected) setIsPaused(true);
-    }
-  };
-
-  const handleReset = () => {
-    if (providerRef.current) {
-      providerRef.current.reset();
-      if (!state?.isConnectedToBackend) {
-        providerRef.current.resume();
-        setIsPaused(false);
-      }
-    }
-  };
-
-  const handleSpeedChange = (speed: number) => {
-    if (providerRef.current) {
-      providerRef.current.setSpeed(speed);
-      if (!state?.isConnectedToBackend) setSpeedMultiplier(speed);
-    }
-  };
-
-  const handleRobotFollow = (robotId: string) => {
-    if (controllerRef.current) {
-      controllerRef.current.focusRobot(robotId);
-    }
-  };
-
-  const handleWarehouseFullscreenToggle = () => {
-    if (document.fullscreenElement === warehouseRootRef.current) {
-      void document.exitFullscreen();
-      return;
-    }
-
-    if (warehouseRootRef.current?.requestFullscreen) {
-      void warehouseRootRef.current.requestFullscreen();
-    }
-  };
-
-  if (!state) {
-    return (
-      <div className="w-screen h-screen bg-industrial-900 flex items-center justify-center font-mono text-slate-300 text-xs">
-        Loading Autonomous Warehouse Environment...
-      </div>
-    );
-  }
-
-  const selectedRobot = state.robots.find(r => r.id === selectedRobotId) || null;
-  const selectedTask = state.tasks.find(t => t.id === selectedTaskId) || null;
-  const fallbackProvider = getFallbackProvider();
+  const state = feed.state;
+  const selectedRobot = state?.robots.find(robot => robot.id === selected);
+  const live = feed.connection === 'live';
+  const interactive = live && !feed.pending;
+  const status = !state ? 'Awaiting telemetry' : state.simulationFinished ? 'Episode complete'
+    : state.simulationPaused ? 'Paused' : 'Running';
+  const connection = { live: 'Live backend', stale: 'Stale telemetry', connecting: 'Connecting', disconnected: 'Disconnected' }[feed.connection];
+  const metrics = state?.metrics;
+  const checkpoint = state?.policy?.checkpointPath;
+  const checkpointName = checkpoint?.split(/[\\/]/).slice(-2).join(' / ');
+  const kpis = [
+    ['Tasks completed', metrics ? format(metrics.completedTasks) : '—'],
+    ['Completion', metrics?.completionRate == null ? '—' : format(metrics.completionRate * 100, 1) + '%'],
+    ['Avg. delivery', metrics?.averageDeliveryTimeSteps == null ? '—' : format(metrics.averageDeliveryTimeSteps, 1) + ' steps'],
+    ['Tasks / 100 steps', format(metrics?.throughputPer100Steps, 1)],
+    ['Physical collisions', format(metrics?.physicalCollisions)],
+    ['Safety conflicts', format(metrics?.safetyConflictEvents)],
+    ['Blocked move groups', format(metrics?.blockedConflictGroups)],
+    ['Safety overrides', format(metrics?.safetyOverrides)],
+    ['Idle robots', format(metrics?.idleRobots)],
+  ];
 
   return (
-    <div ref={warehouseRootRef} className="w-screen h-screen relative bg-industrial-900 text-slate-100 overflow-hidden select-none">
-      {/* Cinematic Intro Overlay */}
-      {showIntro && (
-        <CinematicIntro onComplete={() => setShowIntro(false)} />
-      )}
+    <main className="control-room">
+      <header className="control-header">
+        <h1>Autonomous Warehouse Robot Fleet Coordination Using Multi-Agent Reinforcement Learning</h1>
+        <div className="header-signals">
+          <span className={live ? 'live-signal' : 'warning-signal'}>{connection}</span>
+          {live && state && <span>{state.algorithm} · {state.robots.length} robots · {status}</span>}
+        </div>
+      </header>
+      <div className="control-layout">
+        <section className="warehouse-stage" aria-label="3D warehouse">
+          <header className="panel-heading">
+            <h2>Warehouse</h2>
+            <div className="button-row">
+              <button type="button" onClick={() => scene.current?.cameraManager.setCameraMode('OVERVIEW')}>
+                <Camera size={16} /> Reset camera
+              </button>
+              <button type="button" onClick={() => scene.current?.cameraManager.setCameraMode('TOP_DOWN')}>Overhead</button>
+              <select aria-label="Executed route visibility" value={pathMode} onChange={e => setPathMode(e.target.value as PathVisibilityMode)}>
+                <option value="ALL">All routes</option><option value="SELECTED_ONLY">Selected route</option><option value="OFF">Routes off</option>
+              </select>
+            </div>
+          </header>
+          <div className="warehouse-viewport">
+            {state && <WarehouseCanvas state={state} pathMode={pathMode} selectedRobot={selectedRobot?.id ?? null}
+              onRobotSelect={setSelected} onControllerReady={controller => { scene.current = controller; }} />}
+            {!live && <div className="stale-overlay" role="status">{state ? 'Connection lost · showing last received frame' : connection + ' · waiting for warehouse state'}</div>}
+          </div>
+          <div className="warehouse-legend">
+            <span><i className="swatch pickup" /> Pickup</span><span><i className="swatch delivery" /> Delivery</span>
+            <span><i className="swatch corridor" /> Worker exclusion</span><span>Robot rings show movement and safety state</span>
+            <span>Lines show executed routes</span>
+            <span>Drag to orbit · scroll to zoom</span>
+          </div>
+        </section>
 
-      {/* 3D WebGL Canvas Layer */}
-      <WarehouseCanvas
-        state={state}
-        pathMode={pathMode}
-        isWarehouseFullscreen={isWarehouseFullscreen}
-        onRobotSelect={setSelectedRobotId}
-        onPathModeChange={setPathMode}
-        onControllerReady={ctrl => {
-          controllerRef.current = ctrl;
-        }}
-      />
+        <aside className="control-sidebar">
+          <section className="side-panel">
+            <h2>Simulation controls</h2>
+            <div className="control-fields">
+              <label>Fleet size<select disabled={!interactive} value={state?.robots.length ?? ''} onChange={e => provider.current?.send({ type: 'set_fleet_size', size: Number(e.target.value) })}>
+                {!state && <option value="">Waiting</option>}
+                {[5, 10, 20].map(size => <option key={size} value={size}>{size} robots</option>)}
+              </select></label>
+              <label>Algorithm<select disabled={!interactive} value={state?.algorithm ?? ''} onChange={e => provider.current?.send({ type: 'set_algorithm', algorithm: e.target.value as LiveAlgorithm })}>
+                {!state && <option value="">Waiting</option>}
+                {algorithms.map(algorithm => <option key={algorithm}>{algorithm}</option>)}
+              </select></label>
+              <label>Speed<select disabled={!interactive} value={state?.config.speedMultiplier ?? 1} onChange={e => provider.current?.send({ type: 'set_speed', speed: Number(e.target.value) })}>
+                {[0.25, 0.5, 1, 2, 4].map(speed => <option key={speed} value={speed}>{speed}×</option>)}
+              </select></label>
+            </div>
+            <div className="button-row transport">
+              <button disabled={!interactive || state?.simulationFinished} onClick={() => provider.current?.send({ type: state?.simulationPaused ? (state.timestep ? 'resume' : 'start') : 'pause' })}>
+                {state?.simulationPaused ? <Play size={16} /> : <Pause size={16} />}
+                {state?.simulationPaused ? (state.timestep ? 'Resume' : 'Start') : 'Pause'}
+              </button>
+              <button disabled={!interactive} onClick={() => provider.current?.send({ type: 'reset' })}><RotateCcw size={16} /> Reset</button>
+            </div>
+            {state && <div className="model-status" title={checkpoint ?? undefined}>
+              {state.policy?.checkpointLoaded ? 'Compatible checkpoint' : 'Rule-based controller'}{checkpointName && <strong>{checkpointName}</strong>}
+            </div>}
+            {feed.pending && <p role="status">Applying command…</p>}
+            {(feed.error || state?.startupWarning) && <p role="alert" className="warning-signal">{feed.error || state?.startupWarning}</p>}
+          </section>
 
-      {/* Industrial Engineering Control Dashboard HUD */}
-      <HUDOverlay
-        state={state}
-        onFleetSizeChange={handleFleetSizeChange}
-        onPauseToggle={handlePauseToggle}
-        onReset={handleReset}
-        onSpeedChange={handleSpeedChange}
-        onPresentationModeToggle={() => setIsPresentationMode(!isPresentationMode)}
-        onWarehouseFullscreenToggle={handleWarehouseFullscreenToggle}
-        isPaused={isPaused}
-        currentSpeed={speedMultiplier}
-        isPresentationMode={isPresentationMode}
-        isWarehouseFullscreen={isWarehouseFullscreen}
-        pathMode={pathMode}
-        onPathModeToggle={() => {
-          const nextMode: Record<PathVisibilityMode, PathVisibilityMode> = {
-            ALL: 'SELECTED_ONLY',
-            SELECTED_ONLY: 'OFF',
-            OFF: 'ALL'
-          };
-          setPathMode(nextMode[pathMode]);
-        }}
-      />
+          <section className="side-panel">
+            <h2>Episode telemetry</h2>
+            {state && <p className="episode-line">Episode {state.episode} · Step {state.timestep}{!live && ' · Last received'}</p>}
+            <dl className="kpi-grid">{kpis.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>
+          </section>
 
-      {/* Developer-Only Validation Panel (accessible via ?dev=true) */}
-      {!isPresentationMode && isTestRunnerOpen && fallbackProvider && (
-        <TestRunnerPanel
-          provider={fallbackProvider}
-          state={state}
-          onClose={() => setIsTestRunnerOpen(false)}
-        />
-      )}
-
-      {/* Robot Telemetry Inspector Panel */}
-      {!isPresentationMode && (
-        <RobotInspector
-          robot={selectedRobot}
-          onClose={() => setSelectedRobotId(null)}
-          onFollow={handleRobotFollow}
-        />
-      )}
-
-      {/* Task Logistics Inspector Panel */}
-      {!isPresentationMode && (
-        <TaskInspector
-          task={selectedTask}
-          onClose={() => setSelectedTaskId(null)}
-        />
-      )}
-    </div>
+          <section className="side-panel">
+            <h2>Robot inspection</h2>
+            <select aria-label="Select robot" value={selectedRobot?.id ?? ''} onChange={e => setSelected(e.target.value || null)}>
+              <option value="">Select a robot</option>
+              {state?.robots.map(robot => <option key={robot.id}>{robot.id}</option>)}
+            </select>
+            {selectedRobot && <dl className="robot-details">
+              <div><dt>Position</dt><dd>{selectedRobot.position.join(', ')}</dd></div>
+              <div><dt>State</dt><dd>{selectedRobot.status}</dd></div>
+              <div><dt>Task</dt><dd>{selectedRobot.taskId ?? 'Unassigned'}</dd></div>
+              <div><dt>Cargo</dt><dd>{selectedRobot.hasCargo ? 'Carrying' : 'Empty'}</dd></div>
+              <div><dt>Target</dt><dd>{selectedRobot.targetPosition?.join(', ') ?? '—'}</dd></div>
+            </dl>}
+            {selectedRobot && <button type="button" onClick={() => scene.current?.focusRobot(selectedRobot.id)}>Focus {selectedRobot.id}</button>}
+          </section>
+        </aside>
+      </div>
+    </main>
   );
 }

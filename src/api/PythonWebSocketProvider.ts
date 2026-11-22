@@ -1,166 +1,87 @@
-import { WarehouseState, StateProvider } from '../types/warehouse';
-import { DemoStateProvider } from '../state/DemoStateProvider';
-import { markBackendConnected, markLocalFallback } from './connectionStatus';
+import { WarehouseState } from '../types/warehouse';
 
-export class PythonWebSocketProvider implements StateProvider {
-  private ws: WebSocket | null = null;
-  private subscribers: Set<(state: WarehouseState) => void> = new Set();
-  private fallbackProvider: DemoStateProvider;
-  private fallbackUnsubscribe: (() => void) | null = null;
-  private activeState: WarehouseState;
-  private url: string;
-  private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
+type Connection = 'connecting' | 'live' | 'stale' | 'disconnected';
+export type LiveAlgorithm = 'QMIX' | 'IQL' | 'Rule-Based';
+export interface WarehouseFeed {
+  state: WarehouseState | null;
+  connection: Connection;
+  error: string | null;
+  pending: boolean;
+}
+type Command =
+  | { type: 'start' | 'pause' | 'resume' | 'reset' }
+  | { type: 'set_speed'; speed: number }
+  | { type: 'set_fleet_size'; size: number }
+  | { type: 'set_algorithm'; algorithm: LiveAlgorithm };
+
+export class PythonWebSocketProvider {
+  private socket: WebSocket | null = null;
+  private feed: WarehouseFeed = { state: null, connection: 'connecting', error: null, pending: false };
+  private retry: ReturnType<typeof setTimeout> | undefined;
+  private watchdog: ReturnType<typeof setTimeout> | undefined;
   private disposed = false;
 
-  constructor(url: string = import.meta.env.VITE_WAREHOUSE_WS_URL || 'ws://127.0.0.1:8000/ws') {
-    this.url = url;
-    this.fallbackProvider = new DemoStateProvider();
-    this.activeState = this.fallbackProvider.getState();
-
-    // Subscribe to fallback provider as default
-    this.fallbackUnsubscribe = this.fallbackProvider.subscribe(state => {
-      if (!this.activeState.isConnectedToBackend) {
-        this.activeState = state;
-        this.notifySubscribers();
-      }
-    });
-
+  constructor(private notify: (feed: WarehouseFeed) => void,
+              private url = import.meta.env.VITE_WAREHOUSE_WS_URL || 'ws://127.0.0.1:8000/ws') {
     this.connect();
   }
 
-  private activateFallback(): void {
-    this.activeState = markLocalFallback(this.fallbackProvider.getState());
-    this.fallbackProvider.resume();
-    this.notifySubscribers();
+  private update(changes: Partial<WarehouseFeed>) {
+    this.feed = { ...this.feed, ...changes };
+    this.notify(this.feed);
   }
 
-  public getState(): WarehouseState {
-    return this.activeState;
+  send(command: Command) {
+    if (this.feed.connection !== 'live' || this.feed.pending || this.socket?.readyState !== WebSocket.OPEN) return;
+    this.socket.send(JSON.stringify(command));
+    this.update({ pending: true, error: null });
   }
 
-  public subscribe(callback: (state: WarehouseState) => void): () => void {
-    this.subscribers.add(callback);
-    callback(this.activeState);
-    return () => {
-      this.subscribers.delete(callback);
-    };
-  }
-
-  public setSpeed(multiplier: number): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'set_speed', speed: multiplier }));
-    } else {
-      this.fallbackProvider.setSpeed(multiplier);
-    }
-  }
-
-  public pause(): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'pause' }));
-    } else {
-      this.fallbackProvider.pause();
-    }
-  }
-
-  public resume(): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'resume' }));
-    } else {
-      this.fallbackProvider.resume();
-    }
-  }
-
-  public reset(): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'reset' }));
-    } else {
-      this.fallbackProvider.reset();
-    }
-  }
-
-  public setFleetSize(size: number): void {
-    if (this.ws && this.ws.readyState === WebSocket.OPEN) {
-      this.ws.send(JSON.stringify({ type: 'set_fleet_size', size }));
-    } else {
-      this.fallbackProvider.setFleetSize(size);
-    }
-  }
-  public selectRobot(robotId: string | null): void {
-    this.fallbackProvider.selectRobot(robotId);
-  }
-
-  public selectTask(taskId: string | null): void {
-    this.fallbackProvider.selectTask(taskId);
-  }
-
-  public dispose(): void {
-    this.disposed = true;
-    if (this.reconnectTimer !== null) {
-      clearTimeout(this.reconnectTimer);
-      this.reconnectTimer = null;
-    }
-    this.fallbackUnsubscribe?.();
-    this.fallbackUnsubscribe = null;
-    this.fallbackProvider.dispose();
-    if (this.ws) {
-      this.ws.onclose = null;
-      this.ws.close();
-      this.ws = null;
-    }
-  }
-
-  private connect(): void {
+  private connect() {
     if (this.disposed) return;
-    if (this.ws && (
-      this.ws.readyState === WebSocket.CONNECTING ||
-      this.ws.readyState === WebSocket.OPEN
-    )) return;
+    this.update({ connection: this.feed.state ? 'stale' : 'connecting' });
     try {
-      this.ws = new WebSocket(this.url);
-
-      this.ws.onopen = () => {
-        console.log(`[WebSocket] Connected to Python RL Backend at ${this.url}`);
-        this.fallbackProvider.pause();
+      const socket = new WebSocket(this.url);
+      this.socket = socket;
+      const refreshTimeout = () => {
+        clearTimeout(this.watchdog);
+        this.watchdog = setTimeout(() => socket.close(), 6000);
       };
-
-      this.ws.onmessage = event => {
+      refreshTimeout();
+      socket.onmessage = event => {
         try {
           const payload = JSON.parse(event.data);
-          if ((payload.type === 'state_update' || Array.isArray(payload.robots)) &&
-              typeof payload.isDemoMode === 'boolean') {
-            this.activeState = {
-              ...markBackendConnected(payload),
-            };
-            this.notifySubscribers();
-          } else {
-            console.error('[WebSocket] Ignoring incomplete backend telemetry.');
+          if (payload.type === 'command_error') {
+            this.update({ pending: false, error: payload.error.message });
+          } else if (payload.type === 'state_update' && Array.isArray(payload.robots)) {
+            refreshTimeout();
+            this.update({ state: payload, connection: 'live', pending: false });
           }
-        } catch (e) {
-          console.error('[WebSocket] Failed to parse message:', e);
+        } catch {
+          this.update({ error: 'The backend sent unreadable telemetry.' });
         }
       };
-
-      this.ws.onerror = () => {
-        console.warn('[WebSocket] Backend connection error. Using local DemoMode fallback.');
-        this.activateFallback();
-      };
-
-      this.ws.onclose = () => {
-        if (this.disposed) return;
-        console.warn('[WebSocket] Backend disconnected. Reconnecting in 5s...');
-        this.activateFallback();
-        this.reconnectTimer = setTimeout(() => {
-          this.reconnectTimer = null;
-          this.connect();
-        }, 5000);
-      };
-    } catch (e) {
-      console.warn('[WebSocket] Unable to instantiate WebSocket. Using DemoMode.');
-      this.activateFallback();
+      socket.onerror = () => socket.close();
+      socket.onclose = () => this.reconnect();
+    } catch {
+      this.reconnect();
     }
   }
 
-  private notifySubscribers(): void {
-    this.subscribers.forEach(cb => cb(this.activeState));
+  private reconnect() {
+    clearTimeout(this.watchdog);
+    if (this.disposed) return;
+    this.update({ connection: this.feed.state ? 'stale' : 'disconnected', pending: false });
+    this.retry = setTimeout(() => this.connect(), 1500);
+  }
+
+  dispose() {
+    this.disposed = true;
+    clearTimeout(this.retry);
+    clearTimeout(this.watchdog);
+    if (this.socket) {
+      this.socket.onclose = this.socket.onmessage = this.socket.onerror = null;
+      this.socket.close();
+    }
   }
 }

@@ -6,11 +6,16 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+from time import perf_counter
+from typing import TYPE_CHECKING
 
 import torch
 
 from src.marl.iql_trainer import IQLTrainer
 from src.marl.qmix_trainer import QMIXTrainer
+
+if TYPE_CHECKING:
+    from python_infra.experiment_tracker import ExperimentTracker
 
 
 def _save_checkpoint_snapshot(
@@ -43,11 +48,21 @@ def train_policy(
     seed: int, output: Path, collision_penalty: float | None = None,
     learning_rate: float = 1e-4, target_update_interval: int = 200,
     checkpoint_interval: int = 100, resume_from: Path | None = None,
+    *, tracker: ExperimentTracker | None = None, warm_start_from: Path | None = None,
+    epsilon_start: float = 1.0,
 ) -> dict:
     """Train one fixed configuration and save periodic inference snapshots."""
     if resume_from is not None and not resume_from.is_file():
         raise FileNotFoundError(f"Resume checkpoint file does not exist: {resume_from}")
+    if warm_start_from is not None:
+        if algorithm != "QMIX" or resume_from is not None:
+            raise ValueError("Warm start is supported for QMIX and cannot be combined with resume")
+        if not warm_start_from.is_file():
+            raise FileNotFoundError(f"Warm-start checkpoint file does not exist: {warm_start_from}")
+    if not 0.05 <= epsilon_start <= 1.0 or (algorithm != "QMIX" and epsilon_start != 1.0):
+        raise ValueError("A custom epsilon start must be between 0.05 and 1.0 and requires QMIX")
     output.mkdir(parents=True, exist_ok=False)
+    started = perf_counter()
     overrides = {} if collision_penalty is None else {"collision_penalty": collision_penalty}
     snapshots = output / "snapshots"
 
@@ -58,17 +73,25 @@ def train_policy(
         _save_checkpoint_snapshot(
             algorithm, trainer, metrics, snapshots, checkpoint_interval, total_episodes
         )
+        if tracker is not None:
+            tracker.log_metrics(
+                {key: metrics[key] for key in ("reward", "loss", "steps", "epsilon")},
+                step=metrics["episode"],
+            )
 
     if algorithm == "QMIX":
         trainer = QMIXTrainer(
             num_agents=fleet_size, episodes=episodes, max_steps=max_steps,
             seed=seed, reward_overrides=overrides,
             learning_rate=learning_rate,
+            epsilon_start=epsilon_start,
             target_update_interval=target_update_interval,
             episode_callback=save_snapshot,
         )
         if resume_from is not None:
             trainer.load_checkpoint(str(resume_from))
+        if warm_start_from is not None:
+            trainer.load_checkpoint(str(warm_start_from), warm_start=True)
         initial_episode_offset = trainer.episode_offset
         history = trainer.train()
         checkpoint = output / "qmix.pt"
@@ -104,6 +127,7 @@ def train_policy(
         "fleet_size": fleet_size,
         "episodes": episodes,
         "episodes_completed_total": episodes_completed_total,
+        "training_duration_seconds": perf_counter() - started,
         "max_steps": max_steps,
         "seed": seed,
         "learning_rate": learning_rate,
@@ -118,16 +142,27 @@ def train_policy(
     if resume_from is not None:
         summary["resumed_from"] = str(resume_from)
         summary["resumed_from_sha256"] = hashlib.sha256(resume_from.read_bytes()).hexdigest()
+    if warm_start_from is not None:
+        summary["warm_started_from"] = warm_start_from.as_posix()
+        summary["warm_started_from_sha256"] = hashlib.sha256(warm_start_from.read_bytes()).hexdigest()
+        summary["epsilon_start"] = epsilon_start
+    if tracker is not None:
+        summary["mlflow_run_id"] = tracker.run_id
     files = sorted(
         path for path in output.rglob("*")
         if path.is_file() and path.suffix in {".pt", ".json"}
         and path.name not in {"training_history.json", "training_manifest.json"}
     )
     summary["sha256"] = {
-        str(path.relative_to(output)): hashlib.sha256(path.read_bytes()).hexdigest()
+        path.relative_to(output).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest()
         for path in files
     }
-    (output / "training_manifest.json").write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    manifest_path = output / "training_manifest.json"
+    manifest_path.write_text(json.dumps(summary, indent=2), encoding="utf-8")
+    if tracker is not None:
+        tracker.log_metric("training_duration_seconds", summary["training_duration_seconds"])
+        tracker.log_artifact(str(manifest_path))
+        tracker.log_artifact(str(history_path))
     return summary
 
 
@@ -143,14 +178,30 @@ def main() -> None:
     parser.add_argument("--target-update-interval", type=int, default=200)
     parser.add_argument("--checkpoint-interval", type=int, default=100)
     parser.add_argument("--resume-from", type=Path)
+    parser.add_argument("--warm-start-from", type=Path, help="Initialize QMIX weights with fresh replay and optimizer")
+    parser.add_argument("--epsilon-start", type=float, default=1.0)
     parser.add_argument("--output", type=Path, required=True)
     args = parser.parse_args()
-    result = train_policy(
-        args.algorithm, args.fleet_size, args.episodes, args.max_steps,
-        args.seed, args.output, args.collision_penalty,
-        args.learning_rate, args.target_update_interval, args.checkpoint_interval,
-        args.resume_from,
+    from python_infra.experiment_tracker import ExperimentTracker
+
+    tracker = ExperimentTracker(experiment_name="project25_policy_training")
+    tracker.start_run(
+        run_name=args.output.name,
+        tags={"algorithm": args.algorithm, "fleet_size": args.fleet_size, "observation_vector": "456-D"},
     )
+    try:
+        tracker.log_parameters(vars(args))
+        result = train_policy(
+            args.algorithm, args.fleet_size, args.episodes, args.max_steps,
+            args.seed, args.output, args.collision_penalty,
+            args.learning_rate, args.target_update_interval, args.checkpoint_interval,
+            args.resume_from, tracker=tracker, warm_start_from=args.warm_start_from,
+            epsilon_start=args.epsilon_start,
+        )
+    except BaseException:
+        tracker.end_run(status="FAILED")
+        raise
+    tracker.end_run()
     print(json.dumps(result, indent=2))
 
 

@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { disposeSceneObjects } from './disposeSceneObjects';
 import { GRID_SIZE, CELL_SIZE, gridToWorld } from './gridConfig';
 
 export class ZoneSystem {
@@ -10,7 +11,7 @@ export class ZoneSystem {
 
     this.createDispatchZone();
     this.createChargingStation();
-    this.createHumanSafetyZone();
+
 
     scene.add(this.group);
   }
@@ -123,18 +124,15 @@ export class ZoneSystem {
   /**
    * 3. Human-Worker Safety Zone (Hazard stripes, translucent cage, warning signs)
    */
-  private createHumanSafetyZone(): void {
+  public updateCorridor(cells: [number, number][]): void {
+    const previous = this.group.getObjectByName('HumanSafetyZone');
+    if (previous) {
+      disposeSceneObjects(previous);
+      this.group.remove(previous);
+    }
+    if (!cells.length) return;
     const safetyGroup = new THREE.Group();
     safetyGroup.name = 'HumanSafetyZone';
-
-    // Occupies grid range [13-15, 8-10]
-    const minPos = gridToWorld(8, 8);
-    const maxPos = gridToWorld(10, 10);
-
-    const centerX = (minPos.x + maxPos.x) / 2;
-    const centerZ = (minPos.z + maxPos.z) / 2;
-    const sizeX = (3 * CELL_SIZE);
-    const sizeZ = (3 * CELL_SIZE);
 
     // Hazard Striped Floor Plane
     const canvas = document.createElement('canvas');
@@ -170,36 +168,14 @@ export class ZoneSystem {
       opacity: 0.75
     });
 
-    const floorMesh = new THREE.Mesh(new THREE.PlaneGeometry(sizeX, sizeZ), floorMat);
-    floorMesh.rotation.x = -Math.PI / 2;
-    floorMesh.position.set(centerX, 0.025, centerZ);
-    safetyGroup.add(floorMesh);
-
-    // Translucent Yellow Boundary Cage Wall
-    const cageGeo = new THREE.BoxGeometry(sizeX, 2.2, sizeZ);
-    const cageMat = new THREE.MeshStandardMaterial({
-      color: 0xf59e0b,
-      transparent: true,
-      opacity: 0.12,
-      roughness: 0.1,
-      metalness: 0.8,
-      side: THREE.DoubleSide
-    });
-
-    const cageMesh = new THREE.Mesh(cageGeo, cageMat);
-    cageMesh.position.set(centerX, 1.1, centerZ);
-    safetyGroup.add(cageMesh);
-
-    // Cage Frame Posts
-    const frameGeo = new THREE.BoxGeometry(sizeX, 0.06, sizeZ);
-    const frameMat = new THREE.MeshStandardMaterial({ color: 0xf59e0b, metalness: 0.8, roughness: 0.2 });
-    const topFrame = new THREE.Mesh(frameGeo, frameMat);
-    topFrame.position.set(centerX, 2.2, centerZ);
-    safetyGroup.add(topFrame);
-
-    // Warning Header Sign
-    this.createHeaderSign('HUMAN SAFETY ZONE • AUTHORIZED PERSONNEL ONLY', new THREE.Vector3(centerX, 2.8, centerZ), 0xf59e0b);
-
+    const geometry = new THREE.PlaneGeometry(CELL_SIZE, CELL_SIZE);
+    for (const cell of cells) {
+      const pad = new THREE.Mesh(geometry, floorMat);
+      const position = gridToWorld(...cell);
+      pad.rotation.x = -Math.PI / 2;
+      pad.position.set(position.x, 0.06, position.z);
+      safetyGroup.add(pad);
+    }
     this.group.add(safetyGroup);
   }
 

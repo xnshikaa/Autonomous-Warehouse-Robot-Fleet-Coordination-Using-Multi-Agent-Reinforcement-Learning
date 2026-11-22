@@ -132,7 +132,7 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
         "",
         "| Algorithm | N | Completed/tasks | Completion (95% CI) | Delivery steps (95% CI) | "
         "Collisions/episode (95% CI) | Blocked intent groups/episode (95% CI) | "
-        "Safety conflicts/episode | Throughput/100 steps |",
+        "Safety conflicts/episode (95% CI) | Throughput/100 steps |",
         "|---|---:|---:|---:|---:|---:|---:|---:|---:|",
     ]
     for row in sorted(report["summary"], key=lambda item: (item["fleet_size"], item["algorithm"])):
@@ -152,7 +152,7 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
             f"{estimate('average_completion_time_steps', row['average_completion_time_steps'], 2)} | "
             f"{estimate('collision_rate_per_episode', row['collision_rate_per_episode'])} | "
             f"{estimate('collision_intent_groups_per_episode', row['collision_intent_groups_per_episode'])} | "
-            f"{row['safety_conflict_rate_per_episode']:.2f} | "
+            f"{estimate('safety_conflict_events', row['safety_conflict_rate_per_episode'], 2)} | "
             f"{row['throughput_tasks_per_100_steps']:.3f} |"
         )
 
@@ -264,8 +264,21 @@ def _write_markdown_report(report: dict[str, Any], output_path: Path) -> Path:
         )
         if proxy_ratio is not None:
             collision_findings.append(
-                f"- N=10 blocked safety-override proxy ratio is {proxy_ratio:.3f}; "
-                "this does not substitute for the physical-collision requirement."
+                f"- N=10 safety conflict ratio: QMIX {float(qmix_n10['safety_conflict_rate_per_episode']):.2f} "
+                f"vs IQL {float(iql_n10['safety_conflict_rate_per_episode']):.2f} "
+                f"(ratio: {proxy_ratio:.3f}, a {1.0 - proxy_ratio:.1%} reduction); "
+                "this safety conflict proxy is reported separately and does not substitute for the physical collision metric."
+            )
+        intent_ratio = (
+            float(qmix_n10["collision_intent_groups_per_episode"])
+            / float(iql_n10["collision_intent_groups_per_episode"])
+            if iql_n10["collision_intent_groups_per_episode"] else None
+        )
+        if intent_ratio is not None:
+            collision_findings.append(
+                f"- N=10 blocked intent groups ratio: QMIX {float(qmix_n10['collision_intent_groups_per_episode']):.2f} "
+                f"vs IQL {float(iql_n10['collision_intent_groups_per_episode']):.2f} "
+                f"(ratio: {intent_ratio:.3f}, a {1.0 - intent_ratio:.1%} reduction)."
             )
     else:
         collision_findings.append(
@@ -535,8 +548,9 @@ def run_benchmark(
         comparisons[index]["holm_adjusted_p_value"] = value
 
     for run in run_specs:
-        run["trace_file"] = str(trace_paths[(run["algorithm"], run["fleet_size"])].relative_to(output_dir))
-        run["trace_sha256"] = _sha256(trace_paths[(run["algorithm"], run["fleet_size"])])
+        trace_path = trace_paths[(run["algorithm"], run["fleet_size"])]
+        run["trace_file"] = trace_path.relative_to(output_dir).as_posix()
+        run["trace_sha256"] = _sha256(trace_path)
     manifest_path = output_dir / "manifest.json"
     summary_path = output_dir / "summary.json"
     manifest_path.write_text(json.dumps(manifest, indent=2, allow_nan=False), encoding="utf-8")

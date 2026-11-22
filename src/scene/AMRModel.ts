@@ -17,7 +17,7 @@ export class AMRModel {
 
   // Status color mappings
   private readonly statusColors: Record<RobotStatus, number> = {
-    IDLE: 0x38bdf8,       // Industrial Cyan
+    IDLE: 0xcbd5e1,       // Neutral idle indicator
     MOVING: 0x38bdf8,     // Industrial Cyan
     PICKUP: 0xf59e0b,     // Amber
     DELIVERING: 0x10b981, // Emerald Green

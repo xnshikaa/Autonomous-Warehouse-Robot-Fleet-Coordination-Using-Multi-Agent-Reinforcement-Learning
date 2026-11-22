@@ -1,0 +1,118 @@
+{
+  "schema_version": 1,
+  "purpose": "exposed validation checkpoint selection; not final holdout",
+  "algorithm": "QMIX",
+  "fleet_size": 20,
+  "episodes": 20,
+  "max_steps": 100,
+  "seed": 252120,
+  "selection_order": [
+    "highest completion rate",
+    "lowest mean completed-task delivery time",
+    "fewest blocked conflict groups",
+    "candidate path lexical tie-break"
+  ],
+  "selected_checkpoint": "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt",
+  "results": [
+    {
+      "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt": "16421fd30302cb9b68968b8ed4efe00433222326108c7a8835126592e44d566c"
+      },
+      "completion_rate": 0.0225,
+      "completion_rate_95ci": {
+        "estimate": 0.0225,
+        "lower": 0.0075000000000000015,
+        "upper": 0.04000000000000001,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 34.38095238095238,
+      "mean_episode_delivery_time_steps": 34.38095238095238,
+      "safety_overrides_per_episode": 9.05,
+      "collision_intent_groups_per_episode": 9.05,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts/training/qmix_n20_remediation_control/snapshots/episode_00020/checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts/training/qmix_n20_remediation_control/snapshots/episode_00020/checkpoint_state.pt": "2032700290bb0858c090963a67cac7b1733295994db99c97f22a2d94a4be3307"
+      },
+      "completion_rate": 0.005,
+      "completion_rate_95ci": {
+        "estimate": 0.005,
+        "lower": 0.0,
+        "upper": 0.0125,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 20,
+      "mean_episode_delivery_time_steps": 20.0,
+      "safety_overrides_per_episode": 16.3,
+      "collision_intent_groups_per_episode": 16.25,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts/training/qmix_n20_remediation_control/snapshots/episode_00040/checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts/training/qmix_n20_remediation_control/snapshots/episode_00040/checkpoint_state.pt": "cd543d80bcf88bd43eb63484969284055f16386411ddfc99275f66f918ab341f"
+      },
+      "completion_rate": 0.0,
+      "completion_rate_95ci": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": null,
+      "mean_episode_delivery_time_steps": null,
+      "safety_overrides_per_episode": 10.95,
+      "collision_intent_groups_per_episode": 10.65,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts/training/qmix_n20_remediation_lower_collision/snapshots/episode_00020/checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts/training/qmix_n20_remediation_lower_collision/snapshots/episode_00020/checkpoint_state.pt": "6dbc0ac0500494d2221bc173df71e37193ccfeffccc950420b78fd0b61adc161"
+      },
+      "completion_rate": 0.0,
+      "completion_rate_95ci": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": null,
+      "mean_episode_delivery_time_steps": null,
+      "safety_overrides_per_episode": 45.35,
+      "collision_intent_groups_per_episode": 41.65,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts/training/qmix_n20_remediation_lower_collision/snapshots/episode_00040/checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts/training/qmix_n20_remediation_lower_collision/snapshots/episode_00040/checkpoint_state.pt": "9c844d8df6642726598d2731b55484624ca8d0d541de00dee7a4fc1d0bc2b4c6"
+      },
+      "completion_rate": 0.0,
+      "completion_rate_95ci": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "confidence_level": 0.95,
+        "samples": 20,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": null,
+      "mean_episode_delivery_time_steps": null,
+      "safety_overrides_per_episode": 196.4,
+      "collision_intent_groups_per_episode": 109.1,
+      "physical_collision_rate_per_episode": 0.0
+    }
+  ]
+}

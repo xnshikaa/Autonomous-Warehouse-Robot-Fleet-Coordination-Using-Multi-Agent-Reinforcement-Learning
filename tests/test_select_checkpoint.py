@@ -40,7 +40,7 @@ def test_checkpoint_selector_uses_identical_validation_and_ranks_completion(tmp_
         episodes=2, max_steps=2, seed=321, output=output,
     )
 
-    assert result["selected_checkpoint"] == str(high)
+    assert result["selected_checkpoint"] == high.as_posix()
     assert result["purpose"].endswith("not final holdout")
     assert result["results"][0]["completion_rate"] == 1.0
     assert json.loads(output.read_text())["seed"] == 321

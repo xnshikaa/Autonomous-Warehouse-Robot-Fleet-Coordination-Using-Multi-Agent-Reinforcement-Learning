@@ -9,6 +9,7 @@ import { PathSystem, PathVisibilityMode } from './PathSystem';
 import { TaskSystem } from './TaskSystem';
 import { SafetySystem } from './SafetySystem';
 import { WarehouseState } from '../types/warehouse';
+import { disposeSceneObjects } from './disposeSceneObjects';
 
 export class WarehouseSceneController {
   public scene: THREE.Scene;
@@ -24,6 +25,9 @@ export class WarehouseSceneController {
   public safetySystem: SafetySystem;
 
   private container: HTMLElement;
+  private resizeObserver: ResizeObserver;
+  private layoutSignature = '';
+  private episode: number | undefined;
   private animationFrameId: number | null = null;
   private lastTime: number = performance.now();
   private fpsCounter: number = 60;
@@ -42,7 +46,7 @@ export class WarehouseSceneController {
     // 1. Initialize Scene & Industrial Fog
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color(0x0b0f17);
-    this.scene.fog = new THREE.FogExp2(0x0b0f17, 0.012);
+    this.scene.fog = new THREE.FogExp2(0x0b0f17, 0.006);
 
     // 2. Initialize Camera Manager
     this.cameraManager = new CameraManager(container);
@@ -73,7 +77,8 @@ export class WarehouseSceneController {
     this.safetySystem = new SafetySystem(this.scene);
 
     // Event Listeners
-    window.addEventListener('resize', this.onResize);
+    this.resizeObserver = new ResizeObserver(this.onResize);
+    this.resizeObserver.observe(container);
     this.renderer.domElement.addEventListener('pointerdown', this.onPointerDown);
 
     // Start Loop
@@ -81,6 +86,18 @@ export class WarehouseSceneController {
   }
 
   public updateState(state: WarehouseState): void {
+    const cells = state.layout?.human_corridors.cells ?? [];
+    const layoutSignature = JSON.stringify([state.shelves, cells]);
+    if (layoutSignature !== this.layoutSignature) {
+      this.layoutSignature = layoutSignature;
+      this.shelfSystem.updateLayout(state.shelves);
+      this.zoneSystem.updateCorridor(cells);
+    }
+    if (this.episode !== state.episode) {
+      this.episode = state.episode;
+      this.robotSystem.updateRobots([]);
+      this.taskSystem.updateTasks([]);
+    }
     const interval = state.config.updateIntervalSeconds;
     const moveDuration = interval === undefined ? 0.4 : Math.max(0.02, interval * 0.9);
     this.robotSystem.updateRobots(state.robots, moveDuration);
@@ -133,6 +150,7 @@ export class WarehouseSceneController {
     if (!this.container) return;
     const width = this.container.clientWidth;
     const height = this.container.clientHeight;
+    if (!width || !height) return;
 
     this.renderer.setSize(width, height);
     this.cameraManager.resize(width, height);
@@ -156,7 +174,10 @@ export class WarehouseSceneController {
 
   public dispose(): void {
     this.stop();
-    window.removeEventListener('resize', this.onResize);
+    this.resizeObserver.disconnect();
+    this.cameraManager.dispose();
+    this.robotSystem.updateRobots([]);
+    disposeSceneObjects(this.scene);
     if (this.renderer.domElement) {
       this.renderer.domElement.removeEventListener('pointerdown', this.onPointerDown);
       if (this.renderer.domElement.parentElement) {
@@ -164,6 +185,7 @@ export class WarehouseSceneController {
       }
     }
     this.renderer.dispose();
+    this.renderer.forceContextLoss();
   }
 
   private animate = (): void => {

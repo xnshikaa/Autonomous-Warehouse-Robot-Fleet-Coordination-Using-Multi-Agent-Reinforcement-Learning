@@ -27,7 +27,7 @@ export class WarehouseFloor {
     const ctx = canvas.getContext('2d')!;
 
     // Concrete background
-    ctx.fillStyle = '#0F172A';
+    ctx.fillStyle = '#27343f';
     ctx.fillRect(0, 0, 1024, 1024);
 
     // Subtle concrete noise/grain
@@ -62,7 +62,7 @@ export class WarehouseFloor {
       map: texture,
       roughness: 0.4,
       metalness: 0.2,
-      color: 0x1e293b
+      color: 0xffffff
     });
 
     this.floorMesh = new THREE.Mesh(geometry, material);

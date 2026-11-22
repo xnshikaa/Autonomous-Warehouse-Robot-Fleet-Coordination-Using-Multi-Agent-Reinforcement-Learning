@@ -8,11 +8,17 @@ import logging
 import math
 import os
 from collections import deque
+from pathlib import Path
+from random import Random
 from typing import Any, Callable
 
+from src.ai.baselines.rule_based import RuleBasedController
 from src.ai.environment import WarehouseEnvironment
+from src.evaluation.metrics import infer_robot_robot_collisions
+from src.evaluation.trace_generator import _iql_provider
 from src.marl.environment_adapter import MARLEnvironmentAdapter
 from src.marl.qmix_controller import QMIXController
+from src.warehouse.task_generation import generate_task_assignments
 
 try:
     from fastapi import WebSocket, WebSocketDisconnect
@@ -24,6 +30,8 @@ except ImportError:  # pragma: no cover - optional backend dependency
 
 
 logger = logging.getLogger(__name__)
+ALGORITHMS = ("QMIX", "IQL", "Rule-Based")
+FLEET_SIZES = (5, 10, 20)
 
 
 class CommandValidationError(ValueError):
@@ -47,7 +55,7 @@ def _parse_command(message: str) -> dict[str, Any]:
     if not isinstance(command_type, str) or not command_type:
         raise CommandValidationError("missing_type", "Command requires a non-empty string 'type'.")
 
-    if command_type not in {"reset", "pause", "resume", "set_speed", "set_fleet_size"}:
+    if command_type not in {"reset", "pause", "resume", "start", "set_speed", "set_fleet_size", "set_algorithm"}:
         raise CommandValidationError("unsupported_command", f"Unsupported command type: {command_type}.")
 
     if command_type == "set_speed":
@@ -66,7 +74,13 @@ def _parse_command(message: str) -> dict[str, Any]:
         size = command.get("size")
         if isinstance(size, bool) or not isinstance(size, int) or size <= 0:
             raise CommandValidationError("invalid_fleet_size", "'size' must be a positive integer.")
+        if "checkpoint_path" in command:
+            raise CommandValidationError("invalid_checkpoint_source", "Checkpoints are configured on the server.")
 
+    if command_type == "set_algorithm" and command.get("algorithm") not in ALGORITHMS:
+        raise CommandValidationError("invalid_algorithm", "Choose QMIX, IQL, or Rule-Based.")
+    if "checkpoint_path" in command:
+        raise CommandValidationError("invalid_checkpoint_source", "Checkpoints are configured on the server.")
     return command
 
 
@@ -79,6 +93,8 @@ def _process_command_message(
     simulation_delay: float,
     speed_multiplier: float,
     simulation_paused: bool,
+    *,
+    configure: Callable[[int, str], None] | None = None,
 ) -> tuple[dict[str, Any], float, float, bool]:
     """Apply one client message and return a response plus updated loop state."""
     try:
@@ -93,21 +109,28 @@ def _process_command_message(
         command_type = command["type"]
         if command_type == "reset":
             environment.reset()
-            simulation_paused = False
+            simulation_paused = configure is not None
         elif command_type == "set_fleet_size":
             new_size = command["size"]
-            checkpoint_path = command.get("checkpoint_path")
-            if qmix_controller is not None:
-                qmix_controller.reconfigure_fleet(new_size, checkpoint_path=checkpoint_path)
-            environment.set_num_robots(new_size)
+            if configure is not None:
+                configure(new_size, str(policy_getter()["source"]))
+            else:
+                environment.get_active_layout().validate(required_robots=new_size)
+                if qmix_controller is not None:
+                    qmix_controller.reconfigure_fleet(new_size, allow_untrained=False)
+                environment.set_num_robots(new_size)
+        elif command_type == "set_algorithm":
+            if configure is None:
+                raise ValueError("Algorithm switching is unavailable.")
+            configure(environment.num_robots, command["algorithm"])
         elif command_type == "pause":
             simulation_paused = True
-        elif command_type == "resume":
+        elif command_type in {"start", "resume"}:
             simulation_paused = False
         elif command_type == "set_speed":
             speed_multiplier = float(command["speed"])
             simulation_delay = max(0.01, float(interval_seconds) / speed_multiplier)
-    except (KeyError, TypeError, ValueError, FileNotFoundError) as error:
+    except (KeyError, TypeError, ValueError, OSError) as error:
         return ({
             "type": "command_error",
             "error": {"code": "invalid_command_value", "message": str(error)},
@@ -155,7 +178,7 @@ def _next_policy_actions(environment: WarehouseEnvironment) -> dict[int, int]:
 def _robot_goal(environment: WarehouseEnvironment, robot) -> tuple[int, int]:
     task = environment._get_robot_task(robot.robot_id)
     if task is not None:
-        return task.delivery_position if robot.position == task.pickup_position else task.pickup_position
+        return environment._task_target(robot, task)
     waypoints = tuple((x, min(environment.warehouse_height - 1, 8))
                       for x in (0, 4, 9, 14, 19) if x < environment.warehouse_width)
     return waypoints[(robot.robot_id + environment.episode_manager.current_step // 30) % len(waypoints)]
@@ -194,6 +217,8 @@ def build_state_payload(
     update_interval_seconds: float = 0.1,
     speed_multiplier: float = 1.0,
     simulation_paused: bool = False,
+    *,
+    trajectories: dict[int, deque[tuple[int, int]]] | None = None,
 ) -> dict[str, Any]:
     """Build a JSON snapshot matching the existing React state contract."""
     policy = policy_telemetry or {
@@ -203,7 +228,8 @@ def build_state_payload(
         "checkpointPath": None,
     }
     policy = {**policy, "trainingProgress": policy.get("trainingProgress")}
-    is_qmix = policy.get("source") == "QMIX"
+    algorithm = policy["source"]
+    learned = algorithm in {"QMIX", "IQL"}
     layout = environment.get_active_layout()
     tasks = [{
         "id": f"T{task.task_id:02d}", "pickupPos": list(task.pickup_position),
@@ -220,15 +246,23 @@ def build_state_payload(
     robots = []
     for robot in environment.robots:
         task = environment._get_robot_task(robot.robot_id)
-        path = _planned_path(environment, robot)
-        target = _robot_goal(environment, robot)
+        path = _planned_path(environment, robot) if trajectories is None else trajectories[robot.robot_id]
+        target = (_robot_goal(environment, robot) if trajectories is None
+                  else environment._task_target(robot, task) if task else None)
+        status = "IDLE"
+        if robot.action_overridden:
+            status = "WARNING"
+        elif robot.carrying_item:
+            status = "PICKUP" if task and robot.position == task.pickup_position else "DELIVERING"
+        elif robot.last_executed_action is not None:
+            status = "MOVING"
         robots.append({
             "id": f"R{robot.robot_id + 1:02d}", "position": list(robot.position),
-            "targetPosition": list(target), "rotation": None,
-            "status": "WARNING" if robot.action_overridden else ("MOVING" if robot.last_executed_action is not None else "IDLE"),
+            "targetPosition": list(target) if target is not None else None, "rotation": None,
+            "status": status,
             "taskId": f"T{task.task_id:02d}" if task is not None else None,
             "hasCargo": robot.carrying_item, "battery": None, "path": [list(cell) for cell in path],
-            "pathSource": "BFS_ESTIMATE",
+            "pathSource": "BFS_ESTIMATE" if trajectories is None else "POLICY_TRAJECTORY",
             "safetyAlert": robot.action_overridden,
             "lastRequestedAction": robot.last_requested_action,
             "lastExecutedAction": "NO_OP" if robot.action_overridden else robot.last_executed_action,
@@ -255,8 +289,8 @@ def build_state_payload(
     step = environment.episode_manager.current_step
     return {
         "type": "state_update", "timestep": step, "episode": environment.episode,
-        "algorithm": "QMIX" if is_qmix else "DEMO",
-        "controllerType": "RL_BACKEND" if is_qmix else "DEMO_CONTROLLER",
+        "algorithm": algorithm,
+        "controllerType": "RL_BACKEND" if learned else "RULE_BASED",
         "policy": policy,
         "config": {"gridWidth": layout.width, "gridHeight": layout.height, "cellSize": 1,
                    "layoutId": layout.layout_id,
@@ -282,7 +316,7 @@ def build_state_payload(
                      "reward": (sum(components["total"] for components in environment.last_reward_components.values())
                                 if environment.last_reward_components else None),
                      "fps": None},
-        "safetyOverrideActive": any(event["overridden"] for event in events), "isDemoMode": not is_qmix,
+        "safetyOverrideActive": any(event["overridden"] for event in events), "isDemoMode": algorithm == "DEMO",
         "simulationPaused": bool(simulation_paused),
         "isConnectedToBackend": True,
     }
@@ -296,66 +330,159 @@ def create_app(
 ):
     """Create the FastAPI app used by the visualizer.
 
-    ``policy_source="qmix"`` is the default and routes live actions through
-    ``MARLEnvironmentAdapter`` and ``QMIXController``. Use
-    ``policy_source="demo"`` only for a deterministic visual fallback.
+    Auto mode starts with a configured QMIX policy or the rule-based controller.
+    Explicit learned-policy mode requires a compatible checkpoint at startup.
     """
-    try:
-        from fastapi import FastAPI
-    except ImportError as error:  # pragma: no cover
-        raise RuntimeError("FastAPI is required for the WebSocket bridge; install requirements.txt.") from error
-    policy_source = policy_source.lower().strip()
-    if policy_source not in {"auto", "qmix", "demo"}:
-        raise ValueError("policy_source must be 'auto', 'qmix', or 'demo'")
+    from fastapi import FastAPI
 
-    env = environment or WarehouseEnvironment(load_layout_tasks=True)
+    requested = {"auto": "auto", "qmix": "QMIX", "iql": "IQL",
+                 "rule-based": "Rule-Based", "demo": "Rule-Based"}.get(policy_source.lower().strip())
+    if requested is None:
+        raise ValueError("Choose auto, qmix, iql, or rule-based.")
+    env = environment or WarehouseEnvironment()
     env.reset()
     adapter = MARLEnvironmentAdapter(environment=env)
-    checkpoint_path = checkpoint_path or os.environ.get("QMIX_CHECKPOINT")
-    requested_policy_source = policy_source
-    qmix_controller = None
-    if policy_source in {"auto", "qmix"}:
-        if not checkpoint_path:
-            if policy_source == "qmix":
-                raise ValueError("policy_source='qmix' requires a compatible QMIX_CHECKPOINT.")
-            logger.warning("No QMIX checkpoint configured; using the deterministic DEMO controller.")
-            policy_source = "demo"
-        else:
-            try:
-                qmix_controller = QMIXController(
-                    adapter,
-                    checkpoint_path=checkpoint_path,
-                    epsilon=float(os.environ.get("QMIX_EPSILON", "0")),
-                )
-            except (FileNotFoundError, ValueError) as error:
-                if requested_policy_source == "qmix":
-                    raise
-                logger.warning("QMIX checkpoint is unavailable or incompatible (%s); using DEMO controller.", error)
-                policy_source = "demo"
     app = FastAPI(title="Warehouse Environment Backend")
-    app.state.policy_source = "QMIX" if qmix_controller is not None else "DEMO"
-    simulation_paused = False
+    initial_size = env.num_robots
+    initial_qmix = checkpoint_path or os.environ.get("QMIX_CHECKPOINT")
+    active_policy = {}
+    action_provider = None
+    episode = None
+    travelled = {}
+    delivery_steps = {}
+    conflict_events = 0
+    physical_contacts = 0
+    recent_collisions = []
+    finished = False
+
+    def configure(size: int, algorithm: str) -> None:
+        nonlocal active_policy, action_provider
+        if size not in FLEET_SIZES:
+            raise ValueError("Choose a fleet size of 5, 10, or 20.")
+        env.get_active_layout().validate(required_robots=size)
+        if algorithm == "QMIX":
+            path = (initial_qmix if size == initial_size else None) or os.environ.get(f"QMIX_CHECKPOINT_N{size}")
+            if not path:
+                raise ValueError(f"No QMIX checkpoint configured for {size} robots.")
+            controller = QMIXController(adapter)
+            controller.reconfigure_fleet(size, checkpoint_path=path, allow_untrained=False)
+            candidate_provider = controller.select_actions
+            telemetry = controller.telemetry
+        elif algorithm == "IQL":
+            path = os.environ.get(f"IQL_CHECKPOINT_N{size}")
+            if not path:
+                raise ValueError(f"No IQL checkpoint configured for {size} robots.")
+            directory = Path(path)
+            metadata = json.loads((directory / "iql_manifest.json").read_text(encoding="utf-8"))
+            if (metadata.get("algorithm"), metadata.get("num_robots"), metadata.get("observation_dim"),
+                    metadata.get("action_dim"), metadata.get("include_static_map"),
+                    metadata.get("include_path_costs")) != ("IQL", size, 456, 4, True, True):
+                raise ValueError(f"IQL checkpoint is incompatible with the {size}-robot warehouse.")
+            try:
+                iql = _iql_provider(directory, size)
+            except Exception as error:
+                raise ValueError(f"IQL checkpoint could not be loaded: {error}") from error
+            candidate_provider = lambda: iql(env)
+            telemetry = {"source": algorithm, "checkpointLoaded": True, "trained": True,
+                         "checkpointPath": str(directory), "checkpointId": directory.name}
+        else:
+            candidate_provider = RuleBasedController(env).get_actions
+            telemetry = {"source": algorithm, "checkpointLoaded": False, "trained": False,
+                         "checkpointPath": None}
+        if active_policy:
+            env.set_num_robots(size)
+        active_policy = {**telemetry, "activeFleetSize": size}
+        action_provider = candidate_provider
+        app.state.policy_source = algorithm
+
+    startup_error = None
+    if requested == "auto":
+        try:
+            configure(initial_size, "QMIX")
+        except (OSError, ValueError) as error:
+            startup_error = str(error)
+            configure(initial_size, "Rule-Based")
+    else:
+        configure(initial_size, requested)
+
+    simulation_paused = True
     simulation_delay = max(0.01, float(interval_seconds))
     speed_multiplier = 1.0
     simulation_driver: WebSocket | None = None
 
     def current_policy() -> dict[str, object]:
-        if qmix_controller is not None:
-            return qmix_controller.telemetry
-        return {
-            "source": "DEMO",
-            "checkpointLoaded": False,
-            "trained": False,
-            "checkpointPath": None,
-        }
+        return active_policy
+
+    def refresh_episode() -> None:
+        nonlocal episode, travelled, delivery_steps, conflict_events, physical_contacts, recent_collisions, finished
+        if episode != env.episode:
+            episode = env.episode
+            if environment is None:
+                tasks = generate_task_assignments(env, Random(300_000 + env.episode))
+                for task in tasks:
+                    env.add_task(task.task_id, task.pickup_position, task.delivery_position, task.assigned_robot)
+            travelled = {robot.robot_id: deque([robot.position], maxlen=32) for robot in env.robots}
+            delivery_steps = {}
+            conflict_events = 0
+            physical_contacts = 0
+            recent_collisions = []
+            finished = False
+
+    def tick() -> None:
+        nonlocal conflict_events, physical_contacts, recent_collisions, finished
+        refresh_episode()
+        previous = {robot.robot_id: robot.position for robot in env.robots}
+        _, _, finished, _ = adapter.step(action_provider())
+        positions = {robot.robot_id: robot.position for robot in env.robots}
+        for robot_id, position in positions.items():
+            if position != previous[robot_id]:
+                travelled[robot_id].append(position)
+        step = env.episode_manager.current_step
+        for task in env.tasks:
+            if task.completed:
+                delivery_steps.setdefault(task.task_id, step)
+        conflict_events += sum(event.reason == "robot_collision" for event in env.get_safety_events())
+        contacts = infer_robot_robot_collisions(previous, positions)
+        physical_contacts += len(contacts)
+        recent_collisions = [
+            {"id": f"{episode}-{step}-{index}", "type": "ROBOT_ROBOT_CONFLICT",
+             "robots": [f"R{robot + 1:02d}" for robot in contact["robots"]],
+             "position": positions[contact["robots"][0]], "timestamp": step}
+            for index, contact in enumerate(contacts)
+        ]
+
+    def snapshot() -> dict[str, Any]:
+        refresh_episode()
+        payload = build_state_payload(env, current_policy(), simulation_delay, speed_multiplier,
+                                      simulation_paused, trajectories=travelled)
+        payload["simulationFinished"] = finished
+        payload["startupWarning"] = startup_error
+        payload["recentCollisions"] = recent_collisions
+        metrics = payload["metrics"]
+        step = env.episode_manager.current_step
+        metrics.update({
+            "completionRate": len(delivery_steps) / len(env.tasks) if env.tasks else None,
+            "averageDeliveryTimeSteps": sum(delivery_steps.values()) / len(delivery_steps) if delivery_steps else None,
+            "throughputPer100Steps": len(delivery_steps) * 100 / step if step else None,
+            "safetyConflictEvents": conflict_events,
+            "physicalCollisions": physical_contacts,
+            "totalCollisions": physical_contacts,
+            "collisionCount": physical_contacts,
+            "idleRobots": sum(robot.last_executed_action is None for robot in env.robots),
+        })
+        return payload
 
     @app.get("/health")
     async def health():
         return {"ok": True, "layout": env.get_active_layout().layout_id}
 
+    @app.get("/readiness")
+    async def readiness():
+        return {"ok": True, "policy": current_policy()}
+
     @app.get("/state")
     async def state():
-        return build_state_payload(env, current_policy(), simulation_delay, speed_multiplier, simulation_paused)
+        return snapshot()
 
     @app.websocket("/ws")
     async def websocket_endpoint(websocket: WebSocket):
@@ -370,29 +497,28 @@ def create_app(
                     response, simulation_delay, speed_multiplier, simulation_paused = _process_command_message(
                         raw_message,
                         env,
-                        qmix_controller,
+                        None,
                         current_policy,
                         interval_seconds,
                         simulation_delay,
                         speed_multiplier,
                         simulation_paused,
+                        configure=configure,
                     )
+                    if response["type"] == "state_update":
+                        refresh_episode()
+                        if finished:
+                            simulation_paused = True
+                        response = snapshot()
                     await websocket.send_json(response)
                 except asyncio.TimeoutError:
                     if simulation_driver is None:
                         simulation_driver = websocket
                     if not simulation_paused and simulation_driver is websocket:
-                        actions = (
-                            qmix_controller.select_actions()
-                            if qmix_controller is not None
-                            else _next_policy_actions(env)
-                        )
-                        _, _, terminated, _ = adapter.step(actions)
-                        if terminated:
-                            env.reset()
-                    await websocket.send_json(build_state_payload(
-                        env, current_policy(), simulation_delay, speed_multiplier, simulation_paused
-                    ))
+                        tick()
+                        if finished:
+                            simulation_paused = True
+                    await websocket.send_json(snapshot())
         except WebSocketDisconnect:
             pass
         finally:
