@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
-import { Camera, Pause, Play, RotateCcw, Wifi, WifiOff } from 'lucide-react';
+import { Camera, Pause, Play, RotateCcw, Wifi, WifiOff, Settings } from 'lucide-react';
 import { WarehouseCanvas } from './components/WarehouseCanvas';
-import { LiveAlgorithm, PythonWebSocketProvider, WarehouseFeed } from './api/PythonWebSocketProvider';
+import { LiveAlgorithm, PythonWebSocketProvider, WarehouseFeed, getDefaultWsUrl } from './api/PythonWebSocketProvider';
 import { DemoStateProvider } from './state/DemoStateProvider';
 import { WarehouseSceneController } from './scene/WarehouseSceneController';
 import { PathVisibilityMode } from './scene/PathSystem';
@@ -14,9 +14,6 @@ function format(value: number | null | undefined, decimals = 0) {
   return value == null ? '—' : value.toFixed(decimals);
 }
 
-// How long to wait for the WebSocket backend before giving up and staying in demo mode
-const WS_CONNECT_TIMEOUT_MS = 5000;
-
 type Mode = 'demo' | 'live';
 
 export default function App() {
@@ -24,14 +21,16 @@ export default function App() {
   const demoProvider = useRef<DemoStateProvider | null>(null);
   const scene = useRef<WarehouseSceneController | null>(null);
 
+  const [wsUrl, setWsUrl] = useState<string>(getDefaultWsUrl());
+  const [showEndpointSettings, setShowEndpointSettings] = useState(false);
+  const [endpointInput, setEndpointInput] = useState(getDefaultWsUrl());
+
   // Live feed from WebSocket (null = not connected / not available)
   const [wsFeed, setWsFeed] = useState<WarehouseFeed | null>(null);
   // Demo state from JS simulation engine
   const [demoState, setDemoState] = useState<WarehouseState | null>(null);
   // Current mode — starts as 'demo', switches to 'live' when WS connects
   const [mode, setMode] = useState<Mode>('demo');
-  // Whether we gave up waiting for WS (stopped trying to connect)
-  const [wsGaveUp, setWsGaveUp] = useState(false);
 
   const [selected, setSelected] = useState<string | null>(null);
   const [following, setFollowing] = useState<string | null>(null);
@@ -53,52 +52,29 @@ export default function App() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // Attempt WebSocket backend connection; give up after WS_CONNECT_TIMEOUT_MS
+  // Attempt WebSocket backend connection; continuously reconnect in background
   useEffect(() => {
-    const wsUrl = import.meta.env.VITE_WAREHOUSE_WS_URL || 'ws://127.0.0.1:8000/ws';
     let mounted = true;
-    let giveUpTimer: ReturnType<typeof setTimeout>;
+    wsProvider.current?.dispose();
 
     const provider = new PythonWebSocketProvider(feed => {
       if (!mounted) return;
       setWsFeed(feed);
       if (feed.connection === 'live') {
-        clearTimeout(giveUpTimer);
         setMode('live');
-        setWsGaveUp(false);
-      }
-      if (feed.connection === 'disconnected' && mode !== 'live') {
-        // Stay in demo — backend not available
+      } else if (feed.connection === 'disconnected') {
+        setMode('demo');
       }
     }, wsUrl);
 
     wsProvider.current = provider;
 
-    // If not live within timeout, give up and stay in demo
-    giveUpTimer = setTimeout(() => {
-      if (mounted && mode !== 'live') {
-        setWsGaveUp(true);
-        provider.dispose();
-        wsProvider.current = null;
-      }
-    }, WS_CONNECT_TIMEOUT_MS);
-
     return () => {
       mounted = false;
-      clearTimeout(giveUpTimer);
       provider.dispose();
       wsProvider.current = null;
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // If backend goes away after being live, fall back to demo
-  useEffect(() => {
-    if (wsFeed?.connection === 'disconnected' && mode === 'live') {
-      setMode('demo');
-      setWsGaveUp(true);
-    }
-  }, [wsFeed, mode]);
+  }, [wsUrl]);
 
   // ── Active state (live or demo) ──────────────────────────────────────────
   const state = mode === 'live' ? wsFeed?.state ?? demoState : demoState;
@@ -117,7 +93,7 @@ export default function App() {
 
   const connectionLabel = mode === 'live'
     ? { live: 'Live backend', stale: 'Stale telemetry', connecting: 'Connecting', disconnected: 'Reconnecting' }[feed.connection]
-    : wsGaveUp ? 'Demo mode (no backend)' : 'Demo mode · connecting…';
+    : feed.connection === 'connecting' ? 'Demo mode · connecting backend…' : 'Demo mode (standalone)';
 
   const metrics = state?.metrics;
   const checkpoint = state?.policy?.checkpointPath;
@@ -161,15 +137,33 @@ export default function App() {
   };
   const handleLiveReset = () => { wsProvider.current?.send({ type: 'reset' }); };
 
+  const handleSaveEndpoint = (e: React.FormEvent) => {
+    e.preventDefault();
+    const trimmed = endpointInput.trim();
+    if (trimmed) {
+      localStorage.setItem('warehouse_ws_url', trimmed);
+      setWsUrl(trimmed);
+      setShowEndpointSettings(false);
+    }
+  };
+
   return (
     <main className="control-room">
       <header className="control-header">
         <h1>Autonomous Warehouse Robot Fleet Coordination Using Multi-Agent Reinforcement Learning</h1>
         <div className="header-signals">
-          <span className={live ? 'live-signal' : 'warning-signal'} title={mode === 'demo' ? 'Running fully in-browser — no server required' : undefined}>
+          <span className={live ? 'live-signal' : 'warning-signal'} title={`WebSocket Target: ${wsUrl}`}>
             {live ? <Wifi size={12} style={{ display: 'inline', marginRight: 4 }} /> : <WifiOff size={12} style={{ display: 'inline', marginRight: 4 }} />}
             {connectionLabel}
           </span>
+          <button
+            type="button"
+            className="settings-icon-btn"
+            title="Configure backend WebSocket URL"
+            onClick={() => setShowEndpointSettings(s => !s)}
+            style={{ background: 'transparent', border: 'none', color: '#cddbd8', cursor: 'pointer', padding: '0 4px', display: 'flex', alignItems: 'center' }}>
+            <Settings size={15} />
+          </button>
           {state && <span>{state.algorithm} · {state.robots.length} {state.robots.length === 1 ? 'robot' : 'robots'} · {status}</span>}
         </div>
       </header>
@@ -177,10 +171,38 @@ export default function App() {
       {/* Demo mode banner */}
       {mode === 'demo' && (
         <div className="demo-banner" role="status">
-          🤖 <strong>Demo Mode</strong> — Full in-browser MARL simulation running locally.
-          {!wsGaveUp && ' Trying to connect to live backend…'}
-          {wsGaveUp && ' Connect a live backend via VITE_WAREHOUSE_WS_URL to switch to live mode.'}
+          🤖 <strong>In-Browser 3D MARL Simulation</strong> — Running locally on this device.
+          {feed.connection === 'connecting' ? ' Connecting to backend server…' : ' Connects automatically when backend server is online.'}
+          <button
+            type="button"
+            onClick={() => setShowEndpointSettings(s => !s)}
+            style={{ marginLeft: 12, background: 'rgba(255,255,255,0.15)', border: '1px solid rgba(255,255,255,0.2)', color: '#edf4f0', borderRadius: 4, padding: '2px 8px', fontSize: '0.78rem', cursor: 'pointer' }}>
+            {showEndpointSettings ? 'Hide URL' : 'Backend Settings'}
+          </button>
         </div>
+      )}
+
+      {/* Backend Settings Dialog */}
+      {showEndpointSettings && (
+        <form onSubmit={handleSaveEndpoint} style={{ background: '#0e1c22', borderBottom: '1px solid #1e3a47', padding: '8px 16px', display: 'flex', gap: 8, alignItems: 'center', fontSize: '0.84rem' }}>
+          <label style={{ color: '#8be8c3' }}>Backend WebSocket URL:</label>
+          <input
+            type="text"
+            value={endpointInput}
+            onChange={e => setEndpointInput(e.target.value)}
+            style={{ flex: 1, maxWidth: 450, background: '#162730', color: '#fff', border: '1px solid #2b4c5b', padding: '4px 8px', borderRadius: 4, fontSize: '0.82rem' }}
+            placeholder="wss://marl-warehouse-backend.onrender.com/ws or ws://127.0.0.1:8000/ws"
+          />
+          <button type="submit" style={{ background: '#8be8c3', color: '#09151b', border: 'none', padding: '4px 12px', borderRadius: 4, fontWeight: 'bold', cursor: 'pointer' }}>
+            Connect
+          </button>
+          <button type="button" onClick={() => { setEndpointInput('wss://marl-warehouse-backend.onrender.com/ws'); }} style={{ background: '#223844', color: '#cddbd8', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer' }}>
+            Default Render
+          </button>
+          <button type="button" onClick={() => { setEndpointInput('ws://127.0.0.1:8000/ws'); }} style={{ background: '#223844', color: '#cddbd8', border: 'none', padding: '4px 8px', borderRadius: 4, cursor: 'pointer' }}>
+            Localhost
+          </button>
+        </form>
       )}
 
       <div className="control-layout">
@@ -208,7 +230,7 @@ export default function App() {
             {!state && <div className="stale-overlay" role="status">Starting simulation…</div>}
             {state && mode !== 'live' && (
               <div className="stale-overlay demo-mode-overlay" role="status" style={{ background: 'rgba(0,40,80,0.55)', fontSize: '0.75rem', pointerEvents: 'none' }}>
-                Demo mode · In-browser simulation
+                In-browser simulation active · Ready for live backend
               </div>
             )}
           </div>
@@ -280,7 +302,7 @@ export default function App() {
             {state && (
               <div className="model-status" title={checkpoint ?? undefined}>
                 {mode === 'demo'
-                  ? 'Demo mode · BFS rule-based controller'
+                  ? 'In-browser BFS controller'
                   : state.policy?.checkpointLoaded ? 'Compatible checkpoint' : 'Rule-based controller'}
                 {checkpointName && <strong>{checkpointName}</strong>}
               </div>
@@ -291,7 +313,7 @@ export default function App() {
 
           <section className="side-panel">
             <h2>Episode telemetry</h2>
-            {state && <p className="episode-line">Episode {state.episode} · Step {state.timestep}{mode === 'demo' ? ' · Demo' : !live ? ' · Last received' : ''}</p>}
+            {state && <p className="episode-line">Episode {state.episode} · Step {state.timestep}{mode === 'demo' ? ' · Local sim' : !live ? ' · Last received' : ''}</p>}
             {state?.missionSeed && <p className="episode-line">Single-robot mission · Seed {state.missionSeed}</p>}
             {state?.referenceSeed && <p className="episode-line">Reference scenario · Seed {state.referenceSeed}</p>}
             <dl className="kpi-grid">{kpis.map(([label, value]) => <div key={label}><dt>{label}</dt><dd>{value}</dd></div>)}</dl>

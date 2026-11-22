@@ -14,6 +14,23 @@ type Command =
   | { type: 'set_fleet_size'; size: number }
   | { type: 'set_algorithm'; algorithm: LiveAlgorithm };
 
+export function getDefaultWsUrl(): string {
+  if (typeof window !== 'undefined') {
+    const saved = localStorage.getItem('warehouse_ws_url');
+    if (saved) return saved;
+  }
+  if (import.meta.env.VITE_WAREHOUSE_WS_URL) {
+    return import.meta.env.VITE_WAREHOUSE_WS_URL;
+  }
+  if (typeof window !== 'undefined') {
+    const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+    if (!isLocal) {
+      return 'wss://marl-warehouse-backend.onrender.com/ws';
+    }
+  }
+  return 'ws://127.0.0.1:8000/ws';
+}
+
 export class PythonWebSocketProvider {
   private socket: WebSocket | null = null;
   private feed: WarehouseFeed = { state: null, connection: 'connecting', error: null, pending: false };
@@ -22,7 +39,7 @@ export class PythonWebSocketProvider {
   private disposed = false;
 
   constructor(private notify: (feed: WarehouseFeed) => void,
-              private url = import.meta.env.VITE_WAREHOUSE_WS_URL || 'ws://127.0.0.1:8000/ws') {
+              private url: string = getDefaultWsUrl()) {
     this.connect();
   }
 
@@ -76,7 +93,7 @@ export class PythonWebSocketProvider {
     clearTimeout(this.watchdog);
     if (this.disposed) return;
     this.update({ connection: this.feed.state ? 'stale' : 'disconnected', pending: false });
-    this.retry = setTimeout(() => this.connect(), 1500);
+    this.retry = setTimeout(() => this.connect(), 2500);
   }
 
   dispose() {
