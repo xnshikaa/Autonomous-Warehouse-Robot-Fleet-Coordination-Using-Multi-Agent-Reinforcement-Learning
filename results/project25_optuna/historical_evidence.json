@@ -1,0 +1,3222 @@
+{
+  "git_revision": "8a7f563",
+  "training_manifests": [
+    {
+      "path": "artifacts/training/iql_n10_v1/training_manifest.json",
+      "sha256": "46da7e91cb4757dc8d04df17a6adf7bc3fbb5f38922998ff075e2459b745bc36",
+      "algorithm": "IQL",
+      "fleet_size": 10,
+      "seed": 43,
+      "episodes": 500,
+      "run_id": null
+    },
+    {
+      "path": "artifacts/training/iql_n20_v1/training_manifest.json",
+      "sha256": "b56c2bc8632e2c005d944a9e1020dc01c31a0c53868ee492ff009990321ed7e0",
+      "algorithm": "IQL",
+      "fleet_size": 20,
+      "seed": 44,
+      "episodes": 500,
+      "run_id": null
+    },
+    {
+      "path": "artifacts/training/iql_n5_v1/training_manifest.json",
+      "sha256": "95f6270ece949a68f7054da9d9c50f277446484de4ee0f6741c4d37e9f3d416c",
+      "algorithm": "IQL",
+      "fleet_size": 5,
+      "seed": 42,
+      "episodes": 500,
+      "run_id": null
+    },
+    {
+      "path": "artifacts/training/qmix_n10_v1/training_manifest.json",
+      "sha256": "60afabe49a8f716c9931bf844d873c5094847a9a4c943b549ad1b5d39a6ff907",
+      "algorithm": "QMIX",
+      "fleet_size": 10,
+      "seed": 43,
+      "episodes": 1000,
+      "run_id": null
+    },
+    {
+      "path": "artifacts/training/qmix_n20_remediation_control/training_manifest.json",
+      "sha256": "ff48fdd6db7150418268e73054b899bb36205b9d3ced6faaadad43d2980cc7e9",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 252020,
+      "episodes": 40,
+      "run_id": "6fd0614e4c37432eae027b1db73e368d"
+    },
+    {
+      "path": "artifacts/training/qmix_n20_remediation_lower_collision/training_manifest.json",
+      "sha256": "b03497bc3575fbd3a66e61a9b6b8ffb1dae1fffe46c7e631d0494f5fbb7ee09a",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 252020,
+      "episodes": 40,
+      "run_id": "9b1e427a155145ba88afb727b7009fb5"
+    },
+    {
+      "path": "artifacts/training/qmix_n20_v1/training_manifest.json",
+      "sha256": "ce2d5d64bfaa3e2320cc4f4da3c8c2513b38320b2dfcd57073dec3d9080cfd93",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 44,
+      "episodes": 1000,
+      "run_id": null
+    },
+    {
+      "path": "artifacts/training/qmix_n5_remediation_low_lr/training_manifest.json",
+      "sha256": "392dcd2c2f150e1074cab1ee6fb2ffeb0c462de022576a5c08b123be56d6c6fb",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 253505,
+      "episodes": 40,
+      "run_id": "3c34dbe51255429ca17adbd3ae94e7b2"
+    },
+    {
+      "path": "artifacts/training/qmix_n5_remediation_warm/training_manifest.json",
+      "sha256": "d2cc1785793eaefd9c95e5406360df3b90e54a246c031e9fa22e13ca194e1147",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 251605,
+      "episodes": 100,
+      "run_id": "85b173b15fc94640a5cc6900cd11ae8c"
+    },
+    {
+      "path": "artifacts/training/qmix_n5_smoke/training_manifest.json",
+      "sha256": "9d107b8d53e05b845a28ea35332aa9a73b0d7ab117b7132f65dce7372b5c4e42",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 42,
+      "episodes": 50,
+      "run_id": null
+    },
+    {
+      "path": "artifacts/training/qmix_n5_v1/training_manifest.json",
+      "sha256": "b0bfb44d30a99fab1a0e53d91f90391243c6b6405e92408abd5dfe61b81fd579",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 42,
+      "episodes": 1000,
+      "run_id": null
+    },
+    {
+      "path": "mlruns/4/3c34dbe51255429ca17adbd3ae94e7b2/artifacts/training_manifest.json",
+      "sha256": "392dcd2c2f150e1074cab1ee6fb2ffeb0c462de022576a5c08b123be56d6c6fb",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 253505,
+      "episodes": 40,
+      "run_id": "3c34dbe51255429ca17adbd3ae94e7b2"
+    },
+    {
+      "path": "mlruns/4/6fd0614e4c37432eae027b1db73e368d/artifacts/training_manifest.json",
+      "sha256": "ff48fdd6db7150418268e73054b899bb36205b9d3ced6faaadad43d2980cc7e9",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 252020,
+      "episodes": 40,
+      "run_id": "6fd0614e4c37432eae027b1db73e368d"
+    },
+    {
+      "path": "mlruns/4/78a90ed59d254518ab4ec24df9ef6d2b/artifacts/training_manifest.json",
+      "sha256": "2f6dcee2b85de6c749a79ffc45e11c080acdee31bcf1c0aaded356c17b0f2ca9",
+      "algorithm": "IQL",
+      "fleet_size": 5,
+      "seed": 423,
+      "episodes": 1,
+      "run_id": "78a90ed59d254518ab4ec24df9ef6d2b"
+    },
+    {
+      "path": "mlruns/4/85b173b15fc94640a5cc6900cd11ae8c/artifacts/training_manifest.json",
+      "sha256": "d2cc1785793eaefd9c95e5406360df3b90e54a246c031e9fa22e13ca194e1147",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 251605,
+      "episodes": 100,
+      "run_id": "85b173b15fc94640a5cc6900cd11ae8c"
+    },
+    {
+      "path": "mlruns/4/9b1e427a155145ba88afb727b7009fb5/artifacts/training_manifest.json",
+      "sha256": "b03497bc3575fbd3a66e61a9b6b8ffb1dae1fffe46c7e631d0494f5fbb7ee09a",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 252020,
+      "episodes": 40,
+      "run_id": "9b1e427a155145ba88afb727b7009fb5"
+    },
+    {
+      "path": "mlruns/4/f41cb2184f864a8784208fe5d516f87d/artifacts/training_manifest.json",
+      "sha256": "ea8a5e54c091dace1f85427777f936a92e57ce972359da98a70bfc4a04a72960",
+      "algorithm": "IQL",
+      "fleet_size": 5,
+      "seed": 423,
+      "episodes": 1,
+      "run_id": "f41cb2184f864a8784208fe5d516f87d"
+    },
+    {
+      "path": "mlruns/4/f5d0dd3049644a9da3d490d6ce9511ee/artifacts/training_manifest.json",
+      "sha256": "2080ad3d12e7937bf1432b22d8039bf83e7eb6866948fd9581021d7f908fbe7d",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 423,
+      "episodes": 1,
+      "run_id": "f5d0dd3049644a9da3d490d6ce9511ee"
+    }
+  ],
+  "validation_results": [
+    {
+      "path": "artifacts/training/iql_n5_v1/validation_selection.json",
+      "sha256": "cf9ef4972ea4ad4aae2d22014953a06a4e4850ca6c2197073dc8b4b561768b6a",
+      "algorithm": "IQL",
+      "fleet_size": 5,
+      "seed": 20261120,
+      "episodes": 10,
+      "candidates": [
+        {
+          "candidate": "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200",
+          "checkpoint_sha256": {
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200\\iql_robot_0.pt": "e291c9f0c9c1d2c46e757293387ba2bc141f34ea2006ac29204e54cd655b2c68",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200\\iql_robot_1.pt": "5d026eb0531b7032e01e8bfb43ec376fe96f4e162f74162d639a6ebae847ebf3",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200\\iql_robot_2.pt": "5c1f59a55bac27f4649de9a8dd213aad0d5fbab1aa409f959691cf9b595b82f9",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200\\iql_robot_3.pt": "ae98cd00cc9a7467937a2c94b4f8ed6c2a464d5fe037e8e91b89cb682e10ea34",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200\\iql_robot_4.pt": "856f585f3bd97145d0a4476f2c65741cd69fe9f665a1938d70f585a20685ffef",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00200\\iql_manifest.json": "c540f6ae1b40f0e8b8efca7c25dc4065a2fd09893dace5e34d8555a45512cd36"
+          },
+          "completion_rate": 0.64,
+          "completion_rate_95ci": {
+            "estimate": 0.6399999999999999,
+            "lower": 0.5399999999999999,
+            "upper": 0.76,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300",
+          "checkpoint_sha256": {
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300\\iql_robot_0.pt": "557f9b8b2ae70dce7e6cebe790f49c21537666dae45cdcecc8819265562c3930",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300\\iql_robot_1.pt": "4830aec7c341a55d3c438d0945d29b9d63340d99d3241e6aca42f73d026e827a",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300\\iql_robot_2.pt": "f8a6561c41b70ac7f45c62ea39ceac613bab2c3f042501ac9806288662429863",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300\\iql_robot_3.pt": "f3fe0d3bdffbcc1e5cb1d8de666feb1aae212623ee6b71f78143727bb168c47c",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300\\iql_robot_4.pt": "fe0b03fa630896fefb2f28064d1e43759cfdd7b9f5f4b84dea0c599816a1b5c6",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00300\\iql_manifest.json": "9a7aafb852fb5b3e6c40f6e1511ff1f715d2c82b5215a9146924289a90c1d17b"
+          },
+          "completion_rate": 0.6,
+          "completion_rate_95ci": {
+            "estimate": 0.5999999999999999,
+            "lower": 0.42000000000000004,
+            "upper": 0.76,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500",
+          "checkpoint_sha256": {
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500\\iql_robot_0.pt": "69a046dfbd0023b3f90c202b2b9d17d43731c961c7a0db56f68c4896ac018af8",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500\\iql_robot_1.pt": "fa082edd694405923d873e2fb1a5b5491aac47bddca88434e6664debbc954030",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500\\iql_robot_2.pt": "20545eeac7521e1cf72ab0328aa9360437610e22c59f34b2bf11531131ba5ca1",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500\\iql_robot_3.pt": "ebbcd202106966bab71ea739c37476bc680dcfa595c2a6386fa4ce813c936b0c",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500\\iql_robot_4.pt": "ae90010c7c1f11887a8775c25387777fe251e99697437f2242686fb4f3c2d90d",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00500\\iql_manifest.json": "2efa22447419c7c032cb2f32bd3152ed135b8655d082ba151c81869407b07ee7"
+          },
+          "completion_rate": 0.5599999999999999,
+          "completion_rate_95ci": {
+            "estimate": 0.5599999999999999,
+            "lower": 0.5,
+            "upper": 0.5999999999999999,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400",
+          "checkpoint_sha256": {
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400\\iql_robot_0.pt": "c691e3467ee0676a852c0940788911e310957856022268c9a3f2bc8b885eb6da",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400\\iql_robot_1.pt": "09d6e736846b45c24b01e759f7e23ddf62fa7e509f8a19a7bdca6900bb88ccf9",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400\\iql_robot_2.pt": "dcd0a64e9144bb52ec013c21aedee12a70db039a4750b3f848029b7fb4185c59",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400\\iql_robot_3.pt": "4bf5ea8abd9f40293a493cb6d8c198b17f038bfba71e818d07bfe61e931c4430",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400\\iql_robot_4.pt": "fbdd716200257ea57a8e76964a38b8d8eb1c6535f461a41a785fb4536b31282a",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00400\\iql_manifest.json": "ae1affea6cabde67f217c322a9def0aec2619f49d99208645ab7376cce635086"
+          },
+          "completion_rate": 0.34,
+          "completion_rate_95ci": {
+            "estimate": 0.33999999999999997,
+            "lower": 0.24,
+            "upper": 0.42000000000000004,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100",
+          "checkpoint_sha256": {
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100\\iql_robot_0.pt": "175bd9986feeda864b67982a2b4413eafcab08250fdc83800c7c04ac35236e2e",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100\\iql_robot_1.pt": "85c565ceff6a673649dda0da3e4f268b6f6391b0fc5821586fe53db83ce4e359",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100\\iql_robot_2.pt": "506588614ad35b914a1f2c70f91670b48f4ca076db5fbbde0c3e03718ec98b9a",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100\\iql_robot_3.pt": "58bc0510240208ade990ce895c211649a4d85c4492e47012f2c8843ab76a75c9",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100\\iql_robot_4.pt": "1ef975afcb5bbc03aeb41c4b635fe825b0e1a03f6f837b45c00d0c3e794acb31",
+            "artifacts\\training\\iql_n5_v1\\snapshots\\episode_00100\\iql_manifest.json": "ffd4ac0430946249d412d8d4e872757219849720d48f30fc122112c81f188992"
+          },
+          "completion_rate": 0.2,
+          "completion_rate_95ci": {
+            "estimate": 0.2,
+            "lower": 0.12,
+            "upper": 0.3,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "artifacts/training/qmix_n10_v1/validation_selection.json",
+      "sha256": "7dba21f7626227a1332b6230aefc42d97670bb19bf4bdda7cb38b0f6a7b0707d",
+      "algorithm": "QMIX",
+      "fleet_size": 10,
+      "seed": 20261120,
+      "episodes": 5,
+      "candidates": [
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00500\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00500\\checkpoint_state.pt": "8d1d4521d327f5e49f7d0c1c35031c2908bce63f9ef15227478f8ffd10be5296"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00300\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00300\\checkpoint_state.pt": "257c8cc37d6c750581fdcda08fe3575a019ce15dec9fa5b4c242002d82d9803d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00400\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00400\\checkpoint_state.pt": "45f6d566083adce7bce63d9ac57dca7a7e02108f1f05901f7d684222451be66d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00100\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00100\\checkpoint_state.pt": "e63fa7a234cc6efa3a7830de3966b54d01ddc929556a590dd9c08d8bd63f4c0c"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00200\\checkpoint_state.pt": "30cd5b21a7efcc6918669b92d942a744954cfb2b5cf5407faea0fd0a50f3f1c9"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "artifacts/training/qmix_n10_v1/validation_selection_100steps.json",
+      "sha256": "61e6f81910d33b9c8331ab38e52dff9a8abb1ff4a69b0c6834772aa1f10d8123",
+      "algorithm": "QMIX",
+      "fleet_size": 10,
+      "seed": 20261120,
+      "episodes": 10,
+      "candidates": [
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\qmix.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\qmix.pt": "364c0885cd6e90cf8c871c61d3812cae62143592ad08fc964cc146303a24b30b"
+          },
+          "completion_rate": 0.23,
+          "completion_rate_95ci": {
+            "estimate": 0.23000000000000004,
+            "lower": 0.17,
+            "upper": 0.29000000000000004,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_01000\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_01000\\checkpoint_state.pt": "43e30259e9de5df5b33b9e16a33503631c449836429d1bfe53762551ae37192e"
+          },
+          "completion_rate": 0.23,
+          "completion_rate_95ci": {
+            "estimate": 0.23000000000000004,
+            "lower": 0.17,
+            "upper": 0.29000000000000004,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00900\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00900\\checkpoint_state.pt": "e0660ed08eaf201ad0580a0546e1d5be7c0c2fc8d1711790fd4bc74ae69d846f"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0,
+            "upper": 0.030000000000000006,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00500\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00500\\checkpoint_state.pt": "8d1d4521d327f5e49f7d0c1c35031c2908bce63f9ef15227478f8ffd10be5296"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00600\\checkpoint_state.pt": "aafe0d43f5528b1eb7492dfbadd1523edc2514e6f7db26c863438411d2b3a132"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00400\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00400\\checkpoint_state.pt": "45f6d566083adce7bce63d9ac57dca7a7e02108f1f05901f7d684222451be66d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00300\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00300\\checkpoint_state.pt": "257c8cc37d6c750581fdcda08fe3575a019ce15dec9fa5b4c242002d82d9803d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00100\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00100\\checkpoint_state.pt": "e63fa7a234cc6efa3a7830de3966b54d01ddc929556a590dd9c08d8bd63f4c0c"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00700\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00700\\checkpoint_state.pt": "e274a24bc1d935715f771e49f24642328af3be65539c995b743b33bae6233c3d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00800\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00800\\checkpoint_state.pt": "1deeed05492031d7d101894186a6c87598cd6a1d54c21ab67046065b5e2c248a"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n10_v1\\snapshots\\episode_00200\\checkpoint_state.pt": "30cd5b21a7efcc6918669b92d942a744954cfb2b5cf5407faea0fd0a50f3f1c9"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "artifacts/training/qmix_n20_v1/validation_selection.json",
+      "sha256": "c5ca53ade5950b3ced12fdd2a234abfa705f12850ecbc49e2ecd60565276f9b9",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 20261120,
+      "episodes": 5,
+      "candidates": [
+        {
+          "candidate": "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00200\\checkpoint_state.pt": "16421fd30302cb9b68968b8ed4efe00433222326108c7a8835126592e44d566c"
+          },
+          "completion_rate": 0.02,
+          "completion_rate_95ci": {
+            "estimate": 0.02,
+            "lower": 0.0,
+            "upper": 0.06000000000000001,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00100\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00100\\checkpoint_state.pt": "a41f89e2a781a3400ec5a088b6d798fcfed82ae6dda7e8a5f03d93444553f92b"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0,
+            "upper": 0.030000000000000006,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00300\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00300\\checkpoint_state.pt": "c2ea7ad028e8bec5f0f4584d82508fad39e00464cfa0be5d644f6780a9b79652"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 5,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "artifacts/training/qmix_n5_v1/validation_selection.json",
+      "sha256": "8e2f7eb43f539a7e9bd67e9f88926dcf80f6621714fbebfd01fe98825e5c49fa",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 20261120,
+      "episodes": 10,
+      "candidates": [
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+          },
+          "completion_rate": 0.68,
+          "completion_rate_95ci": {
+            "estimate": 0.68,
+            "lower": 0.54,
+            "upper": 0.8200000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00400\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00400\\checkpoint_state.pt": "16803669fd8c6e351966e98fedf0a5ab732b1545c6d0e0e2330484c7bfe924e3"
+          },
+          "completion_rate": 0.58,
+          "completion_rate_95ci": {
+            "estimate": 0.58,
+            "lower": 0.44000000000000006,
+            "upper": 0.72,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00500\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00500\\checkpoint_state.pt": "b5339de9c6d8691d113369c8eb1db806c428d9a230681035f9a5ed8bd95115e9"
+          },
+          "completion_rate": 0.34,
+          "completion_rate_95ci": {
+            "estimate": 0.34,
+            "lower": 0.24,
+            "upper": 0.44049999999999284,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00300\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00300\\checkpoint_state.pt": "62afc59eade381652933dee7c284e688975489a0748040da0c81628ed462090b"
+          },
+          "completion_rate": 0.2,
+          "completion_rate_95ci": {
+            "estimate": 0.2,
+            "lower": 0.1,
+            "upper": 0.30000000000000004,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00700\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00700\\checkpoint_state.pt": "118c3d597d35b735e114b5a156112c89fa512f3907579e0d74011c0b256f6609"
+          },
+          "completion_rate": 0.18000000000000002,
+          "completion_rate_95ci": {
+            "estimate": 0.18000000000000002,
+            "lower": 0.08,
+            "upper": 0.2800000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00900\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00900\\checkpoint_state.pt": "67a743f0a5b06465ceef991ece4d88c07d745ae308001381589e71af2aed508e"
+          },
+          "completion_rate": 0.18,
+          "completion_rate_95ci": {
+            "estimate": 0.18,
+            "lower": 0.06,
+            "upper": 0.33999999999999997,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00200\\checkpoint_state.pt": "29d53e1ba2a58a089032ea221d731e7c27a32fe44a1995f909e15d1fe86fc136"
+          },
+          "completion_rate": 0.02,
+          "completion_rate_95ci": {
+            "estimate": 0.02,
+            "lower": 0.0,
+            "upper": 0.06000000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00100\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00100\\checkpoint_state.pt": "067486b42c2b70daf373876afcabed3f43ef69a5d6e4cc844fe97e46929fb900"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00800\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00800\\checkpoint_state.pt": "e30d26f48c689fbd87f1c9248e3f04eb27c9cc9c2c2634269d07523624eddc4f"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "artifacts/training/qmix_n5_v1/validation_selection_100steps.json",
+      "sha256": "e0bb0b1708ab22283be61aa806bf1441320f1042156db6741751f3a7fb823764",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 20261120,
+      "episodes": 10,
+      "candidates": [
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+          },
+          "completion_rate": 0.7,
+          "completion_rate_95ci": {
+            "estimate": 0.7,
+            "lower": 0.5599999999999999,
+            "upper": 0.8400000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00400\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00400\\checkpoint_state.pt": "16803669fd8c6e351966e98fedf0a5ab732b1545c6d0e0e2330484c7bfe924e3"
+          },
+          "completion_rate": 0.66,
+          "completion_rate_95ci": {
+            "estimate": 0.6599999999999999,
+            "lower": 0.5,
+            "upper": 0.82,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\qmix.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\qmix.pt": "3d3bbb21daba4ad426d138253eca9fc6a561d334b07fdf13cf9e017806407651"
+          },
+          "completion_rate": 0.44,
+          "completion_rate_95ci": {
+            "estimate": 0.44000000000000006,
+            "lower": 0.28,
+            "upper": 0.6000000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_01000\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_01000\\checkpoint_state.pt": "40495fe6e7e9fbe5a988815eca55e1b3a5127a47089811c57f0220dcf61c583a"
+          },
+          "completion_rate": 0.44,
+          "completion_rate_95ci": {
+            "estimate": 0.44000000000000006,
+            "lower": 0.28,
+            "upper": 0.6000000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00500\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00500\\checkpoint_state.pt": "b5339de9c6d8691d113369c8eb1db806c428d9a230681035f9a5ed8bd95115e9"
+          },
+          "completion_rate": 0.4,
+          "completion_rate_95ci": {
+            "estimate": 0.4,
+            "lower": 0.26,
+            "upper": 0.54,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00300\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00300\\checkpoint_state.pt": "62afc59eade381652933dee7c284e688975489a0748040da0c81628ed462090b"
+          },
+          "completion_rate": 0.2,
+          "completion_rate_95ci": {
+            "estimate": 0.2,
+            "lower": 0.1,
+            "upper": 0.30000000000000004,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00900\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00900\\checkpoint_state.pt": "67a743f0a5b06465ceef991ece4d88c07d745ae308001381589e71af2aed508e"
+          },
+          "completion_rate": 0.2,
+          "completion_rate_95ci": {
+            "estimate": 0.20000000000000004,
+            "lower": 0.08,
+            "upper": 0.34,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00700\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00700\\checkpoint_state.pt": "118c3d597d35b735e114b5a156112c89fa512f3907579e0d74011c0b256f6609"
+          },
+          "completion_rate": 0.18000000000000002,
+          "completion_rate_95ci": {
+            "estimate": 0.18000000000000002,
+            "lower": 0.08,
+            "upper": 0.2800000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00200\\checkpoint_state.pt": "29d53e1ba2a58a089032ea221d731e7c27a32fe44a1995f909e15d1fe86fc136"
+          },
+          "completion_rate": 0.02,
+          "completion_rate_95ci": {
+            "estimate": 0.02,
+            "lower": 0.0,
+            "upper": 0.06000000000000001,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00100\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00100\\checkpoint_state.pt": "067486b42c2b70daf373876afcabed3f43ef69a5d6e4cc844fe97e46929fb900"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00800\\checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00800\\checkpoint_state.pt": "e30d26f48c689fbd87f1c9248e3f04eb27c9cc9c2c2634269d07523624eddc4f"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 10,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/project25_validation/iql_n10.json",
+      "sha256": "3ac5e33032b35191e752b58ff3fb610b67cc7678bf4d56c9d4fe08f380d138cb",
+      "algorithm": "IQL",
+      "fleet_size": 10,
+      "seed": 20261120,
+      "episodes": 20,
+      "candidates": [
+        {
+          "candidate": "artifacts/training/iql_n10_v1/snapshots/episode_00500",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_0.pt": "a722ab2e60ccfc27383e00d10e562dcc5c905cb45ea237919349f1478279c3dc",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_1.pt": "2603ee68bf352d0147459087244c19d5415363b135f62a245eaf87d0335ba6d7",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_2.pt": "c5a4f1effd0880ada019d17c6a3807a25ad89472967def192ec5760dd4755a70",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_3.pt": "191429cf8684ac4de977165c4ff1fa23838ef697a430a6b1193329dd48d27dac",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_4.pt": "158d55547492a779776ba5ea0aef3f508c7ac3f32ed81889938530e94e1caeb6",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_5.pt": "4423c2f4cbc22da41d5ab26b289273ed91bc6b0a175faee27b8f09e68544c29b",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_6.pt": "bf3e818900aec3a9a2402fe58713f3454f4c23b90df649e7b66d4537b4aae976",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_7.pt": "d6cb72144d686c62328720515239a54a0e056c5c8ba87a0a6f84f7a12af1d80c",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_8.pt": "90649ed0985a3196010d226d42b6ec07dc53a010d678cb0e15be017b06b2eb4e",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_robot_9.pt": "517b382beb85b9d34e7d6cc10561c6fa51aac46021cf09e5874a1c7059d99c72",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00500/iql_manifest.json": "9277d11e1119dbc230133130ec114bce83917166a4ea07c1f71acd034835dc0f"
+          },
+          "completion_rate": 0.3,
+          "completion_rate_95ci": {
+            "estimate": 0.30000000000000004,
+            "lower": 0.24499999999999997,
+            "upper": 0.355,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n10_v1/snapshots/episode_00400",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_0.pt": "5a8a85da79ebac14ea5ba559afc9a69596cc839f712c83f3db4617cb45936456",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_1.pt": "55f0fa656726fcfb14125fd0dddd24f96bedcedcc9f46e143d210ddf06806cc0",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_2.pt": "6f66c3956f6c191d1b26c2a46b67d15e1b01095d0fa0fcd8d46e8d86fb0c35f3",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_3.pt": "6ebb16d1ba379f570f7ce337267cd8b27afc9da95759eed5e7478eef549029b0",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_4.pt": "07dd5706cfb31df53e3e294968873aaedf13155a601a010f8763184b4210b80a",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_5.pt": "943a9b968a1f42a28f29ada7bed1c285895c1787256edefb29f7337c0704b8b7",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_6.pt": "e8d5ab03277de1ed3ad4c125fb042c4a15b55af8d3a97dc1cfd0ac642d10a4af",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_7.pt": "2c2d66247ce40bfe92b4ce85ac06b917ddd747ddc7fd7ab51b01c07fd64fe085",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_8.pt": "00e9313594a87f233b706b6923846b7752ecbac924f036a3f66a69be892c5fd2",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_robot_9.pt": "ccdad1c23cf2e5fcf7123795cde0b1c7547c47c2f46465f9a74c03a6e0215a69",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00400/iql_manifest.json": "7d631bfd9cb22dbcacbeb916e4ca6889e8c1bbbb1cc1eca46967375d8473e8ca"
+          },
+          "completion_rate": 0.275,
+          "completion_rate_95ci": {
+            "estimate": 0.275,
+            "lower": 0.215,
+            "upper": 0.335,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n10_v1/snapshots/episode_00300",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_0.pt": "b92c391d799bc313bc44e796dfd9855e0c2c2b39ecac343138d54779bbc8422b",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_1.pt": "3ac77e006a033d4b191e2288e3e5abf392002bb7acf6e89fce66c14c63612df0",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_2.pt": "02f88f915e18fdf3f5acd1926137e9e92b1fdd189510011dae5953bea7ba3961",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_3.pt": "abfceb866219d5db8c7a8cb07bee0d85c5e8da632803b64de6566b2030ead22f",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_4.pt": "c9296f6554e865702eebe259b2c9f440872cd8d14aa290be53be24eb7ef47a83",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_5.pt": "80df8e11b1fa843f5a230d22f4f9792934faeb51d28e214610c7d1262cf70030",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_6.pt": "b7bb9667f67fbdbb1b4c37846edc5cacd1c75e158af7abcf966d11f2df1de037",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_7.pt": "07c9eac646a0485ca4d408302c6fb812802bf7c55989e87987aba50146ac8345",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_8.pt": "2e177c041d826e17f2e206846b61956a3508441255bc0db1a758adcb1eeb66ae",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_robot_9.pt": "dd677465ad17593bcc3f373cc35a073db77d972ac63dea3dc9ab00ef0f397199",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00300/iql_manifest.json": "fd20763d7edfd75f97e44e3ed737d990a89e78dd70934d5efc4c659e9daaac1a"
+          },
+          "completion_rate": 0.17500000000000002,
+          "completion_rate_95ci": {
+            "estimate": 0.17500000000000002,
+            "lower": 0.14,
+            "upper": 0.21000000000000002,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n10_v1/snapshots/episode_00100",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_0.pt": "a28c6235abcd1ac901698fa7d428c4a92465d3cd11641fc6fb37b0ee9b259e74",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_1.pt": "e5170b419874a7023db1c884eaf3a5e487a6180e4aac0ea17166b13774ec8fb9",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_2.pt": "f78285713053059380e32bdb9a248de138df8c3b6551d7842a9f15c879943eb1",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_3.pt": "32dcedd6b2e8a0ce61a48ded51fc866d76057e1c2cfb17030e1a68d58767b2dc",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_4.pt": "7d5b68f20aefbbc522feba136b0c176c354114ca15de66a3326c99e4227c17af",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_5.pt": "ea5af00ad141dfd8ab835e8c69f87e8e8ed3684b21b81ea5b5432456ccbfdb0c",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_6.pt": "ae06bb8e183e000764424db59b51f1cf9e15b44631aadacae6088bae49128fdf",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_7.pt": "1adf5121346401563030b3bb67f1331b5302b8004578fd5bdc1c18e23e18788c",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_8.pt": "1f2cb5f455e828be55ae340b45c264b299b0c76ade1d0c2dced3ce08f25d3d22",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_robot_9.pt": "7b4225406fa2991e242e1be3aac1141978ac03050fb6259ca7c3ae2f4ffd1c1e",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00100/iql_manifest.json": "871defd28f1b13e40751e88abff831f19608940e6a570e7a939c7f4503b05395"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0,
+            "upper": 0.025,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n10_v1/snapshots/episode_00200",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_0.pt": "a86fa0b58114fb0bd0c42e8adf34d9a11091d2d5b33b3d58e88c450fe71e3b61",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_1.pt": "f61fa87115459eabb78dd2a1c5c77a0aa901b8d0e352967b88ada79f6bd980bd",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_2.pt": "e01161cd5589f0c0dd4984db144defba81cd8e71897c8b9da9e4936b0fd2afb3",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_3.pt": "5a969417d11e2e55ab3619797a4af86871097b532408614a593f247b8dc350f7",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_4.pt": "4ac301eb2f7fec331a0c3af2dd5e9770ef026613698cd47c6c7fb1500fd23543",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_5.pt": "d8706fe437af8b9275bc14af8d8f486eee257e89db49dc6a65b98df07df28452",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_6.pt": "7a28ea14ee6269d33210fe729c2295b5108740d43f18c641a3be9c56db6f20ac",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_7.pt": "6ec70c598b7b8ae00b3c64e6ef6788886e706f0588de068ada6d955770a8c228",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_8.pt": "189b702157c7b9852159dfd09bca92e699733eaf72fe998ae36442b2cd3f621d",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_robot_9.pt": "2978df64b30ff2f08e0062f355ea3eb240b137affd1f9a8c12a5e5d957e3c3e6",
+            "artifacts/training/iql_n10_v1/snapshots/episode_00200/iql_manifest.json": "658328b465797238a226df6cb18bdcc0bc1fafbfcf4068976d617dcbe2fd8f27"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/project25_validation/iql_n20.json",
+      "sha256": "3ae9365b7dc275e463757cfbeeca00cfc4ab190e63fbb65de102ed880d369d77",
+      "algorithm": "IQL",
+      "fleet_size": 20,
+      "seed": 20261120,
+      "episodes": 20,
+      "candidates": [
+        {
+          "candidate": "artifacts/training/iql_n20_v1/snapshots/episode_00400",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_0.pt": "d03da8332179bbd586b219fca34ebd10f8b026be21fe79efae942992d992af17",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_1.pt": "363997fdcb74f7d2b7236e3af2d0f72fb58b3753adf10c04d66060171f5f6620",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_10.pt": "efc144ece943e7a40d3d37e46d8d6e21e57d1e54d46499d36855be4253c8090e",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_11.pt": "f2f41817f32b3c66bef18ce7eb49be77fdcabde4c52485abb1d72c06464cf0ab",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_12.pt": "8d8bed52258d0351ee7bef7abb0a912f4b5a9b8b3a3b8851d47752cadb47e4fa",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_13.pt": "d2df5b19204c024ac594a311447175b678f77cb00ed6a0d1d0d71dee395abd03",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_14.pt": "73aea4dfc1ceb2c481ce343026dc8f60fe0b57afd715a36a95f53c604599ee11",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_15.pt": "0c1ee10ab9ffa8757f5a18c5abe88efccba2aa7040f7a66a3b36a9eb81454a81",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_16.pt": "27e0b25555b5abc72bfb6b3916daf8b2a3c28841a8091cf324fc7d14ab586441",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_17.pt": "1fb291c7063d66f2220a9b27d6532817f527703aa79e98244275645e86d379c1",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_18.pt": "a6bf1034a721340bf73b8f33b197851298548239c08815cae4c4bd25fd27aebb",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_19.pt": "b4fd9ca9f7513a22fc997f60389f1083fda1d09b40404a45e108d1b578cb0c26",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_2.pt": "d38a8d10852028719a2272d37ba616cabb81d745e13f1923beab26af93403e76",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_3.pt": "87c94608e3194431dae181ce1992d78d479725c941e0d78047e179ebe6871ec4",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_4.pt": "4b8a2ac88890097b0526166840fe606555ddeb8e176b5b0c5ed8b1cede21e840",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_5.pt": "3617e587df82dce862101ac8cfaa4c6ccbe90f5f85133c597ec33380b7fc2e48",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_6.pt": "488e9472c0e2bbcbec630db39395476f376180a53d146731bc2e1a6418a66fea",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_7.pt": "b701168be0a6e8971148a6b560dd6704d658965e054b8fc095a6aea4b57baf70",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_8.pt": "cd9934ece5f06a3ea886bd9a022e75c5c5c774c7d9926f7a0e3a16231582b324",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_robot_9.pt": "55fd857b35e22360d39d70a89b2d43117ab8d52eb5ed3ea19f73b64cfdb769f2",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00400/iql_manifest.json": "efce5c5d6da184e5a82ac4d3927383f835534f60a43d36f5c39e12c180947b31"
+          },
+          "completion_rate": 0.007500000000000001,
+          "completion_rate_95ci": {
+            "estimate": 0.0075000000000000015,
+            "lower": 0.0,
+            "upper": 0.015000000000000003,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n20_v1/snapshots/episode_00200",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_0.pt": "af69b175e485011bd48a516d601320f64a6fa8ded87b4899887f012cf6b19240",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_1.pt": "b71d6a9ed89e4621c1b942e9686d74082d949882f6ba89315661d5a45ada0828",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_10.pt": "8544c3ce613108a500553fa029bbe152755fdcc264d39226f9916fb640db6660",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_11.pt": "f574a8eeb5bf6fac53b18d83307aea714b3cd06a784eeae28c910dc53fc4e1c2",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_12.pt": "b68060cab8ad1e715d68a44bf43d274ac5df72544067b2b87c04b6ad6160c031",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_13.pt": "f6969b7723bc3b0ef80f896aa2bc4e4e0ad0c41d793a8fcf9b8ba4a9dd7ac05f",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_14.pt": "0c30e7722a27c96eb197d767d35bdfdf12bbd02b079d1b5de52872e7936b7326",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_15.pt": "503b3f23ccfb85d5d22cbff2889ae04b6432f005670959555f202e03cae9b5d2",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_16.pt": "a423f0684e9f3ca3492295d7306d60a31c16ad79419cee0ae692c42e983655e1",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_17.pt": "965b50c4492cfccb946e64a08a782e14d8ad135e74092554ee0e7488fc23fe71",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_18.pt": "766cd04a8dab4348c7c72f826fc8a78687f4cd1e198bdcc96ba997249484b434",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_19.pt": "7052ed9c3f6bcb2a210b7e1a33949920904a80113b01cf8f08d90b76cf07e03a",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_2.pt": "af749628b59aab5687b5876b3709a3b3d87b6ffbc6597b2040a9fd9e5d4bd854",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_3.pt": "3644b1cb1d9bb14f7d328a26df956b1b197b6599cb0d51c42c041443eb17dd7e",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_4.pt": "39a76d3caa0bea7af74acb27ce6c55ac689ff0ff2853dcc7ea59221658202d56",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_5.pt": "375a3464a7b6aedd711fca2b52028968b0f4c816382f83a52683e66ec010b128",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_6.pt": "42c53df6546252640a8bdda87899a8fec664abad2509dd9b42a543c2826e124b",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_7.pt": "8cb142ebd05090a01fbd5e908740542e754d6aea7c6b6e46951163427f5452eb",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_8.pt": "fd39917179b5d895e1bafd168bc8b8569fbe1a154699f4aa47a5f8fac8596a21",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_robot_9.pt": "0bfdf444c8eb12e30e08de62936ced528fe991790dd8ae8732b76080a136d186",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00200/iql_manifest.json": "bbceb888d24f837dc51c6fb9b4182ba45ac4494d16cf90ab18ccdd8d0e54c5b1"
+          },
+          "completion_rate": 0.005,
+          "completion_rate_95ci": {
+            "estimate": 0.005,
+            "lower": 0.0,
+            "upper": 0.0125,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n20_v1/snapshots/episode_00300",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_0.pt": "16c57800d9d4c5079e416faedc318c74864d445a3b352e97a49c0c8960ed8e1c",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_1.pt": "2479ce056c239a1cd141d68b94f6646ab8f516ac4733cb34e54d82c488252f59",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_10.pt": "dc4fc9c0ea1bd55c278ed49fd39dcc6a5d95c96ec4edaa4749b868d79b1f350e",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_11.pt": "1a5a47040c8b0e610d868149662c0fadec04c2eb574fbf9c535dcda29966471c",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_12.pt": "844eb81141946535e112a741773c00f0f9f7890d6d40844d398b0cf69299d74c",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_13.pt": "8677460b83b719563361085d2d8c30d4bf387e8e8f9b81464724dc4e229eb533",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_14.pt": "3ab51d0e85f58500f81e71fbbd659273a411686fcf6b66ae9a6b67c706d61e67",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_15.pt": "9ff6562ed2c74d4ac1269f794781cbb967f35b76f69ef63fc48678b67d6e297e",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_16.pt": "bcf34b76c1d5a64d0da9e075fc5344cdd6a2aeab7423c749c016bcdc0eb6e346",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_17.pt": "b2074c4b958c66e50ece30868417a2c3557158aee3d4d8fef567782efd6a2441",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_18.pt": "e61f6fd0487a160fa26d84f343564cfa18cdbc697a1b9e1e300483e00e2a69f9",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_19.pt": "c7941dfc83bc027737eb91bbd544d7168a374859ea1033ebe892c1756ddc1d05",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_2.pt": "e5293d6a9c86065e97b433963a4d12ac42e02a15472dee7cfbb6229e6606977b",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_3.pt": "3c66245d663cf5715a6e699551a02ffb4d86192d9593fb1641820900cd789f3a",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_4.pt": "3018686127108a17253f23a0ecfe31abedce3d57a68f94accb39af97ad20a98b",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_5.pt": "30b3fba362c87a5c22f0c07b346d95986171c61ba66686cc3d72f0ac6a3cb4d4",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_6.pt": "74083cc5ffb59faaf909ca50b59062443183372a0323b7df3ee59eba81159cdc",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_7.pt": "2ccdacf7157923c759df27674b32299505d0e784d39096b390e56b7543d668f1",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_8.pt": "0f66c5415d00c5f602ca5d2b22669abe1a5389b460230454d02a40466efad062",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_robot_9.pt": "2ae054982171e5bb58a9a139de197ecb46f29bda785a4fe2e1741bb0918f28ce",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00300/iql_manifest.json": "66a2bed3ef040ebaef43243ae41da13f65dd6a7297035d7ff13b32ebda9be2e0"
+          },
+          "completion_rate": 0.0025,
+          "completion_rate_95ci": {
+            "estimate": 0.0025,
+            "lower": 0.0,
+            "upper": 0.0075000000000000015,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n20_v1/snapshots/episode_00500",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_0.pt": "c17bedbabbbc777b3ee9a2799565b57706c08535a916a598223effcb0fe7cee7",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_1.pt": "6bd036d70321e829123c3c5b31aa4e241b8ca3fc41a5d866899375c8abc86a94",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_10.pt": "622ef74078ca82e5471b1c1c5b19c367d62631c0ef446278ba7dc9e742f6fe1b",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_11.pt": "17a8899e766c8c95b302f86215a0cd127cfde9094d98cb219b985429f8254504",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_12.pt": "12e566ba148d620ef36619d0b1c3fbe63bee2fb9bf8b2ceea509fcfbf62b0f91",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_13.pt": "1f9f487fa8303da02b4b9ac1d7a9268f0ef0154f2f15f63662ace24affa226d3",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_14.pt": "112b5393f7784a4f5571ef9f8d6c1af839c7ec3d8ec47a17ab11f65617eee2d8",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_15.pt": "3159612ab21263aaf877e7f95fce5d06014831f22735c2876a991e7b874af418",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_16.pt": "5bb0fa8c763320283fc22d2d220f45d00d7fca69c53823f6f00b6e5b0f845759",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_17.pt": "053d0eb6c099e7f44c3f56c3f2e8d4db5c753345d45848b0e79699dcaf117064",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_18.pt": "653990ef6b68ccfc23072964fd34a1f6b6ba066a82aa725b6ce4c92166edb109",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_19.pt": "4632ba78a3709c8a69da4160d4ac8bfb9c2080ae7579261395d190e172d18f69",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_2.pt": "41fa3a8dc33030720fc3d74049097812a184a9838cb6d5a3cb7aa16f13460783",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_3.pt": "1407c91f61ab21d1711beb71fe678c59e8b8245e35f132ba17e984487c28acfb",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_4.pt": "74b4105b9ef17a877bc0af286dfdfe7fd7cc94bbafa8912f676e4ab5ea263149",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_5.pt": "3c5d3b45d70324e0bbd39476a593dff707a7d28ef4cf6e751d40940fe06667a0",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_6.pt": "8a37939578bab77b35c0299e941e84a294f4325444e35b8fa23abcde9aadb78d",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_7.pt": "bb52c0eea4cb8e32339efbdd89b6306b798b13caab9f51b30cc344322c9f5619",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_8.pt": "0dce51861a905e76ed9a5f70dda00644ca6f2d2b5c252ea58981a04bd1cd726f",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_robot_9.pt": "d78a81cc95b59acff6dc02a540a879593b8ff1ca2bb173dccfe58a944de815da",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00500/iql_manifest.json": "b5d8841b4243f12956c5cb3bed70187dc3c635f5527498c2502cfc6f9177be77"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n20_v1/snapshots/episode_00100",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_0.pt": "d8beb58bf6e56a57a3498f0941b8f67a9c211f6f287c7d9b550de55a4c8aa97c",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_1.pt": "8518f70f01773f55521d6f24ac99a89a35c87e07c53b7a691a38a0a5027c1d5a",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_10.pt": "5dfa944f7bc5cdb31cee063da25b43c50bbbd631bf668f26dbf5644cf5ca1d6f",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_11.pt": "4f21296940098bf4662d3ebcf0b2afe2749d1eb0312145afd5f637b111b8cb07",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_12.pt": "e2eb92943265f6c6486f235951d8f8cd11a3aa9d66858d3bb02ea6bc9afbb873",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_13.pt": "703798d6ac8953cd47b4c4d49ed8f70cd2dfc2b034e5d3d539081429695e9d48",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_14.pt": "45f7d3c8b93bd058da68f4310e29aa3c05da3ec4f86ab4cdd2f86b4f4155cb8b",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_15.pt": "297427bb7d19a80f2dd93b31eaeb34ac30fbd69feb522c1567f4a874e1d99628",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_16.pt": "8df2d9de0db77db5d6f74e5c10453b32dc1ae0393a7f695113d72f64d2ef7f91",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_17.pt": "2a21efb0f270c3edc99654f1cf3bd910189401105b2fae2a58a0858caf802326",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_18.pt": "8f641f5c359f414ef8826b5378d03b1758ea03943d0440c4cc425282f77cec7f",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_19.pt": "a0e1e830c2ac4744099e9040280f3068c9a826d9b80f167ad93c436c256a38d0",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_2.pt": "651e21bfd6db19fafd49c80a625aa7ac43bb870a97ab2a118cf09b2f33c79d7b",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_3.pt": "87044bba873e6fb2cb37c07ff91f24a988561264d4a809bb69182f4f446daf83",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_4.pt": "b2768c6d4196de5f52b6117f075cf56b89fbac8fcf8c834b4cae7ea56c31dbde",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_5.pt": "c63ae0a09bf23fd22df9b5162b10f62b55aa5d0716809bd71e0e35b437adac67",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_6.pt": "008c991765dbe1aa063a65faa2eedbb26e9d6dc0b807628f5adc81e88324d7a4",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_7.pt": "496f60e9915963ca3fa96887203fe3e3fcedf3b310319546a1e19d9552fe63c4",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_8.pt": "7e62d08c213bf67da589a958540abb50c7ee1424b5313e941854620336e05341",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_robot_9.pt": "7d404a06f7766ae3824456f3051e047c9974f9e9c2d7cf9b561321d737344cb4",
+            "artifacts/training/iql_n20_v1/snapshots/episode_00100/iql_manifest.json": "536fd6c4c0f787f15e8f1562b19fa205392ff556c5a42b376dec054201ac3922"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/project25_validation/iql_n5.json",
+      "sha256": "fa5ed952f0daae0f635d59391a2a9e6f83ca9ca1dd0500f8cf87d9a07b694bee",
+      "algorithm": "IQL",
+      "fleet_size": 5,
+      "seed": 20261120,
+      "episodes": 20,
+      "candidates": [
+        {
+          "candidate": "artifacts/training/iql_n5_v1/snapshots/episode_00300",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n5_v1/snapshots/episode_00300/iql_robot_0.pt": "557f9b8b2ae70dce7e6cebe790f49c21537666dae45cdcecc8819265562c3930",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00300/iql_robot_1.pt": "4830aec7c341a55d3c438d0945d29b9d63340d99d3241e6aca42f73d026e827a",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00300/iql_robot_2.pt": "f8a6561c41b70ac7f45c62ea39ceac613bab2c3f042501ac9806288662429863",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00300/iql_robot_3.pt": "f3fe0d3bdffbcc1e5cb1d8de666feb1aae212623ee6b71f78143727bb168c47c",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00300/iql_robot_4.pt": "fe0b03fa630896fefb2f28064d1e43759cfdd7b9f5f4b84dea0c599816a1b5c6",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00300/iql_manifest.json": "9a7aafb852fb5b3e6c40f6e1511ff1f715d2c82b5215a9146924289a90c1d17b"
+          },
+          "completion_rate": 0.7000000000000001,
+          "completion_rate_95ci": {
+            "estimate": 0.7000000000000001,
+            "lower": 0.58,
+            "upper": 0.8000000000000002,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n5_v1/snapshots/episode_00500",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n5_v1/snapshots/episode_00500/iql_robot_0.pt": "69a046dfbd0023b3f90c202b2b9d17d43731c961c7a0db56f68c4896ac018af8",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00500/iql_robot_1.pt": "fa082edd694405923d873e2fb1a5b5491aac47bddca88434e6664debbc954030",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00500/iql_robot_2.pt": "20545eeac7521e1cf72ab0328aa9360437610e22c59f34b2bf11531131ba5ca1",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00500/iql_robot_3.pt": "ebbcd202106966bab71ea739c37476bc680dcfa595c2a6386fa4ce813c936b0c",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00500/iql_robot_4.pt": "ae90010c7c1f11887a8775c25387777fe251e99697437f2242686fb4f3c2d90d",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00500/iql_manifest.json": "2efa22447419c7c032cb2f32bd3152ed135b8655d082ba151c81869407b07ee7"
+          },
+          "completion_rate": 0.68,
+          "completion_rate_95ci": {
+            "estimate": 0.68,
+            "lower": 0.6299999999999999,
+            "upper": 0.7300000000000001,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n5_v1/snapshots/episode_00200",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_0.pt": "e291c9f0c9c1d2c46e757293387ba2bc141f34ea2006ac29204e54cd655b2c68",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_1.pt": "5d026eb0531b7032e01e8bfb43ec376fe96f4e162f74162d639a6ebae847ebf3",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_2.pt": "5c1f59a55bac27f4649de9a8dd213aad0d5fbab1aa409f959691cf9b595b82f9",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_3.pt": "ae98cd00cc9a7467937a2c94b4f8ed6c2a464d5fe037e8e91b89cb682e10ea34",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_robot_4.pt": "856f585f3bd97145d0a4476f2c65741cd69fe9f665a1938d70f585a20685ffef",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00200/iql_manifest.json": "c540f6ae1b40f0e8b8efca7c25dc4065a2fd09893dace5e34d8555a45512cd36"
+          },
+          "completion_rate": 0.65,
+          "completion_rate_95ci": {
+            "estimate": 0.65,
+            "lower": 0.5800000000000001,
+            "upper": 0.72,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n5_v1/snapshots/episode_00400",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n5_v1/snapshots/episode_00400/iql_robot_0.pt": "c691e3467ee0676a852c0940788911e310957856022268c9a3f2bc8b885eb6da",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00400/iql_robot_1.pt": "09d6e736846b45c24b01e759f7e23ddf62fa7e509f8a19a7bdca6900bb88ccf9",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00400/iql_robot_2.pt": "dcd0a64e9144bb52ec013c21aedee12a70db039a4750b3f848029b7fb4185c59",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00400/iql_robot_3.pt": "4bf5ea8abd9f40293a493cb6d8c198b17f038bfba71e818d07bfe61e931c4430",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00400/iql_robot_4.pt": "fbdd716200257ea57a8e76964a38b8d8eb1c6535f461a41a785fb4536b31282a",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00400/iql_manifest.json": "ae1affea6cabde67f217c322a9def0aec2619f49d99208645ab7376cce635086"
+          },
+          "completion_rate": 0.41000000000000003,
+          "completion_rate_95ci": {
+            "estimate": 0.41000000000000003,
+            "lower": 0.33000000000000007,
+            "upper": 0.4800000000000001,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/iql_n5_v1/snapshots/episode_00100",
+          "checkpoint_sha256": {
+            "artifacts/training/iql_n5_v1/snapshots/episode_00100/iql_robot_0.pt": "175bd9986feeda864b67982a2b4413eafcab08250fdc83800c7c04ac35236e2e",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00100/iql_robot_1.pt": "85c565ceff6a673649dda0da3e4f268b6f6391b0fc5821586fe53db83ce4e359",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00100/iql_robot_2.pt": "506588614ad35b914a1f2c70f91670b48f4ca076db5fbbde0c3e03718ec98b9a",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00100/iql_robot_3.pt": "58bc0510240208ade990ce895c211649a4d85c4492e47012f2c8843ab76a75c9",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00100/iql_robot_4.pt": "1ef975afcb5bbc03aeb41c4b635fe825b0e1a03f6f837b45c00d0c3e794acb31",
+            "artifacts/training/iql_n5_v1/snapshots/episode_00100/iql_manifest.json": "ffd4ac0430946249d412d8d4e872757219849720d48f30fc122112c81f188992"
+          },
+          "completion_rate": 0.18000000000000002,
+          "completion_rate_95ci": {
+            "estimate": 0.18000000000000002,
+            "lower": 0.11000000000000001,
+            "upper": 0.2500000000000001,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/project25_validation/qmix_n10.json",
+      "sha256": "a7db467702023ba2756ef201988a2d8cad6d4c24d983acceb344343bc3aa334a",
+      "algorithm": "QMIX",
+      "fleet_size": 10,
+      "seed": 20261120,
+      "episodes": 20,
+      "candidates": [
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt": "43e30259e9de5df5b33b9e16a33503631c449836429d1bfe53762551ae37192e"
+          },
+          "completion_rate": 0.3,
+          "completion_rate_95ci": {
+            "estimate": 0.3,
+            "lower": 0.23500000000000001,
+            "upper": 0.365,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00900/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00900/checkpoint_state.pt": "e0660ed08eaf201ad0580a0546e1d5be7c0c2fc8d1711790fd4bc74ae69d846f"
+          },
+          "completion_rate": 0.015000000000000001,
+          "completion_rate_95ci": {
+            "estimate": 0.015000000000000003,
+            "lower": 0.0,
+            "upper": 0.030000000000000006,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00400/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00400/checkpoint_state.pt": "45f6d566083adce7bce63d9ac57dca7a7e02108f1f05901f7d684222451be66d"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0,
+            "upper": 0.025,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt": "8d1d4521d327f5e49f7d0c1c35031c2908bce63f9ef15227478f8ffd10be5296"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00100/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00100/checkpoint_state.pt": "e63fa7a234cc6efa3a7830de3966b54d01ddc929556a590dd9c08d8bd63f4c0c"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00600/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00600/checkpoint_state.pt": "aafe0d43f5528b1eb7492dfbadd1523edc2514e6f7db26c863438411d2b3a132"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00300/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00300/checkpoint_state.pt": "257c8cc37d6c750581fdcda08fe3575a019ce15dec9fa5b4c242002d82d9803d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00700/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00700/checkpoint_state.pt": "e274a24bc1d935715f771e49f24642328af3be65539c995b743b33bae6233c3d"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00800/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00800/checkpoint_state.pt": "1deeed05492031d7d101894186a6c87598cd6a1d54c21ab67046065b5e2c248a"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n10_v1/snapshots/episode_00200/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n10_v1/snapshots/episode_00200/checkpoint_state.pt": "30cd5b21a7efcc6918669b92d942a744954cfb2b5cf5407faea0fd0a50f3f1c9"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/project25_validation/qmix_n20.json",
+      "sha256": "6a12b4b0cbfe86195d72f577b41ebbe72d3c98da0e6ba480d373e2fa60901edc",
+      "algorithm": "QMIX",
+      "fleet_size": 20,
+      "seed": 20261120,
+      "episodes": 20,
+      "candidates": [
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt": "16421fd30302cb9b68968b8ed4efe00433222326108c7a8835126592e44d566c"
+          },
+          "completion_rate": 0.0175,
+          "completion_rate_95ci": {
+            "estimate": 0.0175,
+            "lower": 0.005,
+            "upper": 0.03250000000000001,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00100/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00100/checkpoint_state.pt": "a41f89e2a781a3400ec5a088b6d798fcfed82ae6dda7e8a5f03d93444553f92b"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0025,
+            "upper": 0.02,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00600/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00600/checkpoint_state.pt": "9cdbbe9a5cd113b9ba4e8bc096bca3107fd9d1f9567acaba38eb36c8f7d631ba"
+          },
+          "completion_rate": 0.0025,
+          "completion_rate_95ci": {
+            "estimate": 0.0025,
+            "lower": 0.0,
+            "upper": 0.0075000000000000015,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_01000/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_01000/checkpoint_state.pt": "4c3646699b1c28afe43885597f9b41e3daee2f531537111f51c6d48d25074b29"
+          },
+          "completion_rate": 0.0025,
+          "completion_rate_95ci": {
+            "estimate": 0.0025,
+            "lower": 0.0,
+            "upper": 0.0075000000000000015,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00700/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00700/checkpoint_state.pt": "359e5f259d8ea735320d48b6bb331777eb08b514cfd6c26396290d73afca03b9"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00500/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00500/checkpoint_state.pt": "eeb4ee650667dc2b768bbecdbb882b540a838c6309f2a18aa5612dea433606b0"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00900/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00900/checkpoint_state.pt": "f855723b9ac39029a6befec7e2d59965881480bca7dcb9f74b4166fa97e23fea"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00300/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00300/checkpoint_state.pt": "c2ea7ad028e8bec5f0f4584d82508fad39e00464cfa0be5d644f6780a9b79652"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00400/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00400/checkpoint_state.pt": "4e62c739934f114a8201fcae101e4e8439b29884e2d714a7baf3b64601e61bb0"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n20_v1/snapshots/episode_00800/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n20_v1/snapshots/episode_00800/checkpoint_state.pt": "a22631e059071903dce8fd3e83785dd475a2b0a85e01e80470e78baac2d0bcbe"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        }
+      ]
+    },
+    {
+      "path": "results/project25_validation/qmix_n5.json",
+      "sha256": "552c9755b78e9acea1a78258ad468ae4586892765de9d9f5fe625e0c20ad62a6",
+      "algorithm": "QMIX",
+      "fleet_size": 5,
+      "seed": 20261120,
+      "episodes": 20,
+      "candidates": [
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+          },
+          "completion_rate": 0.72,
+          "completion_rate_95ci": {
+            "estimate": 0.72,
+            "lower": 0.61,
+            "upper": 0.8300000000000001,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00400/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00400/checkpoint_state.pt": "16803669fd8c6e351966e98fedf0a5ab732b1545c6d0e0e2330484c7bfe924e3"
+          },
+          "completion_rate": 0.59,
+          "completion_rate_95ci": {
+            "estimate": 0.5900000000000001,
+            "lower": 0.4699999999999999,
+            "upper": 0.71,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00500/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00500/checkpoint_state.pt": "b5339de9c6d8691d113369c8eb1db806c428d9a230681035f9a5ed8bd95115e9"
+          },
+          "completion_rate": 0.38,
+          "completion_rate_95ci": {
+            "estimate": 0.38,
+            "lower": 0.2800000000000001,
+            "upper": 0.47999999999999987,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_01000/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_01000/checkpoint_state.pt": "40495fe6e7e9fbe5a988815eca55e1b3a5127a47089811c57f0220dcf61c583a"
+          },
+          "completion_rate": 0.38,
+          "completion_rate_95ci": {
+            "estimate": 0.38,
+            "lower": 0.28,
+            "upper": 0.48999999999999994,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00900/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00900/checkpoint_state.pt": "67a743f0a5b06465ceef991ece4d88c07d745ae308001381589e71af2aed508e"
+          },
+          "completion_rate": 0.23,
+          "completion_rate_95ci": {
+            "estimate": 0.23000000000000004,
+            "lower": 0.15000000000000002,
+            "upper": 0.32,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00300/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00300/checkpoint_state.pt": "62afc59eade381652933dee7c284e688975489a0748040da0c81628ed462090b"
+          },
+          "completion_rate": 0.2,
+          "completion_rate_95ci": {
+            "estimate": 0.2,
+            "lower": 0.12000000000000002,
+            "upper": 0.2900000000000001,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00700/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00700/checkpoint_state.pt": "118c3d597d35b735e114b5a156112c89fa512f3907579e0d74011c0b256f6609"
+          },
+          "completion_rate": 0.14,
+          "completion_rate_95ci": {
+            "estimate": 0.14000000000000004,
+            "lower": 0.08,
+            "upper": 0.20000000000000004,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00800/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00800/checkpoint_state.pt": "e30d26f48c689fbd87f1c9248e3f04eb27c9cc9c2c2634269d07523624eddc4f"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0,
+            "upper": 0.030000000000000006,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00200/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00200/checkpoint_state.pt": "29d53e1ba2a58a089032ea221d731e7c27a32fe44a1995f909e15d1fe86fc136"
+          },
+          "completion_rate": 0.01,
+          "completion_rate_95ci": {
+            "estimate": 0.01,
+            "lower": 0.0,
+            "upper": 0.030000000000000006,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        },
+        {
+          "candidate": "artifacts/training/qmix_n5_v1/snapshots/episode_00100/checkpoint_state.pt",
+          "checkpoint_sha256": {
+            "artifacts/training/qmix_n5_v1/snapshots/episode_00100/checkpoint_state.pt": "067486b42c2b70daf373876afcabed3f43ef69a5d6e4cc844fe97e46929fb900"
+          },
+          "completion_rate": 0.0,
+          "completion_rate_95ci": {
+            "estimate": 0.0,
+            "lower": 0.0,
+            "upper": 0.0,
+            "confidence_level": 0.95,
+            "samples": 20,
+            "resamples": 10000
+          }
+        }
+      ]
+    }
+  ],
+  "qm_mix_benchmarks": [
+    {
+      "manifest": "results/benchmark_full/manifest.json",
+      "manifest_id": "64c7e1df5c82b379",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/benchmark_full/traces/qmix_n5.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 5,
+      "assigned": 100,
+      "completed": 67,
+      "evaluation_task_seeds": [
+        999,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+        },
+        "metadata": {
+          "training_episode": 600,
+          "training_seed": 42,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/benchmark_full/manifest.json",
+      "manifest_id": "64c7e1df5c82b379",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/benchmark_full/traces/qmix_n10.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 10,
+      "assigned": 200,
+      "completed": 55,
+      "evaluation_task_seeds": [
+        999,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt": "43e30259e9de5df5b33b9e16a33503631c449836429d1bfe53762551ae37192e"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 43,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/benchmark_full/manifest.json",
+      "manifest_id": "64c7e1df5c82b379",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/benchmark_full/traces/qmix_n20.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 20,
+      "assigned": 400,
+      "completed": 0,
+      "evaluation_task_seeds": [
+        999,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n20_v1/snapshots/episode_00700/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n20_v1/snapshots/episode_00700/checkpoint_state.pt": "359e5f259d8ea735320d48b6bb331777eb08b514cfd6c26396290d73afca03b9"
+        },
+        "metadata": {
+          "training_episode": 700,
+          "training_seed": 44,
+          "training_config": {
+            "num_agents": 20,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 220,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n20_v1/snapshots/episode_00700/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/benchmark_n5_n10/manifest.json",
+      "manifest_id": "868412fb49b0f395",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/benchmark_n5_n10/traces/qmix_n5.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 5,
+      "assigned": 100,
+      "completed": 67,
+      "evaluation_task_seeds": [
+        999,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+        },
+        "metadata": {
+          "training_episode": 600,
+          "training_seed": 42,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/benchmark_n5_n10/manifest.json",
+      "manifest_id": "868412fb49b0f395",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/benchmark_n5_n10/traces/qmix_n10.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 10,
+      "assigned": 200,
+      "completed": 0,
+      "evaluation_task_seeds": [
+        999,
+        1000,
+        1001,
+        1002,
+        1003,
+        1004,
+        1005,
+        1006,
+        1007,
+        1008,
+        1009,
+        1010,
+        1011,
+        1012,
+        1013,
+        1014,
+        1015,
+        1016,
+        1017,
+        1018
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt": "8d1d4521d327f5e49f7d0c1c35031c2908bce63f9ef15227478f8ffd10be5296"
+        },
+        "metadata": {
+          "training_episode": 500,
+          "training_seed": 43,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n10_v1/snapshots/episode_00500/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_benchmark/manifest.json",
+      "manifest_id": "c343310263787f38",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/evaluation/p2_benchmark/traces/qmix_n5.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 5,
+      "assigned": 100,
+      "completed": 83,
+      "evaluation_task_seeds": [
+        20261120,
+        20261121,
+        20261122,
+        20261123,
+        20261124,
+        20261125,
+        20261126,
+        20261127,
+        20261128,
+        20261129,
+        20261130,
+        20261131,
+        20261132,
+        20261133,
+        20261134,
+        20261135,
+        20261136,
+        20261137,
+        20261138,
+        20261139
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p1_pathcost_n5_refine500/checkpoint_3600",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p1_pathcost_n5_refine500/checkpoint_3600/checkpoint_state.pt": "2570f9d2946683f95fb1f4570180ea28083dd82ce4e3480038741250ac3ff69c"
+        },
+        "metadata": {
+          "training_episode": 3600,
+          "training_seed": 200000,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p1_pathcost_n5_refine500/checkpoint_3600/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_benchmark/manifest.json",
+      "manifest_id": "c343310263787f38",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/evaluation/p2_benchmark/traces/qmix_n10.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 10,
+      "assigned": 200,
+      "completed": 27,
+      "evaluation_task_seeds": [
+        20261120,
+        20261121,
+        20261122,
+        20261123,
+        20261124,
+        20261125,
+        20261126,
+        20261127,
+        20261128,
+        20261129,
+        20261130,
+        20261131,
+        20261132,
+        20261133,
+        20261134,
+        20261135,
+        20261136,
+        20261137,
+        20261138,
+        20261139
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_qmix_n10_seed300010/latest",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_qmix_n10_seed300010/latest/checkpoint_state.pt": "8263455702071515994ae8fd56c340a8384370b7480f8c6a8ec83f77d82c2737"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 300010,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_qmix_n10_seed300010/latest/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_benchmark/manifest.json",
+      "manifest_id": "c343310263787f38",
+      "scenario_manifest_id": null,
+      "scenario_manifest": null,
+      "trace": "results/evaluation/p2_benchmark/traces/qmix_n20.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 20,
+      "assigned": 400,
+      "completed": 65,
+      "evaluation_task_seeds": [
+        20261120,
+        20261121,
+        20261122,
+        20261123,
+        20261124,
+        20261125,
+        20261126,
+        20261127,
+        20261128,
+        20261129,
+        20261130,
+        20261131,
+        20261132,
+        20261133,
+        20261134,
+        20261135,
+        20261136,
+        20261137,
+        20261138,
+        20261139
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_qmix_n20_seed300020/latest",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_qmix_n20_seed300020/latest/checkpoint_state.pt": "6bf213786932404bbf1546dd0a11bc49b61ce929e5129117522f0b1a0167b22c"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 300020,
+          "training_config": {
+            "num_agents": 20,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 220,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_qmix_n20_seed300020/latest/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_final_holdout_2026_11/manifest.json",
+      "manifest_id": "47c08ace928ea885",
+      "scenario_manifest_id": "877e21e36bf45cb717d3e456b3d046b2545ead5a9e66347767a13f0da248e5f4",
+      "scenario_manifest": "results/evaluation/p2_final_holdout_2026_11/scenario_manifest.json",
+      "trace": "results/evaluation/p2_final_holdout_2026_11/traces/qmix_n5.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 5,
+      "assigned": 100,
+      "completed": 83,
+      "evaluation_task_seeds": [
+        976304181,
+        976304182,
+        976304183,
+        976304184,
+        976304185,
+        976304186,
+        976304187,
+        976304188,
+        976304189,
+        976304190,
+        976304191,
+        976304192,
+        976304193,
+        976304194,
+        976304195,
+        976304196,
+        976304197,
+        976304198,
+        976304199,
+        976304200
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_stable_n5_seed650005/snapshots/episode_03400/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_stable_n5_seed650005/snapshots/episode_03400/checkpoint_state.pt": "fa2567f9bb27ee4cb798fdabb165572219e3121eb64d02db055bec04f5d4393c"
+        },
+        "metadata": {
+          "training_episode": 3400,
+          "training_seed": 650005,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_stable_n5_seed650005/snapshots/episode_03400/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_final_holdout_2026_11/manifest.json",
+      "manifest_id": "47c08ace928ea885",
+      "scenario_manifest_id": "877e21e36bf45cb717d3e456b3d046b2545ead5a9e66347767a13f0da248e5f4",
+      "scenario_manifest": "results/evaluation/p2_final_holdout_2026_11/scenario_manifest.json",
+      "trace": "results/evaluation/p2_final_holdout_2026_11/traces/qmix_n10.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 10,
+      "assigned": 200,
+      "completed": 100,
+      "evaluation_task_seeds": [
+        976304181,
+        976304182,
+        976304183,
+        976304184,
+        976304185,
+        976304186,
+        976304187,
+        976304188,
+        976304189,
+        976304190,
+        976304191,
+        976304192,
+        976304193,
+        976304194,
+        976304195,
+        976304196,
+        976304197,
+        976304198,
+        976304199,
+        976304200
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_stable_n10_seed650010/snapshots/episode_01000/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_stable_n10_seed650010/snapshots/episode_01000/checkpoint_state.pt": "86409d18e3193b7a0dde2682ddf006482e5d924c5a51292846c2e890facb9be8"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 650010,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_stable_n10_seed650010/snapshots/episode_01000/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_final_holdout_2026_11/manifest.json",
+      "manifest_id": "47c08ace928ea885",
+      "scenario_manifest_id": "877e21e36bf45cb717d3e456b3d046b2545ead5a9e66347767a13f0da248e5f4",
+      "scenario_manifest": "results/evaluation/p2_final_holdout_2026_11/scenario_manifest.json",
+      "trace": "results/evaluation/p2_final_holdout_2026_11/traces/qmix_n20.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 20,
+      "assigned": 400,
+      "completed": 86,
+      "evaluation_task_seeds": [
+        976304181,
+        976304182,
+        976304183,
+        976304184,
+        976304185,
+        976304186,
+        976304187,
+        976304188,
+        976304189,
+        976304190,
+        976304191,
+        976304192,
+        976304193,
+        976304194,
+        976304195,
+        976304196,
+        976304197,
+        976304198,
+        976304199,
+        976304200
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_stable_n20_seed650020/snapshots/episode_01000/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_stable_n20_seed650020/snapshots/episode_01000/checkpoint_state.pt": "385b6f4043277aa8babc105ed1f1ae8943643519b0435ad9d4705da78219ca19"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 650020,
+          "training_config": {
+            "num_agents": 20,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 220,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_stable_n20_seed650020/snapshots/episode_01000/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_final_holdout_cycle2/manifest.json",
+      "manifest_id": "bcc2d4585d74ebbb",
+      "scenario_manifest_id": "64e1a531970bba12870f9820f07730314f3dc4bd9de38dd2f2ab56f6af520b71",
+      "scenario_manifest": "results/evaluation/p2_final_holdout_cycle2/scenario_manifest.json",
+      "trace": "results/evaluation/p2_final_holdout_cycle2/traces/qmix_n5.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 5,
+      "assigned": 100,
+      "completed": 86,
+      "evaluation_task_seeds": [
+        20261121,
+        20261122,
+        20261123,
+        20261124,
+        20261125,
+        20261126,
+        20261127,
+        20261128,
+        20261129,
+        20261130,
+        20261131,
+        20261132,
+        20261133,
+        20261134,
+        20261135,
+        20261136,
+        20261137,
+        20261138,
+        20261139,
+        20261140
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_stable_n5_seed650005/snapshots/episode_03400/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_stable_n5_seed650005/snapshots/episode_03400/checkpoint_state.pt": "fa2567f9bb27ee4cb798fdabb165572219e3121eb64d02db055bec04f5d4393c"
+        },
+        "metadata": {
+          "training_episode": 3400,
+          "training_seed": 650005,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_stable_n5_seed650005/snapshots/episode_03400/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_final_holdout_cycle2/manifest.json",
+      "manifest_id": "bcc2d4585d74ebbb",
+      "scenario_manifest_id": "64e1a531970bba12870f9820f07730314f3dc4bd9de38dd2f2ab56f6af520b71",
+      "scenario_manifest": "results/evaluation/p2_final_holdout_cycle2/scenario_manifest.json",
+      "trace": "results/evaluation/p2_final_holdout_cycle2/traces/qmix_n10.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 10,
+      "assigned": 200,
+      "completed": 177,
+      "evaluation_task_seeds": [
+        20261121,
+        20261122,
+        20261123,
+        20261124,
+        20261125,
+        20261126,
+        20261127,
+        20261128,
+        20261129,
+        20261130,
+        20261131,
+        20261132,
+        20261133,
+        20261134,
+        20261135,
+        20261136,
+        20261137,
+        20261138,
+        20261139,
+        20261140
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_cycle2_continued_n10_seed650010/snapshots/episode_02300/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_cycle2_continued_n10_seed650010/snapshots/episode_02300/checkpoint_state.pt": "cb7c67c301e99d97b8e4ffc795f18521dd4e06c3e0bda6cd5fa3aa1c44701242"
+        },
+        "metadata": {
+          "training_episode": 2300,
+          "training_seed": 650010,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_cycle2_continued_n10_seed650010/snapshots/episode_02300/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/evaluation/p2_final_holdout_cycle2/manifest.json",
+      "manifest_id": "bcc2d4585d74ebbb",
+      "scenario_manifest_id": "64e1a531970bba12870f9820f07730314f3dc4bd9de38dd2f2ab56f6af520b71",
+      "scenario_manifest": "results/evaluation/p2_final_holdout_cycle2/scenario_manifest.json",
+      "trace": "results/evaluation/p2_final_holdout_cycle2/traces/qmix_n20.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 20,
+      "assigned": 400,
+      "completed": 91,
+      "evaluation_task_seeds": [
+        20261121,
+        20261122,
+        20261123,
+        20261124,
+        20261125,
+        20261126,
+        20261127,
+        20261128,
+        20261129,
+        20261130,
+        20261131,
+        20261132,
+        20261133,
+        20261134,
+        20261135,
+        20261136,
+        20261137,
+        20261138,
+        20261139,
+        20261140
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/checkpoints/qmix/p2_stable_n20_seed650020/snapshots/episode_01000/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/checkpoints/qmix/p2_stable_n20_seed650020/snapshots/episode_01000/checkpoint_state.pt": "385b6f4043277aa8babc105ed1f1ae8943643519b0435ad9d4705da78219ca19"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 650020,
+          "training_config": {
+            "num_agents": 20,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 220,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/checkpoints/qmix/p2_stable_n20_seed650020/snapshots/episode_01000/checkpoint_state.pt": null
+      }
+    },
+    {
+      "manifest": "results/project25_holdout/manifest.json",
+      "manifest_id": "e47ae5704f026c96",
+      "scenario_manifest_id": "ddc457ee542f3f6076058722fb8a130c022828367ac23fd5c011ea1553f6c7bf",
+      "scenario_manifest": "results/project25_holdout/scenario_manifest.json",
+      "trace": "results/project25_holdout/traces/qmix_n5.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 5,
+      "assigned": 100,
+      "completed": 78,
+      "evaluation_task_seeds": [
+        816597421,
+        816597422,
+        816597423,
+        816597424,
+        816597425,
+        816597426,
+        816597427,
+        816597428,
+        816597429,
+        816597430,
+        816597431,
+        816597432,
+        816597433,
+        816597434,
+        816597435,
+        816597436,
+        816597437,
+        816597438,
+        816597439,
+        816597440
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+        },
+        "metadata": {
+          "training_episode": 600,
+          "training_seed": 42,
+          "training_config": {
+            "num_agents": 5,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 55,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n5_v1/snapshots/episode_00600/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/project25_holdout/manifest.json",
+      "manifest_id": "e47ae5704f026c96",
+      "scenario_manifest_id": "ddc457ee542f3f6076058722fb8a130c022828367ac23fd5c011ea1553f6c7bf",
+      "scenario_manifest": "results/project25_holdout/scenario_manifest.json",
+      "trace": "results/project25_holdout/traces/qmix_n10.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 10,
+      "assigned": 200,
+      "completed": 74,
+      "evaluation_task_seeds": [
+        816597421,
+        816597422,
+        816597423,
+        816597424,
+        816597425,
+        816597426,
+        816597427,
+        816597428,
+        816597429,
+        816597430,
+        816597431,
+        816597432,
+        816597433,
+        816597434,
+        816597435,
+        816597436,
+        816597437,
+        816597438,
+        816597439,
+        816597440
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt": "43e30259e9de5df5b33b9e16a33503631c449836429d1bfe53762551ae37192e"
+        },
+        "metadata": {
+          "training_episode": 1000,
+          "training_seed": 43,
+          "training_config": {
+            "num_agents": 10,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 110,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n10_v1/snapshots/episode_01000/checkpoint_state.pt": true
+      }
+    },
+    {
+      "manifest": "results/project25_holdout/manifest.json",
+      "manifest_id": "e47ae5704f026c96",
+      "scenario_manifest_id": "ddc457ee542f3f6076058722fb8a130c022828367ac23fd5c011ea1553f6c7bf",
+      "scenario_manifest": "results/project25_holdout/scenario_manifest.json",
+      "trace": "results/project25_holdout/traces/qmix_n20.json.gz",
+      "trace_sha256_verified": true,
+      "fleet_size": 20,
+      "assigned": 400,
+      "completed": 3,
+      "evaluation_task_seeds": [
+        816597421,
+        816597422,
+        816597423,
+        816597424,
+        816597425,
+        816597426,
+        816597427,
+        816597428,
+        816597429,
+        816597430,
+        816597431,
+        816597432,
+        816597433,
+        816597434,
+        816597435,
+        816597436,
+        816597437,
+        816597438,
+        816597439,
+        816597440
+      ],
+      "max_steps": 100,
+      "checkpoint": {
+        "path": "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt",
+        "sha256": {
+          "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt": "16421fd30302cb9b68968b8ed4efe00433222326108c7a8835126592e44d566c"
+        },
+        "metadata": {
+          "training_episode": 200,
+          "training_seed": 44,
+          "training_config": {
+            "num_agents": 20,
+            "observation_dim": 456,
+            "action_dim": 4,
+            "state_dim": 220,
+            "learning_rate": 0.0001,
+            "gamma": 0.99,
+            "batch_size": 32,
+            "target_update_interval": 200,
+            "reward_overrides": {}
+          }
+        }
+      },
+      "checkpoint_hash_matches": {
+        "artifacts/training/qmix_n20_v1/snapshots/episode_00200/checkpoint_state.pt": true
+      }
+    }
+  ],
+  "legacy_optuna": [
+    {
+      "path": ".pytest_cache/project25-637a22ba-f924-45c0-a0fe-79b48bc0f866/test_optuna_study_execution_an0/optuna/qmix_study.db",
+      "study_trial_states": [
+        [
+          "qmix_n5_study",
+          "COMPLETE",
+          3
+        ]
+      ]
+    }
+  ],
+  "mlflow_experiments": [
+    [
+      0,
+      "Default",
+      0
+    ],
+    [
+      1,
+      "test_qmix_trainer_experiment",
+      1
+    ],
+    [
+      2,
+      "infrastructure_smoke_tests",
+      2
+    ],
+    [
+      3,
+      "test_infra_matrix",
+      2
+    ],
+    [
+      4,
+      "project25_policy_training",
+      8
+    ]
+  ],
+  "mlflow_matching_completion_metrics": [],
+  "mlflow_runs": [
+    {
+      "id": "25dafd3de3564c8b8104e84bd288b348",
+      "experiment_id": 1,
+      "status": "FINISHED",
+      "params": {
+        "project_name": "Autonomous-Warehouse-MARL",
+        "experiment_name": "test_qmix_trainer_experiment",
+        "algorithm": "QMIX",
+        "number_of_agents": "5",
+        "environment_name": "Warehouse-20x20-v1",
+        "environment_version": "1.0.0",
+        "observation_dim": "456",
+        "action_space": "Discrete(4)",
+        "action_dim": "4",
+        "random_seed": "42",
+        "learning_rate": "0.001",
+        "gamma": "0.99",
+        "batch_size": "4",
+        "episode_count": "3",
+        "max_episode_steps": "10",
+        "epsilon_start": "1.0",
+        "epsilon_finish": "0.05",
+        "epsilon_anneal_time": "50000",
+        "reward_config_version": "v1.0",
+        "experiment_type": "actual_training",
+        "extra_replay_buffer_capacity": "5000",
+        "extra_replay_warmup_size": "4",
+        "extra_target_update_interval": "10",
+        "extra_state_dim": "55"
+      },
+      "completion_metrics": [
+        [
+          "completed_tasks",
+          3,
+          0.0,
+          0.0
+        ],
+        [
+          "task_completion_rate",
+          3,
+          0.0,
+          0.0
+        ]
+      ]
+    },
+    {
+      "id": "52c7cececd31488c8699b4b85e85f3d2",
+      "experiment_id": 2,
+      "status": "FINISHED",
+      "params": {
+        "project_name": "Autonomous-Warehouse-MARL",
+        "experiment_name": "infrastructure_smoke_tests",
+        "algorithm": "QMIX",
+        "number_of_agents": "10",
+        "environment_name": "Warehouse-20x20-v1",
+        "environment_version": "1.0.0",
+        "observation_dim": "50",
+        "action_space": "Discrete(4)",
+        "action_dim": "4",
+        "random_seed": "42",
+        "learning_rate": "0.0005",
+        "gamma": "0.99",
+        "batch_size": "32",
+        "episode_count": "5",
+        "max_episode_steps": "50",
+        "epsilon_start": "1.0",
+        "epsilon_finish": "0.05",
+        "epsilon_anneal_time": "50000",
+        "reward_config_version": "v1.0",
+        "experiment_type": "smoke_test"
+      },
+      "completion_metrics": [
+        [
+          "completed_tasks",
+          5,
+          3.0,
+          15.0
+        ],
+        [
+          "task_completion_rate",
+          5,
+          0.2,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "0f83bb06e62546caaeef5c8c0f49023f",
+      "experiment_id": 2,
+      "status": "FINISHED",
+      "params": {
+        "project_name": "Autonomous-Warehouse-MARL",
+        "experiment_name": "infrastructure_smoke_tests",
+        "algorithm": "QMIX",
+        "number_of_agents": "10",
+        "environment_name": "Warehouse-20x20-v1",
+        "environment_version": "1.0.0",
+        "observation_dim": "50",
+        "action_space": "Discrete(4)",
+        "action_dim": "4",
+        "random_seed": "42",
+        "learning_rate": "0.0005",
+        "gamma": "0.99",
+        "batch_size": "32",
+        "episode_count": "5",
+        "max_episode_steps": "50",
+        "epsilon_start": "1.0",
+        "epsilon_finish": "0.05",
+        "epsilon_anneal_time": "50000",
+        "reward_config_version": "v1.0",
+        "experiment_type": "smoke_test"
+      },
+      "completion_metrics": [
+        [
+          "completed_tasks",
+          5,
+          3.0,
+          15.0
+        ],
+        [
+          "task_completion_rate",
+          5,
+          0.2,
+          1.0
+        ]
+      ]
+    },
+    {
+      "id": "781d2a094a1d4c3284df3d756483f946",
+      "experiment_id": 3,
+      "status": "FINISHED",
+      "params": {
+        "project_name": "Autonomous-Warehouse-MARL",
+        "experiment_name": "test_infra_matrix",
+        "algorithm": "QMIX",
+        "number_of_agents": "5",
+        "environment_name": "Warehouse-20x20-v1",
+        "environment_version": "1.0.0",
+        "observation_dim": "50",
+        "action_space": "Discrete(4)",
+        "action_dim": "4",
+        "random_seed": "42",
+        "learning_rate": "0.0005",
+        "gamma": "0.99",
+        "batch_size": "32",
+        "episode_count": "1000",
+        "max_episode_steps": "100",
+        "epsilon_start": "1.0",
+        "epsilon_finish": "0.05",
+        "epsilon_anneal_time": "50000",
+        "reward_config_version": "v1.0",
+        "experiment_type": "training"
+      },
+      "completion_metrics": [
+        [
+          "completed_tasks",
+          1,
+          4.0,
+          4.0
+        ],
+        [
+          "task_completion_rate",
+          1,
+          0.8,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "9bf13b048a124d81bcead2d9fcf6f0b3",
+      "experiment_id": 3,
+      "status": "FINISHED",
+      "params": {
+        "project_name": "Autonomous-Warehouse-MARL",
+        "experiment_name": "test_infra_matrix",
+        "algorithm": "QMIX",
+        "number_of_agents": "5",
+        "environment_name": "Warehouse-20x20-v1",
+        "environment_version": "1.0.0",
+        "observation_dim": "50",
+        "action_space": "Discrete(4)",
+        "action_dim": "4",
+        "random_seed": "42",
+        "learning_rate": "0.0005",
+        "gamma": "0.99",
+        "batch_size": "32",
+        "episode_count": "1000",
+        "max_episode_steps": "100",
+        "epsilon_start": "1.0",
+        "epsilon_finish": "0.05",
+        "epsilon_anneal_time": "50000",
+        "reward_config_version": "v1.0",
+        "experiment_type": "training"
+      },
+      "completion_metrics": [
+        [
+          "completed_tasks",
+          1,
+          4.0,
+          4.0
+        ],
+        [
+          "task_completion_rate",
+          1,
+          0.8,
+          0.8
+        ]
+      ]
+    },
+    {
+      "id": "f41cb2184f864a8784208fe5d516f87d",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "IQL",
+        "fleet_size": "5",
+        "episodes": "1",
+        "max_steps": "3",
+        "seed": "423",
+        "collision_penalty": "None",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "100",
+        "resume_from": "None",
+        "output": ".pytest_cache\\project25_tracking_smoke"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "f5d0dd3049644a9da3d490d6ce9511ee",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "QMIX",
+        "fleet_size": "5",
+        "episodes": "1",
+        "max_steps": "34",
+        "seed": "423",
+        "collision_penalty": "None",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "100",
+        "resume_from": "None",
+        "output": ".pytest_cache\\project25_tracking_qmix"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "78a90ed59d254518ab4ec24df9ef6d2b",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "IQL",
+        "fleet_size": "5",
+        "episodes": "1",
+        "max_steps": "34",
+        "seed": "423",
+        "collision_penalty": "None",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "100",
+        "resume_from": "None",
+        "output": ".pytest_cache\\project25_tracking_iql"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "151ca8b619d04f7db5983903460d2223",
+      "experiment_id": 4,
+      "status": "FAILED",
+      "params": {
+        "algorithm": "QMIX",
+        "fleet_size": "5",
+        "episodes": "100",
+        "max_steps": "100",
+        "seed": "251605",
+        "collision_penalty": "None",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "25",
+        "resume_from": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+        "output": "artifacts\\training\\qmix_n5_remediation_v1"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "85b173b15fc94640a5cc6900cd11ae8c",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "QMIX",
+        "fleet_size": "5",
+        "episodes": "100",
+        "max_steps": "100",
+        "seed": "251605",
+        "collision_penalty": "None",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "25",
+        "resume_from": "None",
+        "warm_start_from": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+        "epsilon_start": "0.2",
+        "output": "artifacts\\training\\qmix_n5_remediation_warm"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "6fd0614e4c37432eae027b1db73e368d",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "QMIX",
+        "fleet_size": "20",
+        "episodes": "40",
+        "max_steps": "100",
+        "seed": "252020",
+        "collision_penalty": "-10.0",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "20",
+        "resume_from": "None",
+        "warm_start_from": "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+        "epsilon_start": "0.3",
+        "output": "artifacts\\training\\qmix_n20_remediation_control"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "9b1e427a155145ba88afb727b7009fb5",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "QMIX",
+        "fleet_size": "20",
+        "episodes": "40",
+        "max_steps": "100",
+        "seed": "252020",
+        "collision_penalty": "-1.0",
+        "learning_rate": "0.0001",
+        "target_update_interval": "200",
+        "checkpoint_interval": "20",
+        "resume_from": "None",
+        "warm_start_from": "artifacts\\training\\qmix_n20_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+        "epsilon_start": "0.3",
+        "output": "artifacts\\training\\qmix_n20_remediation_lower_collision"
+      },
+      "completion_metrics": []
+    },
+    {
+      "id": "3c34dbe51255429ca17adbd3ae94e7b2",
+      "experiment_id": 4,
+      "status": "FINISHED",
+      "params": {
+        "algorithm": "QMIX",
+        "fleet_size": "5",
+        "episodes": "40",
+        "max_steps": "100",
+        "seed": "253505",
+        "collision_penalty": "None",
+        "learning_rate": "2e-05",
+        "target_update_interval": "200",
+        "checkpoint_interval": "10",
+        "resume_from": "None",
+        "warm_start_from": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+        "epsilon_start": "0.12",
+        "output": "artifacts\\training\\qmix_n5_remediation_low_lr"
+      },
+      "completion_metrics": []
+    }
+  ],
+  "n5_p2_benchmark_cycle2_identical_episode_queues": 19,
+  "checkpoint_inventory": "checkpoint_inventory.json"
+}

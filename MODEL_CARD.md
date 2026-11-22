@@ -10,7 +10,7 @@
 | Algorithm | QMIX (Rashid et al., 2018) |
 | Framework | PyTorch (custom implementation — no EPyMARL dependency) |
 | Observation encoder | Map-aware local occupancy + BFS path-cost encoder |
-| Observation dim | 456 (45-D local occupancy grid + path costs × 9 directions + robot/task features) |
+| Observation dim | 456 (local occupancy, robot/task features, static map and four path costs) |
 | Action space | Discrete 4 (UP, DOWN, LEFT, RIGHT) |
 | State dim (mixer) | 11 × N (3 robot features + 8 task features per robot) |
 | Supported fleet sizes | N = 5, 10, 20 |
@@ -40,7 +40,7 @@ Intended use cases:
 Input: obs_i ∈ ℝ^456  (per robot i)
 │
 ├── AgentNetwork (shared weights across all robots)
-│   Linear(456→64) → ReLU → Linear(64→4) → Q(s,a)_i
+│   Linear(456→64) → ReLU → Linear(64→64) → ReLU → Linear(64→4) → Q(s,a)_i
 │
 └── QMixer (centralized, state-conditioned)
     state s ∈ ℝ^(11×N)
@@ -50,16 +50,12 @@ Input: obs_i ∈ ℝ^456  (per robot i)
 
 The agent network is **shared** across all robots (parameter efficient, homogeneous fleet). The mixer is **fleet-size dependent** — a N=5 mixer cannot be loaded into a N=10 architecture (enforced by P6 checkpoint validator).
 
-## Performance (Preliminary — Training in Progress)
+## Performance
 
-> [!NOTE]
-> Performance metrics are updated after full training runs complete. The values below reflect the evaluation pipeline and will be populated with actual results.
-
-Target NFRs:
-- **NFR-1**: QMIX ≥80% task-completion rate at N=5 (20 held-out episodes)
-- **NFR-3**: Zero corridor intrusions across 20 safety episodes
-- **NFR-4**: QMIX collision rate ≤50% of IQL at N=10
-- **NFR-5**: Bootstrap 95% CI for all 3 algorithms × 3 fleet sizes
+Each recovered QMIX run completed 1,000 training episodes. Validation selected
+episode 600 for N=5, episode 1,000 for N=10 and episode 200 for N=20.
+The [final evaluation](FINAL_EVALUATION_REPORT.md) reports outcomes on matched
+episodes with distinct task queues and shows the acceptance status of each target.
 
 ## Ethical Considerations
 
@@ -67,7 +63,7 @@ Target NFRs:
 - **Scope**: Software simulation only; no deployment on physical hardware.
 - **Transparency**: All checkpoints include full architecture metadata (Schema V2). Synthetic/untrained checkpoints are explicitly labeled.
 - **Fairness**: QMIX and IQL evaluations use identical task seeds (matched episodes) for fair comparison.
-- **Carbon tracking**: Training energy consumption is tracked via CodeCarbon and a physical AMR energy model.
+- **Carbon tracking**: Optional CodeCarbon tracking and an AMR energy model are available.
 
 ## Limitations
 
@@ -79,11 +75,11 @@ Target NFRs:
 
 ## Checkpoint Versioning
 
-All checkpoints use **Schema Version 2** and include:
+The recovered QMIX checkpoints use **Schema Version 2** and include:
 - Number of agents, observation dim, action dim, state dim
 - Agent and mixer architecture identifiers
 - Training episode count, seed, algorithm config
-- Unique `checkpoint_id` for traceability
+- Artifact hashes in the training and benchmark manifests for traceability
 
 Incompatible checkpoints (wrong N, obs_dim, or action_dim) are **rejected with a clear error** — no silent partial loading.
 

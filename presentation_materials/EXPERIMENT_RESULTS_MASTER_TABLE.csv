@@ -1,0 +1,10 @@
+manifest_id,algorithm,fleet_size,episodes,tasks,completed_tasks,completion_rate,average_completion_time_steps,throughput_tasks_per_100_steps,physical_collision_events,safety_conflict_events,safety_conflict_rate_per_episode,collision_intent_groups_per_episode,mean_episode_reward
+e47ae5704f026c96,IQL,5,20,100,78,78.00%,37.10,5.138,0,693,34.65,17.25,-36.61
+e47ae5704f026c96,IQL,10,20,200,46,23.00%,36.31,2.300,0,1777,88.85,40.65,-70.58
+e47ae5704f026c96,IQL,20,20,400,1,0.25%,45.00,0.050,0,4998,249.90,115.65,-124.52
+e47ae5704f026c96,QMIX,5,20,100,78,78.00%,34.78,5.765,0,22,1.10,1.10,30.56
+e47ae5704f026c96,QMIX,10,20,200,74,37.00%,34.40,3.700,0,43,2.15,2.10,19.61
+e47ae5704f026c96,QMIX,20,20,400,3,0.75%,42.33,0.150,0,155,7.75,7.75,-0.59
+e47ae5704f026c96,Rule-Based,5,20,100,46,46.00%,27.38,3.729,0,5494,274.70,83.85,-827.88
+e47ae5704f026c96,Rule-Based,10,20,200,79,39.50%,29.71,3.950,0,12822,641.10,180.55,-960.19
+e47ae5704f026c96,Rule-Based,20,20,400,55,13.75%,25.08,2.750,0,34522,1726.10,466.20,-968.79

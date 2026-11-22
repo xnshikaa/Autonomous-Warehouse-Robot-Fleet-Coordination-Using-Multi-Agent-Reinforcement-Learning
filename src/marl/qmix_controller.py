@@ -122,13 +122,6 @@ class QMIXController:
             include_static_map=True,
             include_path_costs=True,
         )
-        candidate_learner = QMIXLearner(
-            num_agents=new_fleet_size,
-            observation_dim=candidate_encoder.observation_dim,
-            action_dim=self.ACTION_DIM,
-            state_dim=11 * new_fleet_size,
-        )
-
         candidate_loaded = False
         candidate_id = None
         candidate_meta = None
@@ -150,6 +143,7 @@ class QMIXController:
                 expected_observation_dim=candidate_encoder.observation_dim,
                 expected_action_dim=self.ACTION_DIM,
                 expected_state_dim=11 * new_fleet_size,
+                expected_mixing_hidden_dim=meta.mixing_hidden_dim,
             )
 
             # Validate tensor names and shapes strictly
@@ -159,6 +153,7 @@ class QMIXController:
                 expected_observation_dim=candidate_encoder.observation_dim,
                 expected_action_dim=self.ACTION_DIM,
                 expected_state_dim=11 * new_fleet_size,
+                expected_mixing_hidden_dim=meta.mixing_hidden_dim,
                 require_mixer=True,
             )
 
@@ -169,6 +164,13 @@ class QMIXController:
             if mixer_state is None:
                 raise ValueError("QMIX checkpoint is missing 'mixer'")
 
+            candidate_learner = QMIXLearner(
+                num_agents=new_fleet_size,
+                observation_dim=candidate_encoder.observation_dim,
+                action_dim=self.ACTION_DIM,
+                state_dim=11 * new_fleet_size,
+                mixing_hidden_dim=meta.mixing_hidden_dim,
+            )
             candidate_learner.agent_network.load_state_dict(agent_state, strict=True)
             candidate_learner.mixer.load_state_dict(mixer_state, strict=True)
             candidate_learner.agent_network.eval()
@@ -183,6 +185,13 @@ class QMIXController:
                     f"No trained checkpoint available for fleet size N={new_fleet_size}. "
                     "Provide a compatible checkpoint or permit untrained mode explicitly."
                 )
+
+            candidate_learner = QMIXLearner(
+                num_agents=new_fleet_size,
+                observation_dim=candidate_encoder.observation_dim,
+                action_dim=self.ACTION_DIM,
+                state_dim=11 * new_fleet_size,
+            )
 
         # Verify candidate inference before committing
         verify_controller_inference(

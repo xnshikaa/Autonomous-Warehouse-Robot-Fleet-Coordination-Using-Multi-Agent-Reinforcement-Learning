@@ -12,7 +12,7 @@
 | Action Space | Discrete(4): UP, DOWN, LEFT, RIGHT |
 | Observation Dimension | 456 features (map-aware local occupancy + BFS path costs + robot/task state) |
 | State Dimension | 11 × N features (centralized state for QMIX mixing network) |
-| Split Scheme | Training (seeds 42, 43, 44) vs Evaluation (seed 999, held-out fixed scenarios) |
+| Split Scheme | Training base seeds 42–44, validation seeds 20261120–20261139, frozen evaluation seeds 816597421–816597440 |
 
 ---
 
@@ -20,10 +20,10 @@
 
 The warehouse dataset is generated online during simulation rollouts. Tasks are created by sampling pickup and delivery pairs:
 
-1. **Pickup Positions**: Sampled uniformly from configured storage rack aisles (`layout.walkable_cells` adjacent to shelf obstacles).
-2. **Delivery Positions**: Sampled from dedicated dispatch / conveyor output bays at warehouse boundaries.
-3. **Queue Discipline**: FIFO task queue with dynamic nearest-available assignment.
-4. **Safety Masking**: Human-worker exclusion corridors are strictly off-limits. Any action targeting a corridor cell is masked or intercepted by the hard safety layer.
+1. Pickup and delivery candidates come from opposite halves of the walkable floor.
+2. The generator excludes worker corridors and robot starts. It checks path reachability, travel distances and unique task endpoints.
+3. Each robot starts with one assigned pickup and delivery task in the benchmark.
+4. The action mask excludes static obstacles and worker corridors. The simulator safety layer also resolves simultaneous move conflicts.
 
 ---
 
@@ -33,18 +33,18 @@ The warehouse dataset is generated online during simulation rollouts. Tasks are 
 
 | Feature Group | Dimensions | Description | Range |
 |---|---|---|---|
-| Local Occupancy Grid | 45 | 5×9 local egocentric patch (empty, obstacle, robot, corridor) | [-1.0, 1.0] |
-| BFS Path Cost Estimates | 9 | Shortest path distance to assigned pickup/delivery per direction | [0.0, 1.0] |
-| Robot Internal State | 6 | Normalized (x, y), cargo status (0/1), battery, current task ID | [0.0, 1.0] |
-| Assigned Task Features | 8 | Pickup (x, y), Delivery (x, y), task status, elapsed steps | [0.0, 1.0] |
-| Team Relative Features | 20 | Relative offsets to nearest 5 teammate robots | [-1.0, 1.0] |
-| Global Map Representation | 368 | Downsampled layout and static obstacle feature map | [0.0, 1.0] |
+| Local occupancy | 45 | 3×3 neighborhood with five one-hot categories | [0.0, 1.0] |
+| Task geometry | 3 | Relative row and column offsets and distance | [-1.0, 1.0] |
+| Task and cargo flags | 2 | Task present and carrying cargo | [0.0, 1.0] |
+| Robot position | 2 | Normalized absolute coordinates | [0.0, 1.0] |
+| Static map | 400 | 20×20 floor, shelf and corridor cells | [0.0, 1.0] |
+| BFS path costs | 4 | Remaining path distance after each movement action | [0.0, 1.0] |
 
 ### Centralized Global State Vector (11 × N)
 
 Used exclusively during centralized training by the QMIX hypernetwork mixer:
 - 3 features per robot: (norm_x, norm_y, carrying_cargo)
-- 8 features per active task: pickup (x,y), delivery (x,y), assigned_flag, time_in_queue
+- 8 features per task covering presence, task ID, assignee, pickup and delivery coordinates, and completion.
 
 ---
 
@@ -52,13 +52,10 @@ Used exclusively during centralized training by the QMIX hypernetwork mixer:
 
 To prevent data leakage and ensure rigorous generalization measurement:
 
-- **Training Sets**:
-  - N=5: Seed 42 (1000 episodes, max 100 steps/episode)
-  - N=10: Seed 43 (1000 episodes, max 100 steps/episode)
-  - N=20: Seed 44 (1000 episodes, max 100 steps/episode)
-- **Validation Snapshots**: Periodic evaluation snapshots every 100 episodes on validation seed 20261120.
-- **Sealed Evaluation Scenarios**: 20 held-out evaluation episodes per fleet size using seed 999.
-- **Corridor Safety Gate**: 20 aggressive adversarial test scenarios forcing robots toward human zones.
+- Training covers 1,000 episodes for QMIX and 500 for IQL per fleet, with base seeds 42, 43 and 44 for N=5, 10 and 20.
+- Validation ranks snapshots saved every 100 episodes using 20 matched task queues per fleet.
+- Final evaluation uses 20 different task queues per fleet, frozen after these runs trained and before the evaluation. The earlier seed-999 benchmark is validation evidence.
+- The separate corridor gate tests 20 deliberate attempts to enter human zones.
 
 ---
 

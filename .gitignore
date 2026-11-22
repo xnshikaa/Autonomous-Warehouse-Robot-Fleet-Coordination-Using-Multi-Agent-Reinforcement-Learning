@@ -33,4 +33,11 @@ __pycache__/
 *.pyc
 .pytest_cache/
 artifacts/checkpoints/
+artifacts/training/qmix_n10_v1/qmix.pt
+artifacts/training/qmix_n20_v1/qmix.pt
+artifacts/training/qmix_n20_remediation_control/
+artifacts/training/qmix_n20_remediation_lower_collision/
+artifacts/training/qmix_n5_remediation_warm/
+python_infra/fontlist-*.json
 
+.vercel

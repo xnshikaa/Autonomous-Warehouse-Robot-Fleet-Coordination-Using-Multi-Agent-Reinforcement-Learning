@@ -1,0 +1,238 @@
+{
+  "schema_version": 1,
+  "purpose": "exposed validation checkpoint selection; not final holdout",
+  "algorithm": "QMIX",
+  "fleet_size": 5,
+  "episodes": 10,
+  "max_steps": 100,
+  "seed": 20261120,
+  "selection_order": [
+    "highest completion rate",
+    "lowest mean completed-task delivery time",
+    "fewest blocked conflict groups",
+    "candidate path lexical tie-break"
+  ],
+  "selected_checkpoint": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+  "results": [
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00600\\checkpoint_state.pt": "89d4a600569b92e68dfa888cd0ff081539c0417b30772ff4c15b1ebcf8309fe8"
+      },
+      "completion_rate": 0.7,
+      "completion_rate_95ci": {
+        "estimate": 0.7,
+        "lower": 0.5599999999999999,
+        "upper": 0.8400000000000001,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 34.35666666666667,
+      "mean_episode_delivery_time_steps": 34.35666666666667,
+      "safety_overrides_per_episode": 0.7,
+      "collision_intent_groups_per_episode": 0.7,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00400\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00400\\checkpoint_state.pt": "16803669fd8c6e351966e98fedf0a5ab732b1545c6d0e0e2330484c7bfe924e3"
+      },
+      "completion_rate": 0.66,
+      "completion_rate_95ci": {
+        "estimate": 0.6599999999999999,
+        "lower": 0.5,
+        "upper": 0.82,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 35.06666666666666,
+      "mean_episode_delivery_time_steps": 35.06666666666667,
+      "safety_overrides_per_episode": 6.6,
+      "collision_intent_groups_per_episode": 6.6,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\qmix.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\qmix.pt": "3d3bbb21daba4ad426d138253eca9fc6a561d334b07fdf13cf9e017806407651"
+      },
+      "completion_rate": 0.44,
+      "completion_rate_95ci": {
+        "estimate": 0.44000000000000006,
+        "lower": 0.28,
+        "upper": 0.6000000000000001,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 37.86666666666667,
+      "mean_episode_delivery_time_steps": 37.86666666666667,
+      "safety_overrides_per_episode": 1.3,
+      "collision_intent_groups_per_episode": 1.2,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_01000\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_01000\\checkpoint_state.pt": "40495fe6e7e9fbe5a988815eca55e1b3a5127a47089811c57f0220dcf61c583a"
+      },
+      "completion_rate": 0.44,
+      "completion_rate_95ci": {
+        "estimate": 0.44000000000000006,
+        "lower": 0.28,
+        "upper": 0.6000000000000001,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 37.86666666666667,
+      "mean_episode_delivery_time_steps": 37.86666666666667,
+      "safety_overrides_per_episode": 1.3,
+      "collision_intent_groups_per_episode": 1.2,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00500\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00500\\checkpoint_state.pt": "b5339de9c6d8691d113369c8eb1db806c428d9a230681035f9a5ed8bd95115e9"
+      },
+      "completion_rate": 0.4,
+      "completion_rate_95ci": {
+        "estimate": 0.4,
+        "lower": 0.26,
+        "upper": 0.54,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 37.48148148148148,
+      "mean_episode_delivery_time_steps": 37.48148148148149,
+      "safety_overrides_per_episode": 5.6,
+      "collision_intent_groups_per_episode": 5.6,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00300\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00300\\checkpoint_state.pt": "62afc59eade381652933dee7c284e688975489a0748040da0c81628ed462090b"
+      },
+      "completion_rate": 0.2,
+      "completion_rate_95ci": {
+        "estimate": 0.2,
+        "lower": 0.1,
+        "upper": 0.30000000000000004,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 31.583333333333332,
+      "mean_episode_delivery_time_steps": 31.583333333333332,
+      "safety_overrides_per_episode": 0.6,
+      "collision_intent_groups_per_episode": 0.6,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00900\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00900\\checkpoint_state.pt": "67a743f0a5b06465ceef991ece4d88c07d745ae308001381589e71af2aed508e"
+      },
+      "completion_rate": 0.2,
+      "completion_rate_95ci": {
+        "estimate": 0.20000000000000004,
+        "lower": 0.08,
+        "upper": 0.34,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 35.333333333333336,
+      "mean_episode_delivery_time_steps": 35.333333333333336,
+      "safety_overrides_per_episode": 0.6,
+      "collision_intent_groups_per_episode": 0.5,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00700\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00700\\checkpoint_state.pt": "118c3d597d35b735e114b5a156112c89fa512f3907579e0d74011c0b256f6609"
+      },
+      "completion_rate": 0.18000000000000002,
+      "completion_rate_95ci": {
+        "estimate": 0.18000000000000002,
+        "lower": 0.08,
+        "upper": 0.2800000000000001,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 34.583333333333336,
+      "mean_episode_delivery_time_steps": 34.583333333333336,
+      "safety_overrides_per_episode": 0.4,
+      "collision_intent_groups_per_episode": 0.4,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00200\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00200\\checkpoint_state.pt": "29d53e1ba2a58a089032ea221d731e7c27a32fe44a1995f909e15d1fe86fc136"
+      },
+      "completion_rate": 0.02,
+      "completion_rate_95ci": {
+        "estimate": 0.02,
+        "lower": 0.0,
+        "upper": 0.06000000000000001,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": 28,
+      "mean_episode_delivery_time_steps": 28.0,
+      "safety_overrides_per_episode": 0.0,
+      "collision_intent_groups_per_episode": 0.0,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00100\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00100\\checkpoint_state.pt": "067486b42c2b70daf373876afcabed3f43ef69a5d6e4cc844fe97e46929fb900"
+      },
+      "completion_rate": 0.0,
+      "completion_rate_95ci": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": null,
+      "mean_episode_delivery_time_steps": null,
+      "safety_overrides_per_episode": 0.0,
+      "collision_intent_groups_per_episode": 0.0,
+      "physical_collision_rate_per_episode": 0.0
+    },
+    {
+      "candidate": "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00800\\checkpoint_state.pt",
+      "checkpoint_sha256": {
+        "artifacts\\training\\qmix_n5_v1\\snapshots\\episode_00800\\checkpoint_state.pt": "e30d26f48c689fbd87f1c9248e3f04eb27c9cc9c2c2634269d07523624eddc4f"
+      },
+      "completion_rate": 0.0,
+      "completion_rate_95ci": {
+        "estimate": 0.0,
+        "lower": 0.0,
+        "upper": 0.0,
+        "confidence_level": 0.95,
+        "samples": 10,
+        "resamples": 10000
+      },
+      "average_completion_time_steps": null,
+      "mean_episode_delivery_time_steps": null,
+      "safety_overrides_per_episode": 0.3,
+      "collision_intent_groups_per_episode": 0.3,
+      "physical_collision_rate_per_episode": 0.0
+    }
+  ]
+}

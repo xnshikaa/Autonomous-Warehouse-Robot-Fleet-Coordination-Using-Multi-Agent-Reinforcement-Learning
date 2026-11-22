@@ -59,11 +59,13 @@ class QMIXTrainer:
         checkpoint_interval: int = 10,
         reward_overrides: Optional[Dict[str, float]] = None,
         episode_callback=None,
+        mixing_hidden_dim: int = 32,
     ):
         self.num_agents = num_agents
         self.action_dim = action_dim
         self.learning_rate = learning_rate
         self.gamma = gamma
+        self.mixing_hidden_dim = mixing_hidden_dim
         self.target_update_interval = target_update_interval
         self.max_steps = max_steps
         self.episodes = episodes
@@ -112,6 +114,7 @@ class QMIXTrainer:
             state_dim=self.state_dim,
             learning_rate=learning_rate,
             gamma=gamma,
+            mixing_hidden_dim=mixing_hidden_dim,
             target_update_interval=target_update_interval,
         )
 
@@ -199,6 +202,7 @@ class QMIXTrainer:
             "state_dim": self.state_dim,
             "learning_rate": self.learning_rate,
             "gamma": self.gamma,
+            "mixing_hidden_dim": self.mixing_hidden_dim,
             "batch_size": self.batch_size,
             "target_update_interval": self.target_update_interval,
             "reward_overrides": self.reward_overrides,
@@ -209,7 +213,7 @@ class QMIXTrainer:
             action_dim=self.action_dim,
             state_dim=self.state_dim,
             agent_hidden_dim=64,
-            mixing_hidden_dim=32,
+            mixing_hidden_dim=self.mixing_hidden_dim,
             run_id=self.run_id,
             episode=episode,
             config=config,
@@ -489,6 +493,7 @@ class QMIXTrainer:
             expected_observation_dim=self.observation_dim,
             expected_action_dim=self.action_dim,
             expected_state_dim=self.state_dim,
+            expected_mixing_hidden_dim=self.mixing_hidden_dim,
         )
         validate_checkpoint_tensors(
             payload,
@@ -496,6 +501,7 @@ class QMIXTrainer:
             expected_observation_dim=self.observation_dim,
             expected_action_dim=self.action_dim,
             expected_state_dim=self.state_dim,
+            expected_mixing_hidden_dim=self.mixing_hidden_dim,
             require_mixer=True,
         )
 

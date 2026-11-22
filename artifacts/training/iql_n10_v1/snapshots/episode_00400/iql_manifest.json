@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "algorithm": "IQL",
+  "num_robots": 10,
+  "observation_dim": 456,
+  "action_dim": 4,
+  "include_static_map": true,
+  "include_path_costs": true,
+  "seed": 43,
+  "episodes_completed": 400,
+  "max_steps": 100,
+  "learning_rate": 0.0001,
+  "gamma": 0.99,
+  "epsilon_start": 1.0,
+  "epsilon_end": 0.1,
+  "epsilon_decay": 0.995,
+  "target_update_frequency": 200,
+  "td_loss": "smooth_l1",
+  "gradient_clip_norm": 10.0,
+  "reward_overrides": {}
+}

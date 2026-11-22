@@ -1,0 +1,43 @@
+{
+  "verified_trial_checkpoints_and_traces": 100,
+  "mlflow_score_steps": 100,
+  "mlflow_run_id": "a795b720c8894037961aaac8953b58bb",
+  "confirmation_intervals": {
+    "screening_winner": {
+      "estimate": 0.56,
+      "lower": 0.44000000000000006,
+      "upper": 0.6700000000000002,
+      "confidence_level": 0.95,
+      "samples": 20,
+      "resamples": 10000
+    },
+    "incumbent": {
+      "estimate": 0.6900000000000001,
+      "lower": 0.56,
+      "upper": 0.8099999999999999,
+      "confidence_level": 0.95,
+      "samples": 20,
+      "resamples": 10000
+    }
+  },
+  "paired_confirmation": {
+    "algorithm_a": "screening_winner",
+    "algorithm_b": "incumbent",
+    "fleet_size": 5,
+    "metric": "completion_rate",
+    "difference_a_minus_b": -0.12999999999999998,
+    "paired_bootstrap_ci": {
+      "estimate": -0.12999999999999998,
+      "lower": -0.28,
+      "upper": 0.02000000000000001,
+      "confidence_level": 0.95,
+      "samples": 20,
+      "resamples": 10000
+    },
+    "paired_sign_flip_p_value": 0.14139293035348233,
+    "paired_episodes": 20,
+    "excluded_undefined_pairs": 0,
+    "permutation_samples": 20000
+  },
+  "identical_task_queues_across_splits": 0
+}

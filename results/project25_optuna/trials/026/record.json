@@ -1,0 +1,132 @@
+{
+  "params": {
+    "learning_rate": 0.0009881610207413544,
+    "mixing_hidden_dim": 16,
+    "gamma": 0.9563653247900528,
+    "collision_penalty": -8.680039500101739,
+    "delivery_reward": 16.289286899976755
+  },
+  "metrics": {
+    "algorithm": "qmix",
+    "fleet_size": 5,
+    "episodes": 6,
+    "tasks": 30,
+    "completed_tasks": 4,
+    "completion_rate": 0.13333333333333333,
+    "average_completion_time_steps": 30.833333333333332,
+    "mean_completed_task_makespan_steps": 31.333333333333332,
+    "unfinished_tasks": 26,
+    "collision_events": 0,
+    "collision_rate_per_episode": 0.0,
+    "robot_robot_collision_events": 0,
+    "safety_overrides": 4,
+    "safety_conflict_events": 4,
+    "safety_conflict_rate_per_episode": 0.6666666666666666,
+    "collision_intent_groups": 3,
+    "collision_intent_groups_per_episode": 0.5,
+    "throughput_tasks_per_100_steps": 0.6666666666666666,
+    "task_weighted_completion_rate": 0.13333333333333333,
+    "mean_episode_reward": 10.999999999999975,
+    "score": 3.456916666666667,
+    "training_seed": 254005,
+    "sampler_seed": 254231,
+    "validation_seed": 254105,
+    "manifest_id": "bb278072d0fd9b3d6009d755037b169dd2af03980427daf53070263b0c7fd96a",
+    "training_mean_reward": 7.818683369728499,
+    "training_mean_loss": 0.27035837693558334,
+    "optimizer_updates": 369,
+    "duration_seconds": 8.044437200005632,
+    "checkpoint": "trials/026/checkpoint_state.pt",
+    "checkpoint_sha256": "8fe7f38901037f7e68d28bdfa5ca2a654a62afe5b813513697174dd995845ac4"
+  },
+  "history": [
+    {
+      "episode": 1,
+      "steps": 100,
+      "epsilon": 0.2,
+      "reward": 28.9716831599093,
+      "completed_tasks": 2,
+      "task_completion_rate": 0.4,
+      "collision_or_conflict_count": 4,
+      "safety_override_events": 4,
+      "collision_intent_groups": 2,
+      "team_reward_component_totals": {
+        "step_penalty": -1.0000000000000007,
+        "progress_reward": 30.400000000000006,
+        "delivery_reward": 6.515714759990702,
+        "collision_penalty": -6.944031600081391,
+        "danger_penalty": 0.0,
+        "blocked_action_penalty": 0.0,
+        "total": 28.9716831599093
+      },
+      "throughput": 2.0,
+      "loss": 0.13992008944784384
+    },
+    {
+      "episode": 2,
+      "steps": 100,
+      "epsilon": 0.15000000000000002,
+      "reward": -14.376126400325575,
+      "completed_tasks": 0,
+      "task_completion_rate": 0.0,
+      "collision_or_conflict_count": 16,
+      "safety_override_events": 16,
+      "collision_intent_groups": 9,
+      "team_reward_component_totals": {
+        "step_penalty": -1.0000000000000007,
+        "progress_reward": 14.399999999999991,
+        "delivery_reward": 0.0,
+        "collision_penalty": -27.77612640032556,
+        "danger_penalty": 0.0,
+        "blocked_action_penalty": 0.0,
+        "total": -14.376126400325575
+      },
+      "throughput": 0.0,
+      "loss": 0.2431093428656459
+    },
+    {
+      "episode": 3,
+      "steps": 100,
+      "epsilon": 0.1,
+      "reward": -26.28023700061042,
+      "completed_tasks": 0,
+      "task_completion_rate": 0.0,
+      "collision_or_conflict_count": 30,
+      "safety_override_events": 30,
+      "collision_intent_groups": 17,
+      "team_reward_component_totals": {
+        "step_penalty": -1.0000000000000007,
+        "progress_reward": 26.80000000000002,
+        "delivery_reward": 0.0,
+        "collision_penalty": -52.08023700061042,
+        "danger_penalty": 0.0,
+        "blocked_action_penalty": 0.0,
+        "total": -26.28023700061042
+      },
+      "throughput": 0.0,
+      "loss": 0.33320641674101353
+    },
+    {
+      "episode": 4,
+      "steps": 100,
+      "epsilon": 0.04999999999999999,
+      "reward": 42.95941371994069,
+      "completed_tasks": 4,
+      "task_completion_rate": 0.8,
+      "collision_or_conflict_count": 2,
+      "safety_override_events": 2,
+      "collision_intent_groups": 1,
+      "team_reward_component_totals": {
+        "step_penalty": -1.0000000000000007,
+        "progress_reward": 34.400000000000006,
+        "delivery_reward": 13.031429519981405,
+        "collision_penalty": -3.4720158000406953,
+        "danger_penalty": 0.0,
+        "blocked_action_penalty": 0.0,
+        "total": 42.95941371994069
+      },
+      "throughput": 4.0,
+      "loss": 0.36519765868783
+    }
+  ]
+}
