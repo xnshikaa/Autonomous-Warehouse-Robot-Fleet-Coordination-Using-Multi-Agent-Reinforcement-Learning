@@ -73,6 +73,11 @@ export interface RobotState {
   lastRequestedAction?: Action;
   lastExecutedAction?: ExecutedAction;
   actionOverridden?: boolean;
+  plannedPath?: [number, number][];
+  lastSuccessfulMove?: { from: [number, number]; to: [number, number]; step: number } | null;
+  blockedReason?: string | null;
+  replanning?: boolean;
+  oscillating?: boolean;
 }
 
 export interface TaskState {
@@ -123,7 +128,7 @@ export interface ActionEventTrace {
 export interface SafetyEvent {
   robotId: string;
   currentCell: [number, number];
-  proposedAction: Action;
+  proposedAction: Action | null;
   targetCell: [number, number] | null;
   finalAction: ExecutedAction;
   overridden: boolean;
@@ -154,6 +159,8 @@ export interface WarehouseMetrics {
   episode: number;
   reward?: number | null;
   fps: number | null;
+  pickups?: number;
+  blockedMoves?: number;
   completionRate?: number | null;
   averageDeliveryTimeSteps?: number | null;
   throughputPer100Steps?: number | null;
@@ -179,6 +186,8 @@ export interface ShelfState {
 export interface WarehouseState {
   timestep: number;
   episode: number;
+  streamId?: string;
+  missionSeed?: number;
   /** Present for backend state; local providers may omit it. */
   simulationPaused?: boolean;
   simulationFinished?: boolean;

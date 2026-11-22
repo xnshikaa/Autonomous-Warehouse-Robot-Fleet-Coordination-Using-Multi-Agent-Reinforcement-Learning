@@ -35,8 +35,8 @@ export class ShelfSystem {
   }
 
   private buildInstancedRacks(): void {
-    const rackWidth = CELL_SIZE * 0.85;  // X span
-    const rackDepth = CELL_SIZE * 0.85;  // Z span
+    const rackWidth = CELL_SIZE * 0.80;  // X span (1.6m on 2.0m grid, giving 20cm perimeter buffer)
+    const rackDepth = CELL_SIZE * 0.80;  // Z span
     const rackHeight = 2.4;              // Y height (3 tiers)
     const postRadius = 0.04;
 

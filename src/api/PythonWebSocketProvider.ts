@@ -54,6 +54,10 @@ export class PythonWebSocketProvider {
           if (payload.type === 'command_error') {
             this.update({ pending: false, error: payload.error.message });
           } else if (payload.type === 'state_update' && Array.isArray(payload.robots)) {
+            const previous = this.feed.state;
+            if (previous && payload.streamId === previous.streamId &&
+                (payload.episode < previous.episode ||
+                 (payload.episode === previous.episode && payload.timestep < previous.timestep))) return;
             refreshTimeout();
             this.update({ state: payload, connection: 'live', pending: false });
           }

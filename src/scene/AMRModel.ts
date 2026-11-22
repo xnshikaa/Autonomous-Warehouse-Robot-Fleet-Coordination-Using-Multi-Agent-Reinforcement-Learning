@@ -44,7 +44,7 @@ export class AMRModel {
    */
   private buildChassis(): void {
     // 1. Lower main base chassis frame (Dark metallic charcoal)
-    const baseGeo = new THREE.BoxGeometry(1.1, 0.16, 1.3);
+    const baseGeo = new THREE.BoxGeometry(0.95, 0.16, 1.15);
     const baseMat = new THREE.MeshStandardMaterial({
       color: 0x0f172a,
       metalness: 0.9,
@@ -57,7 +57,7 @@ export class AMRModel {
     this.mesh.add(baseMesh);
 
     // 2. High-Visibility Safety Amber Upper Body Shell (Contrast against dark floor)
-    const coverGeo = new THREE.BoxGeometry(0.96, 0.14, 1.15);
+    const coverGeo = new THREE.BoxGeometry(0.85, 0.14, 1.02);
     const coverMat = new THREE.MeshStandardMaterial({
       color: 0xf59e0b, // Bright Industrial Safety Amber
       metalness: 0.4,
@@ -70,7 +70,7 @@ export class AMRModel {
     this.mesh.add(coverMesh);
 
     // 3. Side Metal Guards & Trim
-    const guardGeo = new THREE.BoxGeometry(1.12, 0.08, 1.0);
+    const guardGeo = new THREE.BoxGeometry(0.98, 0.08, 0.90);
     const guardMat = new THREE.MeshStandardMaterial({
       color: 0x334155,
       metalness: 0.8,
@@ -81,14 +81,14 @@ export class AMRModel {
     this.mesh.add(guardMesh);
 
     // 4. Front Bumper with Black & Yellow Hazard Stripes
-    const bumperGeo = new THREE.BoxGeometry(1.08, 0.10, 0.12);
+    const bumperGeo = new THREE.BoxGeometry(0.94, 0.10, 0.12);
     const bumperMat = new THREE.MeshStandardMaterial({
       color: 0x1e293b,
       metalness: 0.8,
       roughness: 0.3
     });
     const bumperMesh = new THREE.Mesh(bumperGeo, bumperMat);
-    bumperMesh.position.set(0, 0.14, 0.65);
+    bumperMesh.position.set(0, 0.14, 0.58);
     this.mesh.add(bumperMesh);
 
     // 5. Front Directional LED Headlights
@@ -97,24 +97,24 @@ export class AMRModel {
     
     const leftHeadlight = new THREE.Mesh(lightGeo, lightMat);
     leftHeadlight.rotation.x = Math.PI / 2;
-    leftHeadlight.position.set(-0.38, 0.16, 0.70);
+    leftHeadlight.position.set(-0.32, 0.16, 0.62);
     this.mesh.add(leftHeadlight);
 
     const rightHeadlight = new THREE.Mesh(lightGeo, lightMat);
     rightHeadlight.rotation.x = Math.PI / 2;
-    rightHeadlight.position.set(0.38, 0.16, 0.70);
+    rightHeadlight.position.set(0.32, 0.16, 0.62);
     this.mesh.add(rightHeadlight);
 
     // 6. Rear Red Tail Lights
     const tailMat = new THREE.MeshBasicMaterial({ color: 0xef4444 });
     const leftTaillight = new THREE.Mesh(lightGeo, tailMat);
     leftTaillight.rotation.x = Math.PI / 2;
-    leftTaillight.position.set(-0.38, 0.16, -0.66);
+    leftTaillight.position.set(-0.32, 0.16, -0.58);
     this.mesh.add(leftTaillight);
 
     const rightTaillight = new THREE.Mesh(lightGeo, tailMat);
     rightTaillight.rotation.x = Math.PI / 2;
-    rightTaillight.position.set(0.38, 0.16, -0.66);
+    rightTaillight.position.set(0.32, 0.16, -0.58);
     this.mesh.add(rightTaillight);
   }
 
@@ -137,10 +137,10 @@ export class AMRModel {
     });
 
     const wheelPositions = [
-      [-0.52, 0.10, 0.38],
-      [0.52, 0.10, 0.38],
-      [-0.52, 0.10, -0.38],
-      [0.52, 0.10, -0.38]
+      [-0.45, 0.10, 0.32],
+      [0.45, 0.10, 0.32],
+      [-0.45, 0.10, -0.32],
+      [0.45, 0.10, -0.32]
     ];
 
     wheelPositions.forEach(([x, y, z]) => {
@@ -190,7 +190,7 @@ export class AMRModel {
    */
   private buildStatusRing(): void {
     // 1. Ground shadow ring (resting flush on floor at y = 0.02)
-    const ringGeo = new THREE.RingGeometry(0.55, 0.65, 32);
+    const ringGeo = new THREE.RingGeometry(0.50, 0.60, 32);
     this.statusRingMaterial = new THREE.MeshBasicMaterial({
       color: this.statusColors.IDLE,
       side: THREE.DoubleSide,
@@ -204,7 +204,7 @@ export class AMRModel {
     this.mesh.add(this.statusRingMesh);
 
     // 2. Emissive status LED strip around upper chassis cover
-    const bandGeo = new THREE.BoxGeometry(0.98, 0.03, 1.17);
+    const bandGeo = new THREE.BoxGeometry(0.87, 0.03, 1.04);
     this.statusBandMaterial = new THREE.MeshStandardMaterial({
       color: this.statusColors.IDLE,
       emissive: this.statusColors.IDLE,

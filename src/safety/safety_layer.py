@@ -53,7 +53,7 @@ class SafetyOverrideEvent:
 
     robot_id: Any
     current_cell: Cell
-    proposed_action: int
+    proposed_action: int | None
     target_cell: Cell | None
     final_action: int | None
     overridden: bool

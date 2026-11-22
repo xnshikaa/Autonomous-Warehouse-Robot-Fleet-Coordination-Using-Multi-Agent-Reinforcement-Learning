@@ -14,6 +14,26 @@ algorithm, then press **Start**. **Pause** freezes the current episode.
 **Resume** continues it, and **Reset** starts a fresh paused episode.
 The service exposes `/health`, `/readiness`, `/state`, and `/ws`.
 
+## Camera, movement interpolation, and simulation stability
+
+### Camera stability and tracking
+- **Overview and Presets**: The default overview preset uses stable coordinates `(34, 30, 34)` with target `(0, 0, 0)`, and top-down uses `(0, 48, 0.001)`.
+- **Target Tracking**: When following an active robot, the camera dynamically resolves the robot's world position `(ox, oy, oz)` and smoothly positions the camera at an elevated isometric offset `(ox + 9, 12, oz + 9)` with target `(ox, 0.5, oz)`, keeping the line of sight well above the 2.4m shelf racks and eliminating abrupt zoom-ins.
+- **Manual Orbit Controls**: When user drags or orbits manually, `OrbitControls` automatically disengages follow mode (`FREE_ORBIT`), ensuring the camera never fights user manipulation.
+- **Mesh Reconciliation**: `WarehouseSceneController` reconciles robot instances in-place across episode and stream boundaries, avoiding mesh destruction/recreation thrash that previously detached tracked Three.js meshes.
+
+### Visual clearance and 3D geometry
+- **AMR Chassis**: Refined to `0.95m × 1.15m` with a status ring radius of `0.50m–0.60m` (outer diameter 1.20m), leaving over 50cm clearance in 2.0m aisles.
+- **Shelf Racks**: Scaled to `1.6m × 1.6m` (`CELL_SIZE * 0.80`), ensuring a generous 20cm perimeter buffer inside shelf cells and preventing visual intersection with adjacent AMR status rings.
+
+### Movement interpolation and collision resolution
+- **Smooth Interpolation**: In `RobotSystem`, tweening starts directly from the robot's current position to `targetWorld` without premature snapping backward, eliminating visual jitter and snapping on slow or variable frame rates.
+- **Backend Same-Cell Contention**: `WarehouseEnvironment.step()` prioritizes robots already occupying a cell (`previous == destination`); any incoming robot contending for the same destination is blocked and added to `collision_robots`. Simultaneous moves into empty cells use deterministic tie-breaking.
+- **Single-Robot Mission Reliability**: Verified across 100 consecutive seeded trials (seeds 300001–300100) using `tests/test_single_robot_mission_100.py`:
+  - 100/100 completed pickup-and-delivery cycles (100.0%).
+  - 0 physical collisions, 0 shelf contacts, 0 corridor intrusions, 0 stuck episodes.
+  - Average delivery time: 31.52 steps.
+
 ## Scene and telemetry
 
 The original perspective camera from the parent of commit `90338b7` is

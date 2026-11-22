@@ -9,20 +9,22 @@ export class CameraManager {
   public controls: OrbitControls;
   private currentMode: CameraMode = 'OVERVIEW';
   private targetObject: THREE.Object3D | null = null;
+  private readonly followTarget = new THREE.Vector3();
+  private readonly followDelta = new THREE.Vector3();
   private isTransitioning: boolean = false;
 
   // Preset camera positions & targets
   private readonly presets: Record<CameraMode, { pos: THREE.Vector3; target: THREE.Vector3 }> = {
     OVERVIEW: {
-      pos: new THREE.Vector3(WAREHOUSE_WIDTH * 0.95, WAREHOUSE_WIDTH * 0.85, WAREHOUSE_WIDTH * 0.95),
+      pos: new THREE.Vector3(34, 30, 34),
       target: new THREE.Vector3(0, 0, 0)
     },
     TOP_DOWN: {
-      pos: new THREE.Vector3(0, WAREHOUSE_WIDTH * 1.2, 0.001), // Slight offset to prevent gimbal lock
+      pos: new THREE.Vector3(0, 48, 0.001), // Slight offset to prevent gimbal lock
       target: new THREE.Vector3(0, 0, 0)
     },
     ROBOT_FOLLOW: {
-      pos: new THREE.Vector3(5, 6, 8),
+      pos: new THREE.Vector3(12, 14, 12),
       target: new THREE.Vector3(0, 0.5, 0)
     },
     TASK_FOLLOW: {
@@ -42,9 +44,14 @@ export class CameraManager {
     this.controls = new OrbitControls(this.camera, container);
     this.controls.enableDamping = true;
     this.controls.dampingFactor = 0.05;
-    this.controls.maxPolarAngle = Math.PI / 2 - 0.02; // Prevent camera clipping below floor
-    this.controls.minDistance = 5;
-    this.controls.maxDistance = 120;
+    this.controls.maxPolarAngle = Math.PI / 2 - 0.05; // Prevent camera clipping below floor
+    this.controls.minDistance = 8;
+    this.controls.maxDistance = 75;
+
+    // Disengage follow mode if user manually interacts with controls
+    this.controls.addEventListener('start', () => {
+      this.stopFollowing();
+    });
 
     // Apply default overview preset
     this.setCameraMode('OVERVIEW', false);
@@ -92,9 +99,29 @@ export class CameraManager {
     this.animateCameraTo(desiredPos, targetPos, 1.0);
   }
 
-  public trackObject(object: THREE.Object3D): void {
+  public trackObject(object: THREE.Object3D, animate: boolean = true): void {
     this.targetObject = object;
     this.currentMode = 'ROBOT_FOLLOW';
+
+    const objPos = new THREE.Vector3();
+    object.getWorldPosition(objPos);
+    const targetPos = new THREE.Vector3(objPos.x, 0.5, objPos.z);
+    const cameraPos = new THREE.Vector3(objPos.x + 9, 12, objPos.z + 9);
+
+    if (animate) {
+      this.animateCameraTo(cameraPos, targetPos, 0.8);
+    } else {
+      this.camera.position.copy(cameraPos);
+      this.controls.target.copy(targetPos);
+      this.controls.update();
+    }
+  }
+
+  public stopFollowing(): void {
+    if (this.currentMode === 'ROBOT_FOLLOW') {
+      this.targetObject = null;
+      this.currentMode = 'FREE_ORBIT';
+    }
   }
 
   public dispose(): void {
@@ -103,18 +130,18 @@ export class CameraManager {
     this.controls.dispose();
   }
 
-  public update(): void {
+  public update(deltaSeconds = 1 / 60): void {
     if (this.currentMode === 'ROBOT_FOLLOW' && this.targetObject && !this.isTransitioning) {
-      const objPos = this.targetObject.position;
-      const currentTarget = this.controls.target;
-
-      // Smoothly follow target position without jarring
-      currentTarget.lerp(new THREE.Vector3(objPos.x, objPos.y + 0.6, objPos.z), 0.1);
-
-      // Maintain camera relative offset
-      const offset = new THREE.Vector3(6, 8, 10);
-      const desiredCamPos = currentTarget.clone().add(offset);
-      this.camera.position.lerp(desiredCamPos, 0.08);
+      if (!this.targetObject.parent) {
+        this.stopFollowing();
+      } else {
+        this.targetObject.getWorldPosition(this.followTarget);
+        this.followTarget.y = 0.5;
+        this.followDelta.copy(this.followTarget).sub(this.controls.target)
+          .multiplyScalar(1 - Math.exp(-3 * Math.min(deltaSeconds, 0.1)));
+        this.controls.target.add(this.followDelta);
+        this.camera.position.add(this.followDelta);
+      }
     }
 
     this.controls.update();

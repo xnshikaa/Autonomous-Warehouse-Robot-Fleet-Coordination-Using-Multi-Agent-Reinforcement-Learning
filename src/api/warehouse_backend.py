@@ -11,9 +11,11 @@ from collections import deque
 from pathlib import Path
 from random import Random
 from typing import Any, Callable
+from uuid import uuid4
 
-from src.ai.baselines.rule_based import RuleBasedController
 from src.ai.environment import WarehouseEnvironment
+from src.ai.live_navigation import WarehouseNavigator
+from src.ai.single_robot_mission import MISSION_SEED, queue_mission
 from src.evaluation.metrics import infer_robot_robot_collisions
 from src.evaluation.trace_generator import _iql_provider
 from src.marl.environment_adapter import MARLEnvironmentAdapter
@@ -113,7 +115,7 @@ def _process_command_message(
         elif command_type == "set_fleet_size":
             new_size = command["size"]
             if configure is not None:
-                configure(new_size, str(policy_getter()["source"]))
+                configure(new_size, "Rule-Based" if new_size == 1 else str(policy_getter()["source"]))
             else:
                 environment.get_active_layout().validate(required_robots=new_size)
                 if qmix_controller is not None:
@@ -339,10 +341,12 @@ def create_app(
                  "rule-based": "Rule-Based", "demo": "Rule-Based"}.get(policy_source.lower().strip())
     if requested is None:
         raise ValueError("Choose auto, qmix, iql, or rule-based.")
-    env = environment or WarehouseEnvironment()
+    env = environment or WarehouseEnvironment(conservative_motion=True)
+    env.conservative_motion = True
     env.reset()
     adapter = MARLEnvironmentAdapter(environment=env)
     app = FastAPI(title="Warehouse Environment Backend")
+    stream_id = uuid4().hex
     initial_size = env.num_robots
     initial_qmix = checkpoint_path or os.environ.get("QMIX_CHECKPOINT")
     active_policy = {}
@@ -354,12 +358,19 @@ def create_app(
     physical_contacts = 0
     recent_collisions = []
     finished = False
+    navigator: WarehouseNavigator | None = None
+    pickup_steps = {}
+    successful_moves = {}
+    mission_seed = MISSION_SEED - 1
 
     def configure(size: int, algorithm: str) -> None:
-        nonlocal active_policy, action_provider
-        if size not in FLEET_SIZES:
-            raise ValueError("Choose a fleet size of 5, 10, or 20.")
+        nonlocal active_policy, action_provider, navigator
+        if size not in (1, *FLEET_SIZES):
+            raise ValueError("Choose a fleet size of 1, 5, 10, or 20.")
+        if size == 1 and algorithm != "Rule-Based":
+            raise ValueError("The single-robot mission uses the Rule-Based navigator.")
         env.get_active_layout().validate(required_robots=size)
+        candidate_navigator = None
         if algorithm == "QMIX":
             path = (initial_qmix if size == initial_size else None) or os.environ.get(f"QMIX_CHECKPOINT_N{size}")
             if not path:
@@ -386,13 +397,15 @@ def create_app(
             telemetry = {"source": algorithm, "checkpointLoaded": True, "trained": True,
                          "checkpointPath": str(directory), "checkpointId": directory.name}
         else:
-            candidate_provider = RuleBasedController(env).get_actions
+            candidate_navigator = WarehouseNavigator(env)
+            candidate_provider = candidate_navigator.get_actions
             telemetry = {"source": algorithm, "checkpointLoaded": False, "trained": False,
                          "checkpointPath": None}
         if active_policy:
             env.set_num_robots(size)
         active_policy = {**telemetry, "activeFleetSize": size}
         action_provider = candidate_provider
+        navigator = candidate_navigator
         app.state.policy_source = algorithm
 
     startup_error = None
@@ -415,14 +428,23 @@ def create_app(
 
     def refresh_episode() -> None:
         nonlocal episode, travelled, delivery_steps, conflict_events, physical_contacts, recent_collisions, finished
+        nonlocal pickup_steps, successful_moves, mission_seed
         if episode != env.episode:
             episode = env.episode
-            if environment is None:
+            if env.num_robots == 1 and not env.tasks:
+                mission_seed += 1
+                queue_mission(env, mission_seed)
+            elif environment is None:
                 tasks = generate_task_assignments(env, Random(300_000 + env.episode))
                 for task in tasks:
                     env.add_task(task.task_id, task.pickup_position, task.delivery_position, task.assigned_robot)
             travelled = {robot.robot_id: deque([robot.position], maxlen=32) for robot in env.robots}
             delivery_steps = {}
+            pickup_steps = {}
+            successful_moves = {}
+            if navigator is not None:
+                navigator.routes.clear()
+                navigator.waiting.clear()
             conflict_events = 0
             physical_contacts = 0
             recent_collisions = []
@@ -434,11 +456,14 @@ def create_app(
         previous = {robot.robot_id: robot.position for robot in env.robots}
         _, _, finished, _ = adapter.step(action_provider())
         positions = {robot.robot_id: robot.position for robot in env.robots}
+        step = env.episode_manager.current_step
         for robot_id, position in positions.items():
             if position != previous[robot_id]:
                 travelled[robot_id].append(position)
-        step = env.episode_manager.current_step
+                successful_moves[robot_id] = {"from": previous[robot_id], "to": position, "step": step}
         for task in env.tasks:
+            if task.assigned_robot is not None and (task.completed or env.robots[task.assigned_robot].carrying_item):
+                pickup_steps.setdefault(task.task_id, step)
             if task.completed:
                 delivery_steps.setdefault(task.task_id, step)
         conflict_events += sum(event.reason == "robot_collision" for event in env.get_safety_events())
@@ -456,8 +481,25 @@ def create_app(
         payload = build_state_payload(env, current_policy(), simulation_delay, speed_multiplier,
                                       simulation_paused, trajectories=travelled)
         payload["simulationFinished"] = finished
+        payload["streamId"] = stream_id
         payload["startupWarning"] = startup_error
         payload["recentCollisions"] = recent_collisions
+        if env.num_robots == 1:
+            payload["missionSeed"] = mission_seed
+        for task, record in zip(env.tasks, payload["tasks"], strict=True):
+            record["pickupTimestep"] = pickup_steps.get(task.task_id)
+            record["completedTimestep"] = delivery_steps.get(task.task_id)
+        for robot, record in zip(env.robots, payload["robots"], strict=True):
+            record["lastSuccessfulMove"] = successful_moves.get(robot.robot_id)
+            record["blockedReason"] = robot.blocked_reason
+            history = list(travelled[robot.robot_id])[-4:]
+            record["oscillating"] = len(history) == 4 and history[0] == history[2] and history[1] == history[3]
+            if navigator is not None and env._get_robot_task(robot.robot_id) is not None:
+                route = navigator.routes.get(robot.robot_id, [])
+                record["plannedPath"] = route[route.index(robot.position):] if robot.position in route else []
+                record["replanning"] = robot.robot_id in navigator.waiting
+            if finished and env._get_robot_task(robot.robot_id) is None:
+                record["status"] = "IDLE"
         metrics = payload["metrics"]
         step = env.episode_manager.current_step
         metrics.update({
@@ -468,7 +510,10 @@ def create_app(
             "physicalCollisions": physical_contacts,
             "totalCollisions": physical_contacts,
             "collisionCount": physical_contacts,
-            "idleRobots": sum(robot.last_executed_action is None for robot in env.robots),
+            "idleRobots": sum(robot.last_executed_action is None or
+                              (finished and env._get_robot_task(robot.robot_id) is None) for robot in env.robots),
+            "blockedMoves": env.safety_overrides,
+            "pickups": len(pickup_steps),
         })
         return payload
 

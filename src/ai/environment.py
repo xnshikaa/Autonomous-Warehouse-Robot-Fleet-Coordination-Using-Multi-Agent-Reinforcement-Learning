@@ -29,7 +29,8 @@ class WarehouseEnvironment:
     def __init__(self, num_robots: int = 5, max_steps: int = 100, *, layout_id: str | None = None,
                  layout_library: LayoutLibrary | None = None, load_layout_tasks: bool = False,
                  logger: Any | None = None,
-                 reward_overrides: Mapping[str, float] | None = None):
+                 reward_overrides: Mapping[str, float] | None = None,
+                 conservative_motion: bool = False):
         if isinstance(num_robots, bool) or num_robots <= 0:
             raise ValueError("num_robots must be greater than zero.")
         if isinstance(max_steps, bool) or max_steps <= 0:
@@ -37,6 +38,7 @@ class WarehouseEnvironment:
         self.num_robots, self.max_steps = num_robots, max_steps
         self.layout_library = layout_library or get_default_layout_library()
         self.load_layout_tasks = load_layout_tasks
+        self.conservative_motion = conservative_motion
         self.logger = logger or get_logger("warehouse_safety")
         self.robots: List[RobotState] = []
         self.tasks: List[TaskState] = []
@@ -125,7 +127,7 @@ class WarehouseEnvironment:
         return self._active_layout.task_locations
 
     # Lifecycle -----------------------------------------------------------------
-    def reset(self):
+    def reset(self, *, seed: int | None = None):
         self._active_layout.validate(required_robots=self.num_robots)
         self.robots = [RobotState(i, self._active_layout.robot_starts[i]) for i in range(self.num_robots)]
         for robot in self.robots:
@@ -274,12 +276,14 @@ class WarehouseEnvironment:
                                    event.target_cell, None, True, reason,
                                    event.episode, event.timestep)
 
-    def step(self, actions: Dict[int, int]):
+    def step(self, actions: Dict[int, int | None]):
         if len(actions) != self.num_robots:
             raise ValueError(f"Expected {self.num_robots} actions, received {len(actions)}.")
         for robot_id, action in actions.items():
-            if not isinstance(robot_id, int) or robot_id < 0 or robot_id >= self.num_robots:
+            if type(robot_id) is not int or robot_id < 0 or robot_id >= self.num_robots:
                 raise ValueError(f"Invalid robot id: {robot_id}")
+            if action is None and self.conservative_motion:
+                continue
             if isinstance(action, bool) or action not in self.ACTIONS:
                 raise ValueError(f"Invalid action: {action}")
         previous = {robot.robot_id: robot.position for robot in self.robots}
@@ -297,7 +301,15 @@ class WarehouseEnvironment:
         danger = {robot.robot_id: False for robot in self.robots}
         blocked_motion = {robot.robot_id: False for robot in self.robots}
         for robot in self.robots:
-            decision = self.safety_layer.check_action(robot, actions[robot.robot_id])
+            action = actions[robot.robot_id]
+            if action is None:
+                safe_actions[robot.robot_id] = None
+                self._last_safety_events.append(SafetyOverrideEvent(
+                    robot.robot_id, robot.position, None, None, None, False, None,
+                    self.episode, self.episode_manager.current_step,
+                ))
+                continue
+            decision = self.safety_layer.check_action(robot, action)
             event = SafetyOverrideEvent.from_decision(
                 decision,
                 episode=self.episode,
@@ -321,16 +333,40 @@ class WarehouseEnvironment:
                     else self._get_next_position(robot, safe_actions[robot.robot_id]) for robot in self.robots}
         target_map: dict[Cell, list[int]] = {}
         for robot_id, position in proposed.items():
-            target_map.setdefault(position, []).append(robot_id)
+            if not self.conservative_motion or safe_actions[robot_id] is not None:
+                target_map.setdefault(position, []).append(robot_id)
         # Resolve same-cell contention deterministically: one robot may claim
         # a free destination while the others wait. Freezing every contender
         # made a single conflict a persistent deadlock for the whole group.
-        collision_robots = {
-            robot_id
-            for ids in target_map.values() if len(ids) > 1
-            for robot_id in sorted(ids)[1:]
-        }
-        conflict_groups = [set(ids) for ids in target_map.values() if len(ids) > 1]
+        collision_robots: set[int] = set()
+        conflict_groups: list[set[int]] = []
+        for cell, ids in target_map.items():
+            if len(ids) > 1:
+                conflict_groups.append(set(ids))
+                # Check if any robot was already occupying this cell
+                stationary_occupants = [rid for rid in ids if previous.get(rid) == cell]
+                if stationary_occupants:
+                    # The stationary occupant holds the cell; all incoming contenders are blocked
+                    for rid in ids:
+                        if rid not in stationary_occupants:
+                            collision_robots.add(rid)
+                    # If multiple stationary occupants, tie-break by lowest id
+                    for rid in sorted(stationary_occupants)[1:]:
+                        collision_robots.add(rid)
+                else:
+                    # All contenders are moving into an empty cell: lowest ID claims it
+                    sorted_ids = sorted(ids)
+                    for rid in sorted_ids[1:]:
+                        collision_robots.add(rid)
+        if self.conservative_motion:
+            # Reserve every starting cell for the full tick so simultaneous
+            # motion cannot cross or approach a robot leaving that cell.
+            occupants = {position: robot_id for robot_id, position in previous.items()}
+            for robot_id, destination in proposed.items():
+                owner = occupants.get(destination)
+                if owner is not None and owner != robot_id:
+                    collision_robots.add(robot_id)
+                    conflict_groups.append({robot_id, owner})
         for index, a in enumerate(self.robots):
             for b in self.robots[index + 1:]:
                 if (proposed[a.robot_id] == previous[b.robot_id] and proposed[b.robot_id] == previous[a.robot_id]

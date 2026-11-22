@@ -6,10 +6,7 @@ import { RobotState } from '../types/warehouse';
 import { gridToWorld } from './gridConfig';
 
 interface RobotAnimationState {
-  currentPos: THREE.Vector3;
   targetPos: THREE.Vector3;
-  currentRotation: number;
-  targetRotation: number;
   tweenPos?: gsap.core.Tween;
   tweenRot?: gsap.core.Tween;
 }
@@ -29,7 +26,7 @@ export class RobotSystem {
   /**
    * Syncs state array and animates positional/rotational transitions smoothly
    */
-  public updateRobots(states: RobotState[], moveDurationSec: number = 0.8): void {
+  public updateRobots(states: RobotState[], moveDurationSec: number = 0.8, resync = false): void {
     const activeIds = new Set<string>();
 
     states.forEach(state => {
@@ -50,57 +47,39 @@ export class RobotSystem {
         amr.mesh.rotation.y = renderRotation;
 
         anim = {
-          currentPos: targetWorld.clone(),
           targetPos: targetWorld.clone(),
-          currentRotation: renderRotation,
-          targetRotation: renderRotation
         };
         this.animMap.set(state.id, anim);
-      } else {
-        // Smooth positional transition if target changed
-        if (!anim.targetPos.equals(targetWorld)) {
-          // Calculate heading angle towards target cell
-          const dx = targetWorld.x - anim.currentPos.x;
-          const dz = targetWorld.z - anim.currentPos.z;
-
-          if (Math.abs(dx) > 0.01 || Math.abs(dz) > 0.01) {
-            // Three.js angle facing forward along Z
-            let headingAngle = Math.atan2(dx, dz);
-            
-            // Shortest rotational path (prevent 360 spin bug when wrapping PI)
-            let diff = headingAngle - anim.currentRotation;
-            while (diff < -Math.PI) diff += Math.PI * 2;
-            while (diff > Math.PI) diff -= Math.PI * 2;
-            const finalRot = anim.currentRotation + diff;
-
-            anim.targetRotation = finalRot;
-
-            // Kill active rotation tween & animate turning
-            if (anim.tweenRot) anim.tweenRot.kill();
-            anim.tweenRot = gsap.to(amr.mesh.rotation, {
-              y: finalRot,
-              duration: moveDurationSec * 0.35,
-              ease: 'power2.inOut',
-              onUpdate: () => {
-                anim!.currentRotation = amr!.mesh.rotation.y;
-              }
-            });
+      } else if (!anim.targetPos.equals(targetWorld)) {
+        const dx = targetWorld.x - anim.targetPos.x;
+        const dz = targetWorld.z - anim.targetPos.z;
+        anim.tweenPos?.kill();
+        anim.tweenRot?.kill();
+        if (resync || (dx !== 0 && dz !== 0)) {
+          // A missed multi-agent frame cannot safely interpolate a shortcut.
+          amr.mesh.position.copy(targetWorld);
+          const movement = state.lastSuccessfulMove;
+          if (movement) {
+            amr.mesh.rotation.y = Math.atan2(movement.to[0] - movement.from[0], movement.to[1] - movement.from[1]);
           }
-
-          anim.targetPos.copy(targetWorld);
-
-          // Kill active position tween & animate movement
-          if (anim.tweenPos) anim.tweenPos.kill();
+        } else {
+          // Tween directly from current mesh position to targetWorld to prevent backward snapping jitter
+          const heading = Math.atan2(dx, dz);
+          const delta = heading - amr.mesh.rotation.y;
+          const shortestTurn = Math.atan2(Math.sin(delta), Math.cos(delta));
+          anim.tweenRot = gsap.to(amr.mesh.rotation, {
+            y: amr.mesh.rotation.y + shortestTurn,
+            duration: Math.max(0.12, moveDurationSec * 0.35),
+            ease: 'power2.inOut',
+          });
           anim.tweenPos = gsap.to(amr.mesh.position, {
             x: targetWorld.x,
             z: targetWorld.z,
-            duration: moveDurationSec,
+            duration: Math.max(0.2, moveDurationSec),
             ease: 'power1.inOut',
-            onUpdate: () => {
-              anim!.currentPos.copy(amr!.mesh.position);
-            }
           });
         }
+        anim.targetPos.copy(targetWorld);
       }
 
       amr.setStatus(state.status);

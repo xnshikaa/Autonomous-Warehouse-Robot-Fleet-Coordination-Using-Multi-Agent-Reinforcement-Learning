@@ -28,6 +28,8 @@ export class WarehouseSceneController {
   private resizeObserver: ResizeObserver;
   private layoutSignature = '';
   private episode: number | undefined;
+  private streamId: string | undefined;
+  private timestep = 0;
   private animationFrameId: number | null = null;
   private lastTime: number = performance.now();
   private fpsCounter: number = 60;
@@ -93,14 +95,18 @@ export class WarehouseSceneController {
       this.shelfSystem.updateLayout(state.shelves);
       this.zoneSystem.updateCorridor(cells);
     }
-    if (this.episode !== state.episode) {
+    if (this.episode !== state.episode || this.streamId !== state.streamId) {
+      this.cameraManager.stopFollowing();
       this.episode = state.episode;
-      this.robotSystem.updateRobots([]);
+      this.streamId = state.streamId;
+      this.timestep = state.timestep;
       this.taskSystem.updateTasks([]);
     }
     const interval = state.config.updateIntervalSeconds;
     const moveDuration = interval === undefined ? 0.4 : Math.max(0.02, interval * 0.9);
-    this.robotSystem.updateRobots(state.robots, moveDuration);
+    const missedTick = state.timestep > this.timestep + 1;
+    this.timestep = state.timestep;
+    this.robotSystem.updateRobots(state.robots, moveDuration, missedTick);
     this.pathSystem.updatePaths(state.robots);
     this.taskSystem.updateTasks(state.tasks);
     this.safetySystem.updateCollisions(state.recentCollisions);
@@ -117,6 +123,14 @@ export class WarehouseSceneController {
       this.cameraManager.trackObject(mesh);
       this.pathSystem.setSelectedRobot(robotId);
     }
+  }
+
+  public stopFollowing(): void {
+    this.cameraManager.stopFollowing();
+  }
+
+  public resetCamera(): void {
+    this.cameraManager.setCameraMode('OVERVIEW');
   }
 
   private onPointerDown = (event: MouseEvent): void => {
@@ -205,7 +219,7 @@ export class WarehouseSceneController {
     this.robotSystem.update(delta);
     this.pathSystem.update(delta);
     this.taskSystem.update(delta);
-    this.cameraManager.update();
+    this.cameraManager.update(delta);
 
     this.renderer.render(this.scene, this.cameraManager.camera);
   };
