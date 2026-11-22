@@ -39,3 +39,14 @@
 .robot-details div { display:flex; justify-content:space-between; gap:.5rem; }
 .robot-details dd { margin:0; }
 @media(max-width:900px) { .control-layout { grid-template-columns:1fr; } .warehouse-viewport { height:60vh; min-height:370px; } .control-header { align-items:flex-start; flex-direction:column; } }
+
+/* Demo mode banner */
+.demo-banner {
+  background: linear-gradient(90deg, #0d2a3a 0%, #0a1f2e 100%);
+  border-bottom: 1px solid #1e4060;
+  color: #8be8c3;
+  font-size: .84rem;
+  padding: .45rem 1.2rem;
+  letter-spacing: .01em;
+}
+.demo-banner strong { color: #edf4f0; }

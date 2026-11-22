@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: marl-warehouse-backend
+    runtime: python
+    region: singapore          # closest to India; change to ohio/frankfurt if preferred
+    plan: free
+    buildCommand: pip install -r requirements-backend.txt
+    startCommand: uvicorn render_backend:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHONPATH
+        value: .
+      - key: PYTHONUNBUFFERED
+        value: "1"
+      # Optional: set these in Render Dashboard → Environment to enable QMIX/IQL
+      # - key: QMIX_CHECKPOINT_N5
+      #   value: /path/to/qmix_n5.pt
